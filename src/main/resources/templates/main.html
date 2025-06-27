@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Asterisk ARI Dashboard</title>
+  <style>
+    /* --- ფერები --- */
+    :root {
+      --blue-light: #cce7ff;
+      --blue-main: #007acc;
+      --yellow-main: #ffcc00;
+      --gray-dark: #333;
+      --gray-light: #f5f7fa;
+      --white: #fff;
+    }
+
+    /* --- Reset და ტიპოგრაფია --- */
+    * {
+      box-sizing: border-box;
+    }
+    body {
+      margin: 0; padding: 0;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background-color: var(--gray-light);
+      color: var(--gray-dark);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    header {
+      background: var(--blue-main);
+      color: var(--white);
+      padding: 1rem 2rem;
+      font-size: 1.8rem;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      box-shadow: 0 4px 6px rgb(0 0 0 / 0.1);
+    }
+
+    /* --- ნავიგაცია --- */
+    nav {
+      display: flex;
+      gap: 1rem;
+    }
+    nav > .dropdown {
+      position: relative;
+    }
+    nav > button, nav > .dropdown > button {
+      background: var(--blue-light);
+      border: none;
+      color: var(--blue-main);
+      padding: 0.5rem 1rem;
+      font-weight: 600;
+      border-radius: 4px;
+      cursor: pointer;
+      transition: background 0.3s ease;
+      min-width: 120px;
+      text-align: center;
+    }
+    nav > button:hover, nav > .dropdown > button:hover {
+      background: var(--yellow-main);
+      color: var(--gray-dark);
+    }
+
+    /* --- ჩამოშლადი მენიუ --- */
+    .dropdown-content {
+      display: none;
+      position: absolute;
+      top: 2.6rem;
+      left: 0;
+      background-color: var(--white);
+      min-width: 180px;
+      box-shadow: 0 4px 8px rgb(0 0 0 / 0.15);
+      border-radius: 4px;
+      z-index: 1000;
+    }
+    .dropdown-content button {
+      width: 100%;
+      padding: 0.5rem 1rem;
+      background: none;
+      border: none;
+      color: var(--blue-main);
+      text-align: left;
+      cursor: pointer;
+      font-weight: 500;
+      transition: background 0.2s ease;
+    }
+    .dropdown-content button:hover {
+      background: var(--yellow-main);
+      color: var(--gray-dark);
+    }
+
+    .dropdown:hover .dropdown-content {
+      display: block;
+    }
+
+    /* --- მთავარი კონტენტი --- */
+    main {
+      flex: 1;
+      padding: 2rem;
+      max-width: 1200px;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 1.5rem;
+    }
+
+    .card {
+      background: var(--white);
+      border-radius: 8px;
+      padding: 1.5rem;
+      box-shadow: 0 4px 8px rgb(0 0 0 / 0.1);
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      transition: box-shadow 0.3s ease;
+      cursor: pointer;
+      user-select: none;
+    }
+    .card:hover {
+      box-shadow: 0 8px 16px rgb(0 0 0 / 0.15);
+      background: var(--blue-light);
+      color: var(--blue-main);
+    }
+
+    .card h2 {
+      margin: 0 0 0.5rem 0;
+      font-size: 1.4rem;
+    }
+    .card p {
+      margin: 0;
+      font-size: 1rem;
+      color: var(--gray-dark);
+      text-align: center;
+    }
+
+    /* --- Footer --- */
+    footer {
+      text-align: center;
+      padding: 1rem 0;
+      background: var(--blue-main);
+      color: var(--white);
+      font-size: 0.9rem;
+      user-select: none;
+    }
+
+    /* --- Responsive --- */
+    @media (max-width: 600px) {
+      header {
+        font-size: 1.3rem;
+        flex-direction: column;
+        gap: 0.7rem;
+      }
+      nav {
+        flex-wrap: wrap;
+        justify-content: center;
+      }
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <div>Asterisk ARI Dashboard</div>
+  <nav>
+    <button onclick="location.href='/api/call/originate?endpoint=SIP/1001&extension=2001'">Originate Call</button>
+
+    <div class="dropdown">
+      <button>Users &#x25BE;</button>
+      <div class="dropdown-content">
+        <button onclick="alert('Users List - implement API')">List Users</button>
+        <button onclick="alert('Add User - implement API')">Add User</button>
+      </div>
+    </div>
+
+    <div class="dropdown">
+      <button>CDR &#x25BE;</button>
+      <div class="dropdown-content">
+        <button onclick="alert('View Call Records - implement API')">View Records</button>
+        <button onclick="alert('Export CDR - implement API')">Export CDR</button>
+      </div>
+    </div>
+
+    <div class="dropdown">
+      <button>ARI Events &#x25BE;</button>
+      <div class="dropdown-content">
+        <button onclick="alert('Connect to ARI Events - implement WebSocket')">Connect Events</button>
+      </div>
+    </div>
+  </nav>
+</header>
+
+<main>
+  <div class="card" onclick="alert('Initiate Call Function')">
+    <h2>Make Call</h2>
+    <p>Initiate a new call via ARI</p>
+  </div>
+
+  <div class="card" onclick="alert('View Users')">
+    <h2>Manage Users</h2>
+    <p>Add, remove or edit SIP users</p>
+  </div>
+
+  <div class="card" onclick="alert('View Call Records')">
+    <h2>Call Records</h2>
+    <p>View and export CDR</p>
+  </div>
+
+  <div class="card" onclick="alert('Monitor ARI Events')">
+    <h2>ARI Events</h2>
+    <p>Live monitor ARI websocket events</p>
+  </div>
+</main>
+
+<footer>
+  &copy; 2025 Jaba's Asterisk ARI Manager
+</footer>
+
+</body>
+</html>
