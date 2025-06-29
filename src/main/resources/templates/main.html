@@ -1,11 +1,11 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
+
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Asterisk ARI Dashboard</title>
+  <title>Asterisk PBX Dashboard</title>
   <style>
-    /* --- ფერები --- */
     :root {
       --blue-light: #cce7ff;
       --blue-main: #007acc;
@@ -15,211 +15,269 @@
       --white: #fff;
     }
 
-    /* --- Reset და ტიპოგრაფია --- */
     * {
       box-sizing: border-box;
     }
+
     body {
-      margin: 0; padding: 0;
+      margin: 0;
       font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
       background-color: var(--gray-light);
       color: var(--gray-dark);
-      min-height: 100vh;
       display: flex;
-      flex-direction: column;
+      height: 100vh;
     }
 
-    header {
+    aside {
+      width: 260px;
       background: var(--blue-main);
       color: var(--white);
-      padding: 1rem 2rem;
-      font-size: 1.8rem;
-      font-weight: 700;
       display: flex;
-      align-items: center;
-      justify-content: space-between;
-      box-shadow: 0 4px 6px rgb(0 0 0 / 0.1);
+      flex-direction: column;
+      padding: 1rem;
+      box-shadow: 2px 0 8px rgba(0, 0, 0, 0.1);
+      overflow-y: auto;
     }
 
-    /* --- ნავიგაცია --- */
-    nav {
-      display: flex;
-      gap: 1rem;
+    .logo {
+      font-size: 1.6rem;
+      font-weight: bold;
+      margin-bottom: 2rem;
     }
-    nav > .dropdown {
-      position: relative;
-    }
-    nav > button, nav > .dropdown > button {
+
+    .menu-button {
       background: var(--blue-light);
       border: none;
       color: var(--blue-main);
       padding: 0.5rem 1rem;
-      font-weight: 600;
+      margin-bottom: 0.3rem;
       border-radius: 4px;
+      font-weight: 600;
       cursor: pointer;
+      width: 100%;
+      text-align: left;
       transition: background 0.3s ease;
-      min-width: 120px;
-      text-align: center;
     }
-    nav > button:hover, nav > .dropdown > button:hover {
+
+    .menu-button:hover {
       background: var(--yellow-main);
       color: var(--gray-dark);
     }
 
-    /* --- ჩამოშლადი მენიუ --- */
-    .dropdown-content {
-      display: none;
-      position: absolute;
-      top: 2.6rem;
-      left: 0;
-      background-color: var(--white);
-      min-width: 180px;
-      box-shadow: 0 4px 8px rgb(0 0 0 / 0.15);
-      border-radius: 4px;
-      z-index: 1000;
+    .menu-button.active {
+      background: var(--yellow-main);
+      color: var(--gray-dark);
     }
-    .dropdown-content button {
-      width: 100%;
-      padding: 0.5rem 1rem;
+
+    .dropdown {
+      margin-bottom: 0.5rem;
+    }
+
+    .submenu {
+      display: none;
+      flex-direction: column;
+      margin-left: 1rem;
+      margin-top: 0.3rem;
+      margin-bottom: 0.5rem;
+    }
+
+    .submenu-button {
       background: none;
       border: none;
-      color: var(--blue-main);
+      color: var(--white);
+      padding: 0.4rem 1rem;
       text-align: left;
+      font-size: 0.95rem;
       cursor: pointer;
-      font-weight: 500;
+      border-radius: 4px;
       transition: background 0.2s ease;
+      position: relative;
     }
-    .dropdown-content button:hover {
+
+    .submenu-button:hover {
       background: var(--yellow-main);
       color: var(--gray-dark);
     }
 
-    .dropdown:hover .dropdown-content {
-      display: block;
+    /* აქ ვამატებთ აქტიური ღილაკის სტილს და ისარს მარჯვნივ */
+    .submenu-button.active {
+      background: var(--yellow-main);
+      color: var(--gray-dark);
     }
 
-    /* --- მთავარი კონტენტი --- */
+    .submenu-button.active::after {
+      content: "→";
+      position: absolute;
+      right: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      font-weight: bold;
+      color: var(--gray-dark);
+      font-size: 1.1rem;
+    }
+
     main {
       flex: 1;
       padding: 2rem;
-      max-width: 1200px;
-      margin: 0 auto;
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-      gap: 1.5rem;
+      overflow-y: auto;
     }
 
     .card {
       background: var(--white);
       border-radius: 8px;
       padding: 1.5rem;
-      box-shadow: 0 4px 8px rgb(0 0 0 / 0.1);
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      align-items: center;
-      transition: box-shadow 0.3s ease;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+      text-align: center;
       cursor: pointer;
-      user-select: none;
+      transition: all 0.3s ease;
+      margin-bottom: 1.5rem;
     }
+
     .card:hover {
-      box-shadow: 0 8px 16px rgb(0 0 0 / 0.15);
       background: var(--blue-light);
       color: var(--blue-main);
+      box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15);
     }
 
     .card h2 {
       margin: 0 0 0.5rem 0;
       font-size: 1.4rem;
     }
+
     .card p {
       margin: 0;
       font-size: 1rem;
       color: var(--gray-dark);
-      text-align: center;
-    }
-
-    /* --- Footer --- */
-    footer {
-      text-align: center;
-      padding: 1rem 0;
-      background: var(--blue-main);
-      color: var(--white);
-      font-size: 0.9rem;
-      user-select: none;
-    }
-
-    /* --- Responsive --- */
-    @media (max-width: 600px) {
-      header {
-        font-size: 1.3rem;
-        flex-direction: column;
-        gap: 0.7rem;
-      }
-      nav {
-        flex-wrap: wrap;
-        justify-content: center;
-      }
     }
   </style>
 </head>
+
 <body>
 
-<header>
-  <div>Asterisk ARI Dashboard</div>
-  <nav>
-    <button onclick="location.href='/api/call/originate?endpoint=SIP/1001&extension=2001'">Originate Call</button>
+  <aside>
+    <div class="logo">Asterisk PBX</div>
 
     <div class="dropdown">
-      <button>Users &#x25BE;</button>
-      <div class="dropdown-content">
-        <button onclick="alert('Users List - implement API')">List Users</button>
-        <button onclick="alert('Add User - implement API')">Add User</button>
+      <button class="menu-button" onclick="toggleMenu(this)">Dashboard &#x25BE;</button>
+      <div class="submenu">
+        <button class="submenu-button" onclick="loadContent('/system-overview', this)">System Overview</button>
+        <button class="submenu-button" onclick="loadContent('/active-channels', this)">Active Channels</button>
+        <button class="submenu-button" onclick="loadContent('/cpu-ram', this)">CPU & RAM</button>
       </div>
     </div>
 
     <div class="dropdown">
-      <button>CDR &#x25BE;</button>
-      <div class="dropdown-content">
-        <button onclick="alert('View Call Records - implement API')">View Records</button>
-        <button onclick="alert('Export CDR - implement API')">Export CDR</button>
+      <button class="menu-button" onclick="toggleMenu(this)">Call Management &#x25BE;</button>
+      <div class="submenu">
+        <button class="submenu-button" onclick="loadContent('/extensions', this)">Extensions</button>
+        <button class="submenu-button" onclick="loadContent('/ring-groups', this)">Ring Groups</button>
+        <button class="submenu-button" onclick="loadContent('/queues', this)">Queues</button>
+        <button class="submenu-button" onclick="loadContent('/conferences', this)">Conferences</button>
       </div>
     </div>
 
     <div class="dropdown">
-      <button>ARI Events &#x25BE;</button>
-      <div class="dropdown-content">
-        <button onclick="alert('Connect to ARI Events - implement WebSocket')">Connect Events</button>
+      <button class="menu-button" onclick="toggleMenu(this)">Applications &#x25BE;</button>
+      <div class="submenu">
+        <button class="submenu-button" onclick="loadContent('/ivr', this)">IVR</button>
+        <button class="submenu-button" onclick="loadContent('/announcements', this)">Announcements</button>
+        <button class="submenu-button" onclick="loadContent('/call-parking', this)">Call Parking</button>
+        <button class="submenu-button" onclick="loadContent('/call-forwarding', this)">Call Forwarding</button>
       </div>
     </div>
-  </nav>
-</header>
 
-<main>
-  <div class="card" onclick="alert('Initiate Call Function')">
-    <h2>Make Call</h2>
-    <p>Initiate a new call via ARI</p>
-  </div>
+    <div class="dropdown">
+      <button class="menu-button" onclick="toggleMenu(this)">Connectivity &#x25BE;</button>
+      <div class="submenu">
+        <button class="submenu-button" onclick="loadContent('/sip-settings', this)">SIP Settings</button>
+        <button class="submenu-button" onclick="loadContent('/trunks', this)">Trunks</button>
+        <button class="submenu-button" onclick="loadContent('/outbound-routes', this)">Outbound Routes</button>
+        <button class="submenu-button" onclick="loadContent('/inbound-routes', this)">Inbound Routes</button>
+        <button class="submenu-button" onclick="loadContent('/firewall', this)">Firewall</button>
+      </div>
+    </div>
 
-  <div class="card" onclick="alert('View Users')">
-    <h2>Manage Users</h2>
-    <p>Add, remove or edit SIP users</p>
-  </div>
+    <div class="dropdown">
+      <button class="menu-button" onclick="toggleMenu(this)">Admin &#x25BE;</button>
+      <div class="submenu">
+        <button class="submenu-button" onclick="loadContent('/user-management', this)">User Management</button>
+        <button class="submenu-button" onclick="loadContent('/system-updates', this)">System Updates</button>
+        <button class="submenu-button" onclick="loadContent('/modules', this)">Modules</button>
+      </div>
+    </div>
 
-  <div class="card" onclick="alert('View Call Records')">
-    <h2>Call Records</h2>
-    <p>View and export CDR</p>
-  </div>
+    <div class="dropdown">
+      <button class="menu-button" onclick="toggleMenu(this)">Settings &#x25BE;</button>
+      <div class="submenu">
+        <button class="submenu-button" onclick="loadContent('/network-settings', this)">Network Settings</button>
+        <button class="submenu-button" onclick="loadContent('/voicemail-settings', this)">Voicemail Settings</button>
+        <button class="submenu-button" onclick="loadContent('/time-groups', this)">Time Groups</button>
+        <button class="submenu-button" onclick="loadContent('/feature-codes', this)">Feature Codes</button>
+      </div>
+    </div>
+  </aside>
 
-  <div class="card" onclick="alert('Monitor ARI Events')">
-    <h2>ARI Events</h2>
-    <p>Live monitor ARI websocket events</p>
-  </div>
-</main>
+  <main id="main-content">
+    <div class="card">
+      <h2>Welcome to PBX Panel</h2>
+      <p>Select a module from the left menu to begin managing your system.</p>
+    </div>
+  </main>
 
-<footer>
-  &copy; 2025 Jaba's Asterisk ARI Manager
-</footer>
+  <script>
+    // მენიუს ჩამოშლის ლოგიკა
+    function toggleMenu(button) {
+      document.querySelectorAll('.menu-button').forEach(btn => {
+        const submenu = btn.nextElementSibling;
+        if (btn !== button) {
+          btn.classList.remove('active');
+          if (submenu && submenu.classList.contains('submenu')) {
+            submenu.style.display = 'none';
+          }
+        }
+      });
+
+      const submenu = button.nextElementSibling;
+      const isVisible = submenu && submenu.style.display === 'flex';
+
+      if (submenu && submenu.classList.contains('submenu')) {
+        submenu.style.display = isVisible ? 'none' : 'flex';
+        button.classList.toggle('active', !isVisible);
+      }
+    }
+
+    // დინამიური კონტენტის ჩატვირთვა <main> ელემენტში, გვერდი არ გადაიტვირთება
+    function loadContent(url, button) {
+      // აქტიური ღილაკის დამახსოვრება
+      setActiveSubmenuButton(button);
+
+      const xhr = new XMLHttpRequest();
+      xhr.open('POST', url, true);
+      xhr.onload = function () {
+        if (xhr.status === 200) {
+          // მიღებული HTML ჩასვა main-ში
+          document.getElementById('main-content').innerHTML = xhr.responseText;
+        } else {
+          document.getElementById('main-content').innerHTML = `<p>Failed to load content. Status: ${xhr.status}</p>`;
+        }
+      };
+      xhr.onerror = function () {
+        document.getElementById('main-content').innerHTML = `<p>Error loading content.</p>`;
+      };
+      xhr.send();
+    }
+
+    // აქტიური submenu-button-ის მონიშვნა და ისარის დამატება
+    function setActiveSubmenuButton(button) {
+      // ყველა submenu-button-იდან active კლასის წაშლა
+      document.querySelectorAll('.submenu-button.active').forEach(btn => {
+        btn.classList.remove('active');
+      });
+      // ამ ღილაკს დამატება active კლასის
+      button.classList.add('active');
+    }
+  </script>
 
 </body>
+
 </html>
