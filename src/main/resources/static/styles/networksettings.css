@@ -1,0 +1,128 @@
+.lan-actions {
+    position: sticky;
+    top: 0;
+    backdrop-filter: blur(8px);
+    background-color: rgba(17, 17, 17, 0.7);
+    padding: 10px 20px;
+    z-index: 100;
+    display: flex;
+    gap: 10px;
+    border-bottom: 1px solid #333;
+    margin-bottom: 20px;
+    animation: slideDownFade 0.5s ease;
+    transition: background-color 0.3s ease, backdrop-filter 0.3s ease;
+}
+
+@keyframes slideDownFade {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.action-btn {
+    background-color: #007acc;
+    color: white;
+    border: none;
+    padding: 8px 18px;
+    border-radius: 4px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background 0.3s ease;
+}
+
+.action-btn:hover {
+    background-color: #005b99;
+}
+
+
+.lan-form {
+    background-color: var(--white);
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    padding: 1.5rem;
+    margin-bottom: 1.5rem;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+    transition: box-shadow 0.3s ease;
+}
+
+.lan-form:hover {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.lan-form h3 {
+    margin-top: 0;
+    color: var(--blue-main);
+    font-size: 1.2rem;
+    margin-bottom: 1rem;
+}
+
+.lan-form label {
+    display: inline-block;
+    width: 120px;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+}
+
+.lan-form input {
+    width: 220px;
+    padding: 6px 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    background-color: #fff;
+    color: var(--gray-dark);
+    font-size: 0.95rem;
+    margin-bottom: 1rem;
+}
+
+.lan-form input:focus {
+    border-color: var(--blue-main);
+    outline: none;
+    box-shadow: 0 0 4px rgba(0, 122, 204, 0.4);
+}
+
+.lan-form p {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.lan-form .submit-btn {
+    background-color: var(--blue-main);
+    color: var(--white);
+    border: none;
+    padding: 0.6rem 1.2rem;
+    font-weight: 600;
+    border-radius: 4px;
+    cursor: pointer;
+    margin-top: 10px;
+    transition: background-color 0.3s ease;
+}
+
+.lan-form .submit-btn:hover {
+    background-color: var(--yellow-main);
+    color: var(--gray-dark);
+}
+
+.status-dot {
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    margin-left: 10px;
+    box-shadow: 0 0 6px rgba(0, 0, 0, 0.2);
+}
+
+.status-dot.online {
+    background-color: #4caf50;
+    box-shadow: 0 0 8px #4caf50aa;
+}
+
+.status-dot.offline {
+    background-color: #e53935;
+    box-shadow: 0 0 8px #e53935aa;
+}
+

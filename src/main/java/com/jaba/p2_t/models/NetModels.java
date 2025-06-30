@@ -17,4 +17,5 @@ public class NetModels {
     private boolean status;         
     private String yamlFileName; 
     private String nickname;
+    private String metric;
 }

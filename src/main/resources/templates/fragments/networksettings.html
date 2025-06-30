@@ -1,0 +1,47 @@
+<div class="lan-actions">
+    <form action="/net-program" method="post" style="display:inline;" onsubmit="submitLanForm(event, this)">
+        <button type="submit" class="action-btn">Program</button>
+    </form>
+
+    <form action="/net-set-and-reboot" method="post" style="display:inline;" onsubmit="submitLanForm(event, this)">
+        <button type="submit" class="action-btn">Set and Reboot</button>
+    </form>
+</div>
+
+
+<div th:each="lan : ${net}" class="lan-form">
+    <form th:action="@{/set-lan}" method="post" onsubmit="submitLanForm(event, this)">
+        <div style="display: flex; align-items: center; justify-content: space-between;">
+            <h3 th:text="${lan.nickname} + ' (' + ${lan.name} + ')'"></h3>
+            <div th:classappend="${lan.status} ? 'status-dot online' : 'status-dot offline'"></div>
+        </div>
+
+        <input type="hidden" name="nickname" th:value="${lan.nickname}" />
+
+        <p><label>IP Address:</label>
+            <input type="text" name="ip" th:value="${lan.ipAddress}" />
+        </p>
+
+        <p><label>Gateway:</label>
+            <input type="text" name="gateway" th:value="${lan.gateWay}" />
+        </p>
+
+        <p><label>DNS 1:</label>
+            <input type="text" name="dns1" th:value="${lan.dns1}" />
+        </p>
+
+        <p><label>DNS 2:</label>
+            <input type="text" name="dns2" th:value="${lan.dns2}" />
+        </p>
+
+        <p><label>Subnet:</label>
+            <input type="text" name="subnet" th:value="${lan.subNet}" />
+        </p>
+
+        <p><label>Metric:</label>
+            <input type="text" name="metric" th:value="${lan.metric}" />
+        </p>
+
+        <button type="submit" class="submit-btn">Save</button>
+    </form>
+</div>

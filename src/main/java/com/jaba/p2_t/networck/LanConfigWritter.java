@@ -2,25 +2,49 @@ package com.jaba.p2_t.networck;
 
 import com.jaba.p2_t.models.NetModels;
 import lombok.RequiredArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.yaml.snakeyaml.DumperOptions;
 import org.yaml.snakeyaml.Yaml;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileWriter;
-import java.io.IOException;
+import java.io.*;
+import java.nio.file.Files;
+import java.nio.file.StandardCopyOption;
 import java.util.*;
 
 @Service
 @RequiredArgsConstructor
 public class LanConfigWritter {
 
+    private static final Logger log = LoggerFactory.getLogger(LanConfigWritter.class);
     private final NetService netService;
 
     @SuppressWarnings("unchecked")
-    public void setLan(String nickname, String ip, String gateway, String dns1, String dns2, String subnet) {
+    public void setLan(String nickname, String ip, String gateway, String dns1, String dns2, String subnet, String metric) {
+        // Input validation
+        if (!isValidIPv4(ip) || !isValidIPv4(gateway)) {
+            log.warn("Invalid IP or gateway format: ip={}, gateway={}", ip, gateway);
+            return;
+        }
+        if ((dns1 != null && !dns1.isBlank() && !isValidIPv4(dns1)) ||
+            (dns2 != null && !dns2.isBlank() && !isValidIPv4(dns2))) {
+            log.warn("Invalid DNS format: dns1={}, dns2={}", dns1, dns2);
+            return;
+        }
+        if (!isValidSubnet(subnet)) {
+            log.warn("Invalid subnet format: {}", subnet);
+            return;
+        }
+
+        // IP conflict check
         List<NetModels> configs = netService.getNetModels();
+        for (NetModels model : configs) {
+            if (!nickname.equals(model.getNickname()) && ip.equals(model.getIpAddress())) {
+                log.error("IP conflict detected: {} already used by {}", ip, model.getNickname());
+                return;
+            }
+        }
 
         NetModels match = configs.stream()
                 .filter(m -> nickname.equals(m.getNickname()))
@@ -28,13 +52,28 @@ public class LanConfigWritter {
                 .orElse(null);
 
         if (match == null) {
-            System.out.println("Nickname not found: " + nickname);
+            log.warn("Nickname '{}' not found", nickname);
             return;
         }
 
         String iface = match.getName();
         String yamlFileName = match.getYamlFileName();
-        File yamlFile = new File("./maintestrepo/" + yamlFileName); // "/etc/netplan/" რეალურ გამოყენებაში
+        File yamlFile = new File("./maintestrepo/" + yamlFileName);
+
+        if (!yamlFile.exists()) {
+            log.error("YAML file does not exist: {}", yamlFile.getAbsolutePath());
+            return;
+        }
+
+        // Backup existing config
+        try {
+            File backup = new File(yamlFile.getAbsolutePath() + ".bak");
+            Files.copy(yamlFile.toPath(), backup.toPath(), StandardCopyOption.REPLACE_EXISTING);
+            log.info("Backup created: {}", backup.getName());
+        } catch (IOException e) {
+            log.error("Failed to create backup for {}", yamlFile.getName(), e);
+            return;
+        }
 
         try (FileInputStream fis = new FileInputStream(yamlFile)) {
             Yaml yaml = new Yaml();
@@ -59,13 +98,8 @@ public class LanConfigWritter {
             Map<String, Object> ifaceConfig = new LinkedHashMap<>();
             ifaceConfig.put("dhcp4", false);
 
-            // Subnet შეფასება: თუ "8", "16", "24" პირდაპირ გამოიყენე, თუ არა - გარდაქმნა
-            String cidrSuffix;
-            if (subnet.equals("8") || subnet.equals("16") || subnet.equals("24")) {
-                cidrSuffix = subnet;
-            } else {
-                cidrSuffix = String.valueOf(cidrFromSubnet(subnet));
-            }
+            // subnet: თუ 8,16,24-ზე სხვანაირად იკითხე (cidr)
+            String cidrSuffix = (subnet.matches("8|16|24")) ? subnet : String.valueOf(cidrFromSubnet(subnet));
 
             ifaceConfig.put("addresses", List.of(ip + "/" + cidrSuffix));
             ifaceConfig.put("gateway4", gateway);
@@ -77,12 +111,15 @@ public class LanConfigWritter {
             nameservers.put("addresses", dnsList);
             ifaceConfig.put("nameservers", nameservers);
 
+            // აქ გამოიყენე method პარამეტრად მიღებული metric, თუ null ან ცარიელია დააყენე ნაგულისხმევი
+            String metricToSet = (metric != null && !metric.isBlank()) ? metric : "100";
+
             Map<String, Object> route = new LinkedHashMap<>();
             route.put("to", "0.0.0.0/0");
             route.put("via", gateway);
-            route.put("metric", getMetricFromNickname(nickname));
-
+            route.put("metric", Integer.parseInt(metricToSet));
             ifaceConfig.put("routes", List.of(route));
+
             ethernets.put(iface, ifaceConfig);
 
             DumperOptions options = new DumperOptions();
@@ -92,11 +129,14 @@ public class LanConfigWritter {
 
             try (FileWriter fw = new FileWriter(yamlFile)) {
                 outYaml.dump(data, fw);
-                System.out.println("Updated: " + yamlFile.getAbsolutePath());
+                log.info("✅ Updated YAML: {}", yamlFile.getAbsolutePath());
             }
 
+            // სურვილისამებრ შეგიძლია აქ netplan apply დააყენო
+            // applyNetplan();
+
         } catch (IOException | ClassCastException e) {
-            e.printStackTrace();
+            log.error("Failed to update LAN config for {}", iface, e);
         }
     }
 
@@ -116,13 +156,28 @@ public class LanConfigWritter {
         };
     }
 
-    private int getMetricFromNickname(String nickname) {
-        if (nickname != null && nickname.startsWith("LAN")) {
-            try {
-                return Integer.parseInt(nickname.substring(3)) * 100;
-            } catch (NumberFormatException ignored) {
+    private boolean isValidIPv4(String ip) {
+        return ip != null && ip.matches("^(25[0-5]|2[0-4]\\d|1?\\d{1,2})(\\.(25[0-5]|2[0-4]\\d|1?\\d{1,2})){3}$");
+    }
+
+    private boolean isValidSubnet(String subnet) {
+        return subnet != null && (
+                subnet.matches("^(8|16|24|25|26|27|28|29|30|31)$") ||
+                subnet.matches("^(255\\.(255|0|128|192|224|240|248|252|254)(\\.\\d{1,3}){2})$")
+        );
+    }
+
+    private void applyNetplan() {
+        try {
+            Process process = new ProcessBuilder("netplan", "apply").start();
+            int exitCode = process.waitFor();
+            if (exitCode == 0) {
+                log.info("✔️ netplan apply succeeded.");
+            } else {
+                log.error("❌ netplan apply failed. Exit code: {}", exitCode);
             }
+        } catch (IOException | InterruptedException e) {
+            log.error("Error while applying netplan", e);
         }
-        return 100;
     }
 }

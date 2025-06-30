@@ -15,7 +15,6 @@ public class ExtCon {
 
     @PostMapping("/extensions")
     public String postExt() {
-        lanConfigWritter.setLan("LAN7", "192.168.300.200", "192.168.300.1", "8.8.8.8", "8.8.4.4",  "24");
         return "fragments/extensions";
     }
 

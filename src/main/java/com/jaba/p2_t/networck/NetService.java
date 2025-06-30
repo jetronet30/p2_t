@@ -3,6 +3,8 @@ package com.jaba.p2_t.networck;
 import com.jaba.p2_t.models.NetModels;
 import jakarta.annotation.PostConstruct;
 import org.apache.commons.net.util.SubnetUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.yaml.snakeyaml.Yaml;
 
@@ -15,6 +17,7 @@ import java.util.*;
 @Service
 public class NetService {
 
+    private static final Logger log = LoggerFactory.getLogger(NetService.class);
     private static final File NETWORCK_FOLDER = new File("./maintestrepo/");
 
     @SuppressWarnings("unchecked")
@@ -23,11 +26,15 @@ public class NetService {
         List<NetModels> result = new ArrayList<>();
 
         if (!NETWORCK_FOLDER.exists() || !NETWORCK_FOLDER.isDirectory()) {
+            log.warn("Network folder not found: {}", NETWORCK_FOLDER.getAbsolutePath());
             return result;
         }
 
         File[] yamlFiles = NETWORCK_FOLDER.listFiles((dir, name) -> name.endsWith(".yaml"));
-        if (yamlFiles == null) return result;
+        if (yamlFiles == null) {
+            log.warn("No YAML files found in {}", NETWORCK_FOLDER.getAbsolutePath());
+            return result;
+        }
 
         Yaml yamlParser = new Yaml();
         int lanIndex = 1;
@@ -36,17 +43,18 @@ public class NetService {
             try (FileInputStream fis = new FileInputStream(yamlFile)) {
 
                 Map<String, Object> yamlData = yamlParser.load(fis);
-                if (yamlData == null) continue;
+                if (yamlData == null || !(yamlData.get("network") instanceof Map))
+                    continue;
 
                 Map<String, Object> network = (Map<String, Object>) yamlData.get("network");
-                if (network == null) continue;
-
                 Map<String, Object> ethernets = (Map<String, Object>) network.get("ethernets");
-                if (ethernets == null) continue;
+                if (ethernets == null)
+                    continue;
 
                 for (Map.Entry<String, Object> entry : ethernets.entrySet()) {
                     String ifaceName = entry.getKey();
-                    Map<String, Object> ifaceConfig = (Map<String, Object>) entry.getValue();
+                    if (!(entry.getValue() instanceof Map ifaceConfig))
+                        continue;
 
                     // IP და Subnet
                     List<String> addresses = (List<String>) ifaceConfig.get("addresses");
@@ -58,38 +66,48 @@ public class NetService {
                     if (ipWithCidr != null && ipWithCidr.contains("/")) {
                         try {
                             SubnetUtils utils = new SubnetUtils(ipWithCidr);
+                            utils.setInclusiveHostCount(true);
+                            ip = utils.getInfo().getAddress();
                             subnet = utils.getInfo().getNetmask();
-                            ip = utils.getInfo().getAddress(); // ან უბრალოდ ipWithCidr.split("/")[0]
                         } catch (IllegalArgumentException e) {
-                            e.printStackTrace();
+                            log.error("Invalid CIDR in {}: {}", yamlFile.getName(), ipWithCidr, e);
+                            continue;
                         }
                     } else {
                         ip = ipWithCidr;
                     }
 
                     // Gateway
-                    String gateway = (String) network.get("gateway4");
-                    if (gateway == null) {
-                        gateway = (String) ifaceConfig.get("gateway4");
-                    }
+                    String gateway = (String) ifaceConfig.getOrDefault("gateway4", network.get("gateway4"));
 
                     // DNS
                     String dns1 = null, dns2 = null;
-                    Map<String, Object> nameservers = (Map<String, Object>) ifaceConfig.get("nameservers");
-                    if (nameservers == null) {
-                        nameservers = (Map<String, Object>) network.get("nameservers");
-                    }
+                    Map<String, Object> nameservers = (Map<String, Object>) ifaceConfig.getOrDefault("nameservers",
+                            network.get("nameservers"));
                     if (nameservers != null) {
                         List<String> dnsList = (List<String>) nameservers.get("addresses");
                         if (dnsList != null && !dnsList.isEmpty()) {
                             dns1 = dnsList.get(0);
-                            if (dnsList.size() > 1) {
+                            if (dnsList.size() > 1)
                                 dns2 = dnsList.get(1);
+                        }
+                    }
+
+                    // მეტრიკის ამოღება routes-ს შორის
+                    String metric = "0"; // ნაგულისხმევი მნიშვნელობა
+                    List<Map<String, Object>> routes = (List<Map<String, Object>>) ifaceConfig.get("routes");
+                    if (routes != null && !routes.isEmpty()) {
+                        // ვეძებთ route-ს რომლის to = "0.0.0.0/0" ან საერთო სახე (default route)
+                        for (Map<String, Object> route : routes) {
+                            Object toVal = route.get("to");
+                            if ("0.0.0.0/0".equals(toVal) && route.get("metric") != null) {
+                                metric = String.valueOf(route.get("metric"));
+                                break;
                             }
                         }
                     }
 
-                    // Interface link status (true თუ კაბელი/სიგნალი არის)
+                    // Interface link status
                     boolean status = isInterfaceActive(ifaceName);
 
                     // Nickname
@@ -104,29 +122,45 @@ public class NetService {
                             subnet,
                             status,
                             yamlFile.getName(),
-                            nickname
-                    );
+                            nickname,
+                            metric);
 
                     result.add(model);
                 }
 
             } catch (IOException | ClassCastException e) {
-                e.printStackTrace();
+                log.error("Error reading YAML file: {}", yamlFile.getName(), e);
             }
         }
 
         return result;
     }
 
+    public String getIpByNickName(String nickname) {
+        return getNetModels().stream()
+                .filter(m -> nickname.equals(m.getNickname()))
+                .map(NetModels::getIpAddress)
+                .findFirst()
+                .orElse(null);
+    }
+
+    public String getNameByNickName(String nickname) {
+        return getNetModels().stream()
+                .filter(m -> nickname.equals(m.getNickname()))
+                .map(NetModels::getName)
+                .findFirst()
+                .orElse(null);
+    }
+
     private boolean isInterfaceActive(String ifaceName) {
         File carrierFile = new File("/sys/class/net/" + ifaceName + "/carrier");
         try {
             if (carrierFile.exists()) {
-                String content = Files.readString(carrierFile.toPath());
-                return content.equals("1");
+                String content = Files.readString(carrierFile.toPath()).trim();
+                return "1".equals(content);
             }
         } catch (IOException e) {
-            e.printStackTrace();
+            log.error("Failed to read interface status for {}", ifaceName, e);
         }
         return false;
     }
