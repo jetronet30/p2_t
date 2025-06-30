@@ -35,18 +35,15 @@ public class NetSerCon {
 
         lanConfigWritter.setLan(nickname, ip, gateway, dns1, dns2, subnet, metric);
 
-        // საჭიროა გადატვირთული net-ის ჩასმა მოდელში
         model.addAttribute("net", netService.getNetModels());
 
-        // აბრუნებს ფრაგმენტს (რომელიც უნდა შეიცავდეს <main id="main-content">)
         return "fragments/networksettings";
     }
 
-   
-
     @PostMapping("/net-set-and-reboot")
     public String netReboot(Model m) {
-        if(SerManger.applyNetplan()) SerManger.reboot();
+        if (SerManger.restartNetwork())
+            SerManger.reboot();
         return "fragments/networksettings";
     }
 

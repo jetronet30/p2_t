@@ -95,24 +95,27 @@ public class SerManger {
      * @return true on success, false otherwise.
      */
     public static boolean restartNetwork() {
-        log.info("Running 'netplan try' to test network config...");
-        boolean tryResult = executeCommand("netplan", "try");
+        log.info("Applying network config with 'netplan apply'...");
 
-        if (!tryResult) {
-            log.error("'netplan try' failed. Aborting network restart.");
+        try {
+            Process applyProcess = new ProcessBuilder("netplan", "apply")
+                    .inheritIO() // აჩვენოს ტერმინალში stdout/stderr
+                    .start();
+
+            int exitCode = applyProcess.waitFor();
+
+            if (exitCode == 0) {
+                log.info("Network configuration applied successfully.");
+                return true;
+            } else {
+                log.error("'netplan apply' failed with exit code: {}", exitCode);
+                return false;
+            }
+
+        } catch (IOException | InterruptedException e) {
+            log.error("Error while running 'netplan apply'", e);
             return false;
         }
-
-        log.info("'netplan try' succeeded. Applying network config...");
-        boolean applyResult = executeCommand("netplan", "apply");
-
-        if (applyResult) {
-            log.info("Network restarted successfully.");
-        } else {
-            log.error("Failed to apply network config after successful try.");
-        }
-
-        return applyResult;
     }
 
     /**
@@ -175,14 +178,6 @@ public class SerManger {
         }
     }
 
-    /**
-     * Applies netplan using `netplan try` for safe config test.
-     * 
-     * @return true if succeeded, false otherwise.
-     */
-    public static boolean applyNetplan() {
-        return executeCommand("netplan", "try");
-    }
 
     /**
      * Synchronizes system time using NTP.
