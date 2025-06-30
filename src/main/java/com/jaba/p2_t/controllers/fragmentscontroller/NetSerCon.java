@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 import com.jaba.p2_t.networck.LanConfigWritter;
 import com.jaba.p2_t.networck.NetService;
+import com.jaba.p2_t.servermanager.SerManger;
 
 import lombok.RequiredArgsConstructor;
 
@@ -41,17 +42,11 @@ public class NetSerCon {
         return "fragments/networksettings";
     }
 
-    @PostMapping("/net-program")
-    public String netProgram(Model m) {
-        m.addAttribute("net", netService.getNetModels());
-        System.out.println("netProgram");
-        return "fragments/networksettings";
-    }
+   
 
     @PostMapping("/net-set-and-reboot")
     public String netReboot(Model m) {
-        m.addAttribute("net", netService.getNetModels());
-        System.out.println("netReboot");
+        if(SerManger.applyNetplan()) SerManger.reboot();
         return "fragments/networksettings";
     }
 

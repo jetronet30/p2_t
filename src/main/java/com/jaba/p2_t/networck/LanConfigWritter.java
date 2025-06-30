@@ -21,14 +21,15 @@ public class LanConfigWritter {
     private final NetService netService;
 
     @SuppressWarnings("unchecked")
-    public void setLan(String nickname, String ip, String gateway, String dns1, String dns2, String subnet, String metric) {
+    public void setLan(String nickname, String ip, String gateway, String dns1, String dns2, String subnet,
+            String metric) {
         // Input validation
         if (!isValidIPv4(ip) || !isValidIPv4(gateway)) {
             log.warn("Invalid IP or gateway format: ip={}, gateway={}", ip, gateway);
             return;
         }
         if ((dns1 != null && !dns1.isBlank() && !isValidIPv4(dns1)) ||
-            (dns2 != null && !dns2.isBlank() && !isValidIPv4(dns2))) {
+                (dns2 != null && !dns2.isBlank() && !isValidIPv4(dns2))) {
             log.warn("Invalid DNS format: dns1={}, dns2={}", dns1, dns2);
             return;
         }
@@ -58,7 +59,7 @@ public class LanConfigWritter {
 
         String iface = match.getName();
         String yamlFileName = match.getYamlFileName();
-        File yamlFile = new File("./maintestrepo/" + yamlFileName);
+        File yamlFile = new File("/etc/netplan/" + yamlFileName);
 
         if (!yamlFile.exists()) {
             log.error("YAML file does not exist: {}", yamlFile.getAbsolutePath());
@@ -78,7 +79,8 @@ public class LanConfigWritter {
         try (FileInputStream fis = new FileInputStream(yamlFile)) {
             Yaml yaml = new Yaml();
             Map<String, Object> data = yaml.load(fis);
-            if (data == null) data = new LinkedHashMap<>();
+            if (data == null)
+                data = new LinkedHashMap<>();
 
             Map<String, Object> network = (Map<String, Object>) data.get("network");
             if (network == null) {
@@ -106,12 +108,15 @@ public class LanConfigWritter {
 
             Map<String, Object> nameservers = new LinkedHashMap<>();
             List<String> dnsList = new ArrayList<>();
-            if (dns1 != null && !dns1.isBlank()) dnsList.add(dns1);
-            if (dns2 != null && !dns2.isBlank()) dnsList.add(dns2);
+            if (dns1 != null && !dns1.isBlank())
+                dnsList.add(dns1);
+            if (dns2 != null && !dns2.isBlank())
+                dnsList.add(dns2);
             nameservers.put("addresses", dnsList);
             ifaceConfig.put("nameservers", nameservers);
 
-            // აქ გამოიყენე method პარამეტრად მიღებული metric, თუ null ან ცარიელია დააყენე ნაგულისხმევი
+            // აქ გამოიყენე method პარამეტრად მიღებული metric, თუ null ან ცარიელია დააყენე
+            // ნაგულისხმევი
             String metricToSet = (metric != null && !metric.isBlank()) ? metric : "100";
 
             Map<String, Object> route = new LinkedHashMap<>();
@@ -129,7 +134,7 @@ public class LanConfigWritter {
 
             try (FileWriter fw = new FileWriter(yamlFile)) {
                 outYaml.dump(data, fw);
-                log.info("✅ Updated YAML: {}", yamlFile.getAbsolutePath());
+                log.info(" Updated YAML: {}", yamlFile.getAbsolutePath());
             }
 
             // სურვილისამებრ შეგიძლია აქ netplan apply დააყენო
@@ -161,23 +166,24 @@ public class LanConfigWritter {
     }
 
     private boolean isValidSubnet(String subnet) {
-        return subnet != null && (
-                subnet.matches("^(8|16|24|25|26|27|28|29|30|31)$") ||
-                subnet.matches("^(255\\.(255|0|128|192|224|240|248|252|254)(\\.\\d{1,3}){2})$")
-        );
+        return subnet != null && (subnet.matches("^(8|16|24|25|26|27|28|29|30|31)$") ||
+                subnet.matches("^(255\\.(255|0|128|192|224|240|248|252|254)(\\.\\d{1,3}){2})$"));
     }
 
-    private void applyNetplan() {
+    public boolean applyNetplan() {
         try {
-            Process process = new ProcessBuilder("netplan", "apply").start();
+            Process process = new ProcessBuilder("netplan", "try").start();
             int exitCode = process.waitFor();
             if (exitCode == 0) {
-                log.info("✔️ netplan apply succeeded.");
+                log.info(" netplan apply succeeded.");
+                return true;
             } else {
-                log.error("❌ netplan apply failed. Exit code: {}", exitCode);
+                log.error("netplan apply failed. Exit code: {}", exitCode);
+                return false;
             }
         } catch (IOException | InterruptedException e) {
-            log.error("Error while applying netplan", e);
+            log.error(" Error while applying netplan", e);
+            return false;
         }
     }
 }

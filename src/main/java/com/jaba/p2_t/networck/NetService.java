@@ -18,7 +18,7 @@ import java.util.*;
 public class NetService {
 
     private static final Logger log = LoggerFactory.getLogger(NetService.class);
-    private static final File NETWORCK_FOLDER = new File("./maintestrepo/");
+    private static final File NETWORCK_FOLDER = new File("/etc/netplan");
 
     @SuppressWarnings("unchecked")
     @PostConstruct
