@@ -77,8 +77,24 @@ public class NetService {
                         ip = ipWithCidr;
                     }
 
-                    // Gateway
-                    String gateway = (String) ifaceConfig.getOrDefault("gateway4", network.get("gateway4"));
+                    // Gateway fallback: gateway4 or via from default route
+                    String gateway = null;
+                    if (ifaceConfig.containsKey("gateway4")) {
+                        gateway = (String) ifaceConfig.get("gateway4");
+                    } else {
+                        List<Map<String, Object>> routes = (List<Map<String, Object>>) ifaceConfig.get("routes");
+                        if (routes != null) {
+                            for (Map<String, Object> route : routes) {
+                                Object toVal = route.get("to");
+                                if (toVal != null &&
+                                        ("default".equalsIgnoreCase(toVal.toString()) ||
+                                         "0.0.0.0/0".equals(toVal.toString()))) {
+                                    gateway = (String) route.get("via");
+                                    break;
+                                }
+                            }
+                        }
+                    }
 
                     // DNS
                     String dns1 = null, dns2 = null;
@@ -93,24 +109,23 @@ public class NetService {
                         }
                     }
 
-                    // მეტრიკის ამოღება routes-ს შორის
-                    String metric = "0"; // ნაგულისხმევი მნიშვნელობა
+                    // Metric from default route
+                    String metric = "0";
                     List<Map<String, Object>> routes = (List<Map<String, Object>>) ifaceConfig.get("routes");
-                    if (routes != null && !routes.isEmpty()) {
-                        // ვეძებთ route-ს რომლის to = "0.0.0.0/0" ან საერთო სახე (default route)
+                    if (routes != null) {
                         for (Map<String, Object> route : routes) {
                             Object toVal = route.get("to");
-                            if ("0.0.0.0/0".equals(toVal) && route.get("metric") != null) {
+                            if (toVal != null &&
+                                    ("default".equalsIgnoreCase(toVal.toString()) ||
+                                     "0.0.0.0/0".equals(toVal.toString())) &&
+                                    route.get("metric") != null) {
                                 metric = String.valueOf(route.get("metric"));
                                 break;
                             }
                         }
                     }
 
-                    // Interface link status
                     boolean status = isInterfaceActive(ifaceName);
-
-                    // Nickname
                     String nickname = "LAN" + lanIndex++;
 
                     NetModels model = new NetModels(

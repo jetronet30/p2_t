@@ -22,8 +22,7 @@ public class LanConfigWritter {
 
     @SuppressWarnings("unchecked")
     public void setLan(String nickname, String ip, String gateway, String dns1, String dns2, String subnet,
-            String metric) {
-        // Input validation
+                       String metric) {
         if (!isValidIPv4(ip) || !isValidIPv4(gateway)) {
             log.warn("Invalid IP or gateway format: ip={}, gateway={}", ip, gateway);
             return;
@@ -38,7 +37,6 @@ public class LanConfigWritter {
             return;
         }
 
-        // IP conflict check
         List<NetModels> configs = netService.getNetModels();
         for (NetModels model : configs) {
             if (!nickname.equals(model.getNickname()) && ip.equals(model.getIpAddress())) {
@@ -66,7 +64,6 @@ public class LanConfigWritter {
             return;
         }
 
-        // Backup existing config
         try {
             File backup = new File(yamlFile.getAbsolutePath() + ".bak");
             Files.copy(yamlFile.toPath(), backup.toPath(), StandardCopyOption.REPLACE_EXISTING);
@@ -79,48 +76,32 @@ public class LanConfigWritter {
         try (FileInputStream fis = new FileInputStream(yamlFile)) {
             Yaml yaml = new Yaml();
             Map<String, Object> data = yaml.load(fis);
-            if (data == null)
-                data = new LinkedHashMap<>();
+            if (data == null) data = new LinkedHashMap<>();
 
-            Map<String, Object> network = (Map<String, Object>) data.get("network");
-            if (network == null) {
-                network = new LinkedHashMap<>();
-                data.put("network", network);
-            }
-
+            Map<String, Object> network = (Map<String, Object>) data.getOrDefault("network", new LinkedHashMap<>());
+            data.put("network", network);
             network.put("version", 2);
-            network.put("renderer", "networkd");
 
-            Map<String, Object> ethernets = (Map<String, Object>) network.get("ethernets");
-            if (ethernets == null) {
-                ethernets = new LinkedHashMap<>();
-                network.put("ethernets", ethernets);
-            }
+            Map<String, Object> ethernets = (Map<String, Object>) network.getOrDefault("ethernets", new LinkedHashMap<>());
+            network.put("ethernets", ethernets);
 
             Map<String, Object> ifaceConfig = new LinkedHashMap<>();
             ifaceConfig.put("dhcp4", false);
 
-            // subnet: თუ 8,16,24-ზე სხვანაირად იკითხე (cidr)
             String cidrSuffix = (subnet.matches("8|16|24")) ? subnet : String.valueOf(cidrFromSubnet(subnet));
-
             ifaceConfig.put("addresses", List.of(ip + "/" + cidrSuffix));
-            ifaceConfig.put("gateway4", gateway);
 
             Map<String, Object> nameservers = new LinkedHashMap<>();
             List<String> dnsList = new ArrayList<>();
-            if (dns1 != null && !dns1.isBlank())
-                dnsList.add(dns1);
-            if (dns2 != null && !dns2.isBlank())
-                dnsList.add(dns2);
+            if (dns1 != null && !dns1.isBlank()) dnsList.add(dns1);
+            if (dns2 != null && !dns2.isBlank()) dnsList.add(dns2);
             nameservers.put("addresses", dnsList);
             ifaceConfig.put("nameservers", nameservers);
 
-            // აქ გამოიყენე method პარამეტრად მიღებული metric, თუ null ან ცარიელია დააყენე
-            // ნაგულისხმევი
             String metricToSet = (metric != null && !metric.isBlank()) ? metric : "100";
 
             Map<String, Object> route = new LinkedHashMap<>();
-            route.put("to", "0.0.0.0/0");
+            route.put("to", "default");
             route.put("via", gateway);
             route.put("metric", Integer.parseInt(metricToSet));
             ifaceConfig.put("routes", List.of(route));
@@ -134,11 +115,8 @@ public class LanConfigWritter {
 
             try (FileWriter fw = new FileWriter(yamlFile)) {
                 outYaml.dump(data, fw);
-                log.info(" Updated YAML: {}", yamlFile.getAbsolutePath());
+                log.info("Updated YAML: {}", yamlFile.getAbsolutePath());
             }
-
-            // სურვილისამებრ შეგიძლია აქ netplan apply დააყენო
-            // applyNetplan();
 
         } catch (IOException | ClassCastException e) {
             log.error("Failed to update LAN config for {}", iface, e);
@@ -175,14 +153,14 @@ public class LanConfigWritter {
             Process process = new ProcessBuilder("netplan", "try").start();
             int exitCode = process.waitFor();
             if (exitCode == 0) {
-                log.info(" netplan apply succeeded.");
+                log.info("netplan apply succeeded.");
                 return true;
             } else {
                 log.error("netplan apply failed. Exit code: {}", exitCode);
                 return false;
             }
         } catch (IOException | InterruptedException e) {
-            log.error(" Error while applying netplan", e);
+            log.error("Error while applying netplan", e);
             return false;
         }
     }
