@@ -20,11 +20,9 @@ public class SerInitializer implements WebServerFactoryCustomizer<ConfigurableWe
     public DataSource dataSource() {
         HikariDataSource ds = new HikariDataSource();
 
-        ds.setJdbcUrl("jdbc:postgresql://localhost:5432/p2_t");
-        ds.setUsername("pbxa");
-
-        ds.setPassword("pbxA");
-
+        ds.setJdbcUrl("jdbc:postgresql://localhost:5432/p2_t_db");
+        ds.setUsername("jetronet");
+        ds.setPassword("bostana30");
         ds.setDriverClassName("org.postgresql.Driver");
 
         return ds;
