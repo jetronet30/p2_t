@@ -1,3 +1,29 @@
-AAAAAAAAAAAAAAAAAAA
+<div class="ext-actions">
+    <form action="/ext-program" method="post">
+        <button type="submit" class="action-btn" id="program-btn">Program</button>
+    </form>
 
-AAAAAAAAAAAAAAAAAAAAAAAAA
+    <form action="/ext-add" method="post" class="range-form">
+        <input type="text" name="exten" placeholder="exten">
+        <input type="text" name="exten-end" placeholder="exten-end">
+        <button type="submit" class="action-btn">Add</button>
+        <label  id="program-alert" style="color: rgb(251, 255, 0); font-size: 18px;" hidden >&#x26A0;</label>
+    </form>
+</div>
+
+<div th:each="ext : ${extensions}" class="ext-form">
+    <form class="exten-form" method="post">
+        <input type="text" name="exten" th:value="${ext.exten}">
+        <input type="text" name="callerId" th:value="${ext.callerId}">
+        <input type="text" name="context" th:value="${ext.context}">
+        <input type="password" name="secret" th:value="${ext.secret}">
+
+        <button type="submit" class="mini-btn " th:formaction="@{/edit-exten/{id}(id=${ext.id})}">
+            Edit
+        </button>
+
+        <button type="submit" class="mini-btn" th:formaction="@{/delete-exten/{id}(id=${ext.id})}">
+            Delete
+        </button>
+    </form>
+</div>
