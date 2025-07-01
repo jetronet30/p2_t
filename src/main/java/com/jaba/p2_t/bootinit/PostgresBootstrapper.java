@@ -21,7 +21,7 @@ public class PostgresBootstrapper {
                 System.out.println("✅ PostgreSQL already installed.");
             }
 
-            createUserAndDatabase();
+
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -32,39 +32,7 @@ public class PostgresBootstrapper {
         return runCheck("psql --version");
     }
 
-    private static void createUserAndDatabase() {
-        String sql = """
-            DO $$
-            BEGIN
-                IF NOT EXISTS (
-                    SELECT FROM pg_catalog.pg_roles WHERE rolname = 'jetronet'
-                ) THEN
-                    CREATE USER jetronet WITH PASSWORD 'bostana30';
-                    ALTER USER jetronet WITH SUPERUSER;
-                END IF;
-            END
-            $$;
-
-            DO $$
-            BEGIN
-                IF NOT EXISTS (
-                    SELECT FROM pg_database WHERE datname = 'p2_t_db'
-                ) THEN
-                    CREATE DATABASE p2_t_db OWNER jetronet;
-                END IF;
-            END
-            $$;
-        """;
-
-        try {
-            Path tmpFile = Files.createTempFile("pginit_", ".sql");
-            Files.writeString(tmpFile, sql);
-            run("sudo -u postgres psql -f " + tmpFile.toAbsolutePath());
-            Files.deleteIfExists(tmpFile);
-        } catch (IOException e) {
-            throw new RuntimeException("❌ ვერ შეიქმნა დროებითი SQL ფაილი", e);
-        }
-    }
+    
 
     private static boolean runCheck(String command) {
         try {
@@ -87,7 +55,55 @@ public class PostgresBootstrapper {
         }
     }
 
-    
+    private static void initWithInteractivePsql() {
+    try {
+        ProcessBuilder pb = new ProcessBuilder("bash", "-c", "sudo -u postgres psql");
+        Process process = pb.start();
+
+        BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
+        BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(process.getOutputStream()));
+
+        // Helper: ელოდება prompt-ს ან კონკრეტულ პასუხს
+        String waitFor(BufferedReader r, String keyword) throws IOException {
+            StringBuilder output = new StringBuilder();
+            String line;
+            while ((line = r.readLine()) != null) {
+                System.out.println("<< " + line); // optional debug
+                output.append(line).append("\n");
+                if (line.contains(keyword)) break;
+            }
+            return output.toString();
+        }
+
+        // Step 1: დაველოდოთ prompt-ს
+        waitFor(reader, "postgres=#");
+
+        // Step 2: შექმნა მომხმარებელი
+        writer.write("CREATE USER jetronet WITH PASSWORD 'bostana30';\n");
+        writer.flush();
+        String out1 = waitFor(reader, "CREATE ROLE");
+
+        // Step 3: SUPERUSER
+        writer.write("ALTER USER jetronet WITH SUPERUSER;\n");
+        writer.flush();
+        String out2 = waitFor(reader, "ALTER ROLE");
+
+        // Step 4: ბაზის შექმნა
+        writer.write("CREATE DATABASE p2_t_db OWNER jetronet;\n");
+        writer.flush();
+        String out3 = waitFor(reader, "CREATE DATABASE");
+
+        // Step 5: გასვლა
+        writer.write("\\q\n");
+        writer.flush();
+
+        process.waitFor();
+
+    } catch (Exception e) {
+        e.printStackTrace();
+    }
+}
+
 
 
 }
