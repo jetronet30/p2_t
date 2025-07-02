@@ -13,16 +13,16 @@ public class SerInitializer implements WebServerFactoryCustomizer<ConfigurableWe
 
     @Override
     public void customize(ConfigurableWebServerFactory factory) {
-        factory.setPort(8090);
+        factory.setPort(ServerSettings.getConfig().getPort());
     }
 
     @Bean
     public DataSource dataSource() {
         HikariDataSource ds = new HikariDataSource();
 
-        ds.setJdbcUrl("jdbc:postgresql://localhost:5432/p2_t_db");
-        ds.setUsername("jetronet");
-        ds.setPassword("bostana30");
+        ds.setJdbcUrl(ServerSettings.getFullDBHost());
+        ds.setUsername(ServerSettings.getConfig().getDataUser());
+        ds.setPassword(ServerSettings.getConfig().getDataPassword());
         ds.setDriverClassName("org.postgresql.Driver");
 
         return ds;

@@ -1,0 +1,121 @@
+.ser-actions {
+    position: sticky;
+    top: 0;
+    backdrop-filter: blur(8px);
+    background-color: rgba(17, 17, 17, 0.7);
+    padding: 10px 20px;
+    z-index: 100;
+    display: flex;
+    gap: 10px;
+    border-bottom: 1px solid #333;
+    margin-bottom: 20px;
+    animation: slideDownFade 0.5s ease;
+    transition: background-color 0.3s ease, backdrop-filter 0.3s ease;
+}
+
+.ser-actions form {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.ser-actions input[type="text"] {
+    height: 30px;
+    padding: 4px 8px;
+    font-size: 0.85rem;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    background-color: #fff;
+    color: #333;
+    width: 110px;
+}
+
+.ser-act-btn {
+    height: 32px;
+    padding: 0 14px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    background-color: #007acc;
+    color: white;
+    transition: background-color 0.3s ease;
+}
+
+.ser-act-btn:hover {
+    background-color: #005b99;
+}
+
+/* ---------- Server Settings Vertical Form ---------- */
+
+#server-settings-container {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 2rem;
+}
+
+#server-settings-container form {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    background-color: #f7f7f7;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    padding: 20px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    max-width: 500px;
+    width: 100%;
+}
+
+#server-settings-container form:hover {
+    box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+}
+
+#server-settings-container input[type="text"] {
+    height: 28px;
+    padding: 4px 8px;
+    font-size: 0.85rem;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    background-color: #fff;
+    color: #020202;
+}
+
+#server-settings-container input[type="text"]:focus {
+    border-color: #007acc;
+    outline: none;
+    box-shadow: 0 0 3px rgba(0, 122, 204, 0.4);
+}
+
+.ser-btn {
+    height: 32px;
+    padding: 0 14px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    background-color: #007acc;
+    color: #ffeb3b;
+    transition: background-color 0.2s ease;
+}
+
+.ser-btn:hover {
+    background-color: #ffeb3b;
+    color: #007acc;
+}
+
+/* Animation reused */
+@keyframes slideDownFade {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+

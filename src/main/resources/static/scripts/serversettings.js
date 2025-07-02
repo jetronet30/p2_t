@@ -7,15 +7,14 @@ document.addEventListener("DOMContentLoaded", () => {
     const style = document.createElement("style");
     style.textContent = `
       .${successClass} {
-        background-color:rgb(160, 219, 174) !important;
+        background-color: rgb(160, 219, 174) !important;
       }
       .${errorClass} {
-        background-color:rgb(216, 135, 142) !important;
+        background-color: rgb(216, 135, 142) !important;
       }
     `;
     document.head.appendChild(style);
 
-    // ⚠️ ფუნქცია Program ღილაკის სიმბოლოსთვის
     function showProgramAlert(duration = 3000) {
         const alertIcon = document.getElementById("program-alert");
         if (alertIcon) {
@@ -26,7 +25,7 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     }
 
-    // ✅ 1. General form submit (Add, Program)
+    // ✅ 1. General submit (Reboot, Factory Reset, etc.)
     document.body.addEventListener("submit", async (event) => {
         const form = event.target;
         if (!form.matches("form")) return;
@@ -35,14 +34,14 @@ document.addEventListener("DOMContentLoaded", () => {
 
         // გადამოწმება თუ იყო დაჭერილი "edit" ღილაკი
         const isEdit = submitter?.textContent.trim().toLowerCase() === "edit";
-        if (isEdit) return;
+        if (isEdit) return; // "Edit" ღილაკი გადაეცემა შემდეგ მონიტორს
 
-        // გადამოწმება თუ არის ext-add-btn ან ext-program-btn ღილაკი
-        const isExtAddButton = submitter?.id === "ext-add-btn";
-        const isExtProgramButton = submitter?.id === "ext-program-btn";
+        // გადამოწმება თუ არის ser-factory-btn ან ser-reboot-btn ღილაკი
+        const isSerFactoryButton = submitter?.id === "ser-factory-btn";
+        const isSerRebootButton = submitter?.id === "ser-reboot-btn";
 
         // თუ არც ერთი ღილაკი არ არის დაიჭერილი, არ ვაგრძელებთ
-        if (!isExtAddButton && !isExtProgramButton) return;
+        if (!isSerFactoryButton && !isSerRebootButton) return;
 
         event.preventDefault();
 
@@ -62,12 +61,12 @@ document.addEventListener("DOMContentLoaded", () => {
             mainContent.innerHTML = html;
 
             // აქ შეიძლება განხორციელდეს კონკრეტული ლოგიკა, თუ რომელ ღილაკს დავაჭირეთ
-            if (isExtAddButton) {
-                // აქ შეიძლება იყოს დამატებითი ლოგიკა ext-add-btn ღილაკისთვის
-                console.log("Ext Add button pressed");
-            } else if (isExtProgramButton) {
-                // აქ შეიძლება იყოს დამატებითი ლოგიკა ext-program-btn ღილაკისთვის
-                console.log("Ext Program button pressed");
+            if (isSerFactoryButton) {
+                // აქ შეიძლება იყოს დამატებითი ლოგიკა ser-factory-btn ღილაკისთვის
+                console.log("Factory Reset button pressed");
+            } else if (isSerRebootButton) {
+                // აქ შეიძლება იყოს დამატებითი ლოგიკა ser-reboot-btn ღილაკისთვის
+                console.log("Reboot button pressed");
             }
 
         } catch (err) {
@@ -76,14 +75,15 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 
 
-    // ✅ 2. Edit ღილაკი
+    
+    // ✅ 2. Edit ღილაკი ("server-settings-container"-ში)
     document.body.addEventListener("click", async (event) => {
         const btn = event.target.closest("button[type='submit']");
         if (!btn) return;
 
-        // აქ გატესტავს თუ id "ext-edit-btn"-ია
-        const isExtEditButton = btn.id === "ext-edit-btn";
-        if (!isExtEditButton) return; // თუ არ არის ext-edit-btn, არ ვაგრძელებთ
+        // აქ გატესტავს თუ id "ser-edit-btn"-ია
+        const isSerEditButton = btn.id === "ser-edit-btn";
+        if (!isSerEditButton) return; // თუ არ არის ser-edit-btn, არ ვაგრძელებთ
 
         const form = btn.closest("form");
         if (!form) return;
@@ -106,62 +106,19 @@ document.addEventListener("DOMContentLoaded", () => {
             if (!response.ok) throw new Error(`Status ${response.status}`);
 
             const result = await response.json();
-            const container = form.closest(".ext-form");
+            const container = form.closest("#server-settings-container form");
 
             if (result.success) {
                 if (container) {
                     container.classList.remove(errorClass);
                     container.classList.add(successClass);
                 }
-                showProgramAlert(); // ⚠️ აჩვენე სიმბოლო
+                showProgramAlert();
             } else {
                 if (container) {
                     container.classList.remove(successClass);
                     container.classList.add(errorClass);
                 }
-            }
-        } catch (err) {
-            alert("დაფიქსირდა შეცდომა: " + err.message);
-        }
-    });
-
-
-    // ✅ 3. Delete ღილაკი
-    document.body.addEventListener("click", async (event) => {
-        const btn = event.target.closest("button[type='submit']");
-        if (!btn) return;
-
-        // გადამოწმება თუ ღილაკი "ext-delete-btn"-ია
-        const isDelete = btn.id === "ext-delete-btn";
-        if (!isDelete) return; // თუ არ არის ext-delete-btn, არ ვაგრძელებთ
-
-        const form = btn.closest("form");
-        if (!form) return;
-
-        event.preventDefault();
-
-        const formData = new FormData(form);
-        const action = btn.getAttribute("formaction") || form.getAttribute("action");
-        const method = form.getAttribute("method")?.toUpperCase() || "POST";
-
-        try {
-            const response = await fetch(action, {
-                method,
-                body: formData,
-                headers: {
-                    "Accept": "application/json"
-                }
-            });
-
-            if (!response.ok) throw new Error(`Status ${response.status}`);
-
-            const result = await response.json();
-            if (result.success) {
-                const container = form.closest(".ext-form");
-                if (container) container.remove(); // წაშლის ფორმა
-                showProgramAlert(); // ⚠️ აჩვენე სიმბოლო
-            } else {
-                alert(result.error || "წაშლის შეცდომა!");
             }
         } catch (err) {
             alert("დაფიქსირდა შეცდომა: " + err.message);

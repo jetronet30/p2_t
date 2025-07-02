@@ -1,0 +1,10 @@
+{
+  "port" : 8090,
+  "dataUser" : "jetronet",
+  "dataPassword" : "bostana30",
+  "dataName" : "p2_t_db",
+  "dataHost" : "localhost",
+  "dataPort" : 5432,
+  "sipDefPassword" : "minitelsy2",
+  "licenzi" : "demo"
+}

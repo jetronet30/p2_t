@@ -1,0 +1,26 @@
+<div class="ser-actions">
+    <form action="/set-reboot" method="post" class="ser-form">
+        <button type="submit" class="ser-act-btn" id="ser-reboot-btn">Reboot</button>
+    </form>
+
+    <form action="/set-factory-reset" method="post" class="range-form">
+        <input type="text" name="key" >
+        <button type="submit" class="ser-act-btn" id="ser-factory-btn">Factory Reset</button>
+    </form>
+</div>
+<div id="server-settings-container">
+    <form action="/set-serversettings">
+        <label for="ser-port"></label>
+        <input type="text" name="ser-port" id="ser-port" value="">
+        <input type="text" name="ser-licenzi" id="ser-licenzi" value="">
+        <input type="text" namw="ser-sipdef-pass" id="ser-sipdef-pass" value="">
+        <input type="text" name="ser-data-user" id="ser-data-user" value="">
+        <input type="text" name="ser-data-password" id="ser-data-password" value="">
+        <input type="text" name="ser-data-name" id="ser-data-name" value="">
+        <input type="text" name="ser-data-port" id="ser-data-port" value="">
+        <input type="text" name="ser-data-host" id="ser-data-host" value="">
+        <button type="submit" class="ser-btn"  id = "ser-edit-btn">
+            Edit
+        </button>
+    </form>
+</div>
