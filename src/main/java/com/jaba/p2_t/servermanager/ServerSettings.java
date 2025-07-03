@@ -41,6 +41,9 @@ public class ServerSettings {
         }
         return "jdbc:postgresql://" + config.getDataHost() + ":" + config.getDataPort() + "/" + config.getDataName();
     }
+    public int getPort(){
+        return config.getPort();
+    }
 
     public static void initServerSettings() {
         if (!SETTINGS.exists()) {

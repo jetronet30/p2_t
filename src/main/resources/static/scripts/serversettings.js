@@ -1,4 +1,4 @@
-document.addEventListener("DOMContentLoaded", () => {
+export function init() {
     const mainContent = document.getElementById("main-content");
 
     const successClass = "highlight-success";
@@ -125,4 +125,7 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     });
 
+}
+document.addEventListener('DOMContentLoaded', () => {
+  init();
 });
