@@ -75,14 +75,13 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     });
 
-
     // ✅ 2. Edit ღილაკი
     document.body.addEventListener("click", async (event) => {
         const btn = event.target.closest("button[type='submit']");
         if (!btn) return;
 
         // აქ გატესტავს თუ id "ext-edit-btn"-ია
-        const isExtEditButton = btn.id === "ext-edit-btn";
+        const isExtEditButton = btn.id.startsWith("ext-edit-btn"); // დიახ, ახლა დინამიური ID-სთვის
         if (!isExtEditButton) return; // თუ არ არის ext-edit-btn, არ ვაგრძელებთ
 
         const form = btn.closest("form");
@@ -125,14 +124,13 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     });
 
-
     // ✅ 3. Delete ღილაკი
     document.body.addEventListener("click", async (event) => {
         const btn = event.target.closest("button[type='submit']");
         if (!btn) return;
 
         // გადამოწმება თუ ღილაკი "ext-delete-btn"-ია
-        const isDelete = btn.id === "ext-delete-btn";
+        const isDelete = btn.id.startsWith("ext-delete-btn"); // დინამიური ID-ებისთვის
         if (!isDelete) return; // თუ არ არის ext-delete-btn, არ ვაგრძელებთ
 
         const form = btn.closest("form");
@@ -167,5 +165,7 @@ document.addEventListener("DOMContentLoaded", () => {
             alert("დაფიქსირდა შეცდომა: " + err.message);
         }
     });
+
+   
 
 });

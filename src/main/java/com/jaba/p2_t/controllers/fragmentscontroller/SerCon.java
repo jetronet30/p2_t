@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 @Controller
 public class SerCon {
-    @PostMapping("/server-settings")
+    @PostMapping("/serversettings")
     public String postSerSet(Model m){
         return"fragments/serversettings";
     }

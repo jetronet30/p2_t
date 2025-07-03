@@ -21,9 +21,9 @@
     <div class="dropdown">
       <button class="menu-button" onclick="toggleMenu(this)">Dashboard &#x25BE;</button>
       <div class="submenu">
-        <button class="submenu-button" onclick="loadContent('/system-overview', this)">System Overview</button>
-        <button class="submenu-button" onclick="loadContent('/active-channels', this)">Active Channels</button>
-        <button class="submenu-button" onclick="loadContent('/cpu-ram', this)">CPU & RAM</button>
+        <button class="submenu-button" onclick="loadContent('/systemoverview', this)">System Overview</button>
+        <button class="submenu-button" onclick="loadContent('/activechannels', this)">Active Channels</button>
+        <button class="submenu-button" onclick="loadContent('/cpuram', this)">CPU & RAM</button>
       </div>
     </div>
 
@@ -31,7 +31,7 @@
       <button class="menu-button" onclick="toggleMenu(this)">Call Management &#x25BE;</button>
       <div class="submenu">
         <button class="submenu-button" onclick="loadContent('/extensions', this)">Extensions</button>
-        <button class="submenu-button" onclick="loadContent('/ring-groups', this)">Ring Groups</button>
+        <button class="submenu-button" onclick="loadContent('/ringgroups', this)">Ring Groups</button>
         <button class="submenu-button" onclick="loadContent('/queues', this)">Queues</button>
         <button class="submenu-button" onclick="loadContent('/conferences', this)">Conferences</button>
       </div>
@@ -50,10 +50,10 @@
     <div class="dropdown">
       <button class="menu-button" onclick="toggleMenu(this)">Connectivity &#x25BE;</button>
       <div class="submenu">
-        <button class="submenu-button" onclick="loadContent('/sip-settings', this)">SIP Settings</button>
+        <button class="submenu-button" onclick="loadContent('/sipsettings', this)">SIP Settings</button>
         <button class="submenu-button" onclick="loadContent('/trunks', this)">Trunks</button>
-        <button class="submenu-button" onclick="loadContent('/outbound-routes', this)">Outbound Routes</button>
-        <button class="submenu-button" onclick="loadContent('/inbound-routes', this)">Inbound Routes</button>
+        <button class="submenu-button" onclick="loadContent('/outboundroutes', this)">Outbound Routes</button>
+        <button class="submenu-button" onclick="loadContent('/inboundroutes', this)">Inbound Routes</button>
         <button class="submenu-button" onclick="loadContent('/firewall', this)">Firewall</button>
       </div>
     </div>
@@ -61,8 +61,8 @@
     <div class="dropdown">
       <button class="menu-button" onclick="toggleMenu(this)">Admin &#x25BE;</button>
       <div class="submenu">
-        <button class="submenu-button" onclick="loadContent('/user-management', this)">User Management</button>
-        <button class="submenu-button" onclick="loadContent('/system-updates', this)">System Updates</button>
+        <button class="submenu-button" onclick="loadContent('/usermanagement', this)">User Management</button>
+        <button class="submenu-button" onclick="loadContent('/systemupdates', this)">System Updates</button>
         <button class="submenu-button" onclick="loadContent('/modules', this)">Modules</button>
       </div>
     </div>
@@ -70,11 +70,11 @@
     <div class="dropdown">
       <button class="menu-button" onclick="toggleMenu(this)">Settings &#x25BE;</button>
       <div class="submenu">
-        <button class="submenu-button" onclick="loadContent('/server-settings', this)">Network Settings</button>
-        <button class="submenu-button" onclick="loadContent('/network-settings', this)">Network Settings</button>
-        <button class="submenu-button" onclick="loadContent('/voicemail-settings', this)">Voicemail Settings</button>
-        <button class="submenu-button" onclick="loadContent('/time-groups', this)">Time Groups</button>
-        <button class="submenu-button" onclick="loadContent('/feature-codes', this)">Feature Codes</button>
+        <button class="submenu-button" onclick="loadContent('/serversettings', this)">Network Settings</button>
+        <button class="submenu-button" onclick="loadContent('/networksettings', this)">Server Settings</button>
+        <button class="submenu-button" onclick="loadContent('/voicemailsettings', this)">Voicemail Settings</button>
+        <button class="submenu-button" onclick="loadContent('/timegroups', this)">Time Groups</button>
+        <button class="submenu-button" onclick="loadContent('/featurecodes', this)">Feature Codes</button>
       </div>
     </div>
   </aside>
@@ -82,11 +82,10 @@
   <main id="main-content">
     
   </main>
-  <script th:src="@{/scripts/main.js}"></script>
+  <script  th:src="@{/scripts/main.js}"></script>
+  <script th:src="@{/scripts/extensions.js}"></script>
   <script th:src="@{/scripts/networksettings.js}"></script>
   <script th:src="@{/scripts/serversettings.js}"></script>
-  <script th:src="@{/scripts/extensions.js}"></script>
-  <script th:src="@{/scripts/test.js}"></script>
 
 </body>
 

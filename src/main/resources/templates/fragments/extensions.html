@@ -1,29 +1,61 @@
 <div class="ext-actions">
+    <!-- Program ღილაკი -->
     <form action="/ext-program" method="post">
         <button type="submit" class="action-btn" id="ext-program-btn">Program</button>
     </form>
 
+    <!-- Add ღილაკი და ფორმა -->
     <form action="/ext-add" method="post" class="range-form">
         <input type="text" name="exten" placeholder="exten">
         <input type="text" name="exten-end" placeholder="exten-end">
         <button type="submit" class="action-btn" id="ext-add-btn">Add</button>
-        <label  id="program-alert" style="color: rgb(251, 255, 0); font-size: 18px;" hidden >&#x26A0;</label>
+        <label id="program-alert" style="color: rgb(251, 255, 0); font-size: 18px;" hidden>&#x26A0;</label>
     </form>
+
+    <!-- საძიებო ველი -->
+    <input type="text" id="searchField" placeholder="ძიება..." style="margin-top: 15px;">
 </div>
 
 <div th:each="ext : ${extensions}" class="ext-form">
-    <form class="exten-form" method="post">
+    <!-- თითოეული ფორმის ID იქნება დინამიური ext.id-ის მიხედვით -->
+    <form class="exten-form" method="post" th:id="'ext-form' + ${ext.id}">
         <input type="text" name="exten" th:value="${ext.exten}">
         <input type="text" name="callerId" th:value="${ext.callerId}">
         <input type="text" name="context" th:value="${ext.context}">
         <input type="password" name="secret" th:value="${ext.secret}">
 
-        <button type="submit" class="mini-btn " id="ext-edit-btn" th:formaction="@{/edit-exten/{id}(id=${ext.id})}">
+        <!-- edit ღილაკი, ID დინამიურად ერგება ext.id -->
+        <button type="submit" class="mini-btn" 
+                th:id="'ext-edit-btn' + ${ext.id}" 
+                id="ext-edit-btn" 
+                th:formaction="@{/edit-exten/{id}(id=${ext.id})}">
             Edit
         </button>
 
-        <button type="submit" class="mini-btn" id="ext-delete-btn" th:formaction="@{/delete-exten/{id}(id=${ext.id})}">
+        <!-- delete ღილაკი, ID დინამიურად ერგება ext.id -->
+        <button type="submit" class="mini-btn" 
+                th:id="'ext-delete-btn' + ${ext.id}" 
+                id="ext-delete-btn" 
+                th:formaction="@{/delete-exten/{id}(id=${ext.id})}">
             Delete
         </button>
     </form>
 </div>
+
+<script>
+    // საძიებო ველის ფუნქციონალი
+    document.getElementById('searchField').addEventListener('input', function () {
+        const searchValue = this.value.toLowerCase();
+        const forms = document.querySelectorAll('.ext-form');
+        
+        forms.forEach(form => {
+            // ფორმის ID გამოგვაქვს
+            const formId = form.getAttribute('th:id').replace('ext-form', ''); // ext.id-თან შეხმატეს ID
+            if (formId && formId.includes(searchValue)) {
+                form.style.display = ''; // ვაჩვენოთ ფორმა
+            } else {
+                form.style.display = 'none'; // ვმალავთ ფორმას
+            }
+        });
+    });
+</script>
