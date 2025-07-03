@@ -53,6 +53,7 @@
     display: flex;
     justify-content: center;
     margin-bottom: 2rem;
+    text-align: center;
 }
 
 #server-settings-container form {
@@ -80,6 +81,7 @@
     border-radius: 4px;
     background-color: #fff;
     color: #020202;
+    text-align: center;
 }
 
 #server-settings-container input[type="text"]:focus {
@@ -117,5 +119,3 @@
         transform: translateY(0);
     }
 }
-
-

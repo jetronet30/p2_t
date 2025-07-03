@@ -24,20 +24,37 @@ function loadContent(url, button) {
     // აქტიური ღილაკის დამახსოვრება
     setActiveSubmenuButton(button);
 
-    const xhr = new XMLHttpRequest();
-    xhr.open('POST', url, true);
-    xhr.onload = function () {
-        if (xhr.status === 200) {
-            // მიღებული HTML ჩასვა main-ში
-            document.getElementById('main-content').innerHTML = xhr.responseText;
+    fetch(url, {
+        method: 'POST',
+    })
+    .then(response => {
+        if (response.ok) {
+            return response.text(); // პასუხის დამუშავება როგორც ტექსტი (HTML)
         } else {
-            document.getElementById('main-content').innerHTML = `<p>Failed to load content. Status: ${xhr.status}</p>`;
+            throw new Error(`Failed to load content. Status: ${response.status}`);
         }
-    };
-    xhr.onerror = function () {
-        document.getElementById('main-content').innerHTML = `<p>Error loading content.</p>`;
-    };
-    xhr.send();
+    })
+    .then(data => {
+        // მიღებული HTML ჩასვა main-ში
+        document.getElementById('main-content').innerHTML = data;
+
+        // დამატებითი ფუნქციონალის დატვირთვა
+        const page = url.split('/').pop(); // გვერდის სახელი URL-დან
+        import(`/scripts/${page}.js`)
+            .then(mod => {
+                if (typeof mod.init === "function") {
+                    mod.init(); // ინიციალიზაციის ფუნქციის გაშვება, თუ არსებობს
+                } else {
+                    console.warn(`No init() found in ${page}.js`);
+                }
+            })
+            .catch(err => {
+                console.warn(`No script found for ${page}:`, err.message);
+            });
+    })
+    .catch(error => {
+        document.getElementById('main-content').innerHTML = `<p style="color:red;">${error.message}</p>`;
+    });
 }
 
 // აქტიური submenu-button-ის მონიშვნა და ისარის დამატება

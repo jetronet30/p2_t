@@ -17,7 +17,7 @@ public class NetSerCon {
     private final NetService netService;
     private final LanConfigWritter lanConfigWritter;
 
-    @PostMapping("/network-settings")
+    @PostMapping("/networksettings")
     public String getNet(Model m) {
         m.addAttribute("net", netService.getNetModels());
         return "fragments/networksettings";

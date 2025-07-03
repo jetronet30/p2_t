@@ -41,21 +41,7 @@
         </button>
     </form>
 </div>
+<script th:src="@{/scripts/extensions.js}"></script>
 
-<script>
-    // საძიებო ველის ფუნქციონალი
-    document.getElementById('searchField').addEventListener('input', function () {
-        const searchValue = this.value.toLowerCase();
-        const forms = document.querySelectorAll('.ext-form');
-        
-        forms.forEach(form => {
-            // ფორმის ID გამოგვაქვს
-            const formId = form.getAttribute('th:id').replace('ext-form', ''); // ext.id-თან შეხმატეს ID
-            if (formId && formId.includes(searchValue)) {
-                form.style.display = ''; // ვაჩვენოთ ფორმა
-            } else {
-                form.style.display = 'none'; // ვმალავთ ფორმას
-            }
-        });
-    });
-</script>
+
+
