@@ -22,6 +22,12 @@ public class PjsipEndpoint {
     private String disallow;
 
     private String allow;
+    
+    private String callerId;
+
+    private String type;
+    private String password;
+
 
     @Column(name = "direct_media")
     private Boolean directMedia;
@@ -35,11 +41,5 @@ public class PjsipEndpoint {
     @Column(name = "aors")
     private String aorsId;
 
-    @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "auth", referencedColumnName = "id", insertable = false, updatable = false)
-    private PjsipAuth auth;
-
-    @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "aors", referencedColumnName = "id", insertable = false, updatable = false)
-    private PjsipAor aor;
+    
 }

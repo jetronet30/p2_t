@@ -21,7 +21,7 @@ public class ExtCon {
 
     @PostMapping("/extensions")
     public String postExt(Model model) {
-       // model.addAttribute("extensions", extensionService.getAllExtensionsSorted());
+        model.addAttribute("extensions", extensionService.getAllExtensionsSorteId());
         return "fragments/extensions";
     }
 
@@ -29,24 +29,25 @@ public class ExtCon {
     public String addExt(Model model,
             @RequestParam("exten") String exten, @RequestParam("exten-end") String extenEnd) {
         if (extenEnd != null && !extenEnd.isEmpty() && exten != null && !exten.isEmpty()) {
-            //extensionService.addExtensionsRange(exten, extenEnd);
+            extensionService.addExtensionsRange(exten, extenEnd);
+            extensionService.generatePjsipConf("/etc/asterisk/pjsip.conf");
         } else if (exten != null && !exten.isEmpty()) {
-            //extensionService.addExtension(exten, null, null, null);
+            extensionService.addExtension(exten);
+            extensionService.generatePjsipConf("/etc/asterisk/pjsip.conf");
         }
-        //model.addAttribute("extensions", extensionService.getAllExtensionsSorted());
+        model.addAttribute("extensions", extensionService.getAllExtensionsSorteId());
         return "fragments/extensions";
     }
 
     @ResponseBody
     @PostMapping("/edit-exten/{id}")
     public Map<String, Object> editExt(
-            @PathVariable("id") Long id,
-            @RequestParam("exten") String exten,
-            @RequestParam("secret") String secret,
+            @PathVariable("id") String id,
+            @RequestParam("password") String password,
             @RequestParam("callerId") String callerId,
             @RequestParam("context") String context) {
         try {
-            //extensionService.editExtension(id, exten, callerId, context, secret);
+            extensionService.editExtension(id, callerId, context, password);
             Map<String, Object> response = new HashMap<>();
             response.put("success", true);
             return response;
@@ -61,9 +62,11 @@ public class ExtCon {
 
     @ResponseBody
     @PostMapping("/delete-exten/{id}")
-    public Map<String, Object> deleteExt(@PathVariable("id") Long id) { 
+    public Map<String, Object> deleteExt(@PathVariable("id") String id) {
         Map<String, Object> res = new HashMap<>();
-        if (true) {
+        boolean success = extensionService.deleteExtension(id);
+        extensionService.generatePjsipConf("/etc/asterisk/pjsip.conf");
+        if (success) {
             res.put("success", true);
         } else {
             res.put("success", false);
@@ -71,5 +74,4 @@ public class ExtCon {
         }
         return res;
     }
-
 }
