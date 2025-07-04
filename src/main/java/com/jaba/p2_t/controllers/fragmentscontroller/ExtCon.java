@@ -21,7 +21,7 @@ public class ExtCon {
 
     @PostMapping("/extensions")
     public String postExt(Model model) {
-        model.addAttribute("extensions", extensionService.getAllExtensionsSorted());
+       // model.addAttribute("extensions", extensionService.getAllExtensionsSorted());
         return "fragments/extensions";
     }
 
@@ -29,11 +29,11 @@ public class ExtCon {
     public String addExt(Model model,
             @RequestParam("exten") String exten, @RequestParam("exten-end") String extenEnd) {
         if (extenEnd != null && !extenEnd.isEmpty() && exten != null && !exten.isEmpty()) {
-            extensionService.addExtensionsRange(exten, extenEnd);
+            //extensionService.addExtensionsRange(exten, extenEnd);
         } else if (exten != null && !exten.isEmpty()) {
-            extensionService.addExtension(exten, null, null, null);
+            //extensionService.addExtension(exten, null, null, null);
         }
-        model.addAttribute("extensions", extensionService.getAllExtensionsSorted());
+        //model.addAttribute("extensions", extensionService.getAllExtensionsSorted());
         return "fragments/extensions";
     }
 
@@ -46,7 +46,7 @@ public class ExtCon {
             @RequestParam("callerId") String callerId,
             @RequestParam("context") String context) {
         try {
-            extensionService.editExtension(id, exten, callerId, context, secret);
+            //extensionService.editExtension(id, exten, callerId, context, secret);
             Map<String, Object> response = new HashMap<>();
             response.put("success", true);
             return response;
@@ -63,7 +63,7 @@ public class ExtCon {
     @PostMapping("/delete-exten/{id}")
     public Map<String, Object> deleteExt(@PathVariable("id") Long id) { 
         Map<String, Object> res = new HashMap<>();
-        if (extensionService.deleteExtension(id)) {
+        if (true) {
             res.put("success", true);
         } else {
             res.put("success", false);

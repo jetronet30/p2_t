@@ -14,3 +14,6 @@ make config
 systemctl enable asterisk
 systemctl start asterisk
 systemctl status asterisk
+
+
+sudo apt install odbc-postgresql               დრაივერი  აუცილებელია!!!!!!!!!!!!!!!!!
