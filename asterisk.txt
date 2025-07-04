@@ -1,0 +1,16 @@
+cd /usr/src
+wget http://downloads.asterisk.org/pub/telephony/asterisk/asterisk-20-current.tar.gz
+tar zxvf asterisk-20-current.tar.gz
+rm -rf asterisk-20-current.tar.gz
+cd asterisk-20*/
+contrib/scripts/install_prereq install
+./configure
+make menuselect
+make
+contrib/scripts/get_mp3_source.sh
+make install
+make samples
+make config
+systemctl enable asterisk
+systemctl start asterisk
+systemctl status asterisk

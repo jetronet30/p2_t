@@ -31,7 +31,6 @@ public class ServerSettings {
         private String dataName;
         private String dataHost;
         private int dataPort;
-        private String sipDefPassword;
         private String licenzi;
     }
 
@@ -44,6 +43,25 @@ public class ServerSettings {
     public int getPort(){
         return config.getPort();
     }
+    public int getDataPort(){
+        return config.getDataPort();
+    }
+    public String getDataUser(){
+        return config.getDataUser();
+    }
+    public String getDataPassword(){
+        return config.getDataPassword();
+    }
+    public String getDataName(){
+        return config.getDataName();
+    }
+    public String getDataHost(){
+        return config.getDataHost();
+    }
+    public String getLicenzi(){
+        return config.getLicenzi();
+    }
+
 
     public static void initServerSettings() {
         if (!SETTINGS.exists()) {
@@ -55,8 +73,8 @@ public class ServerSettings {
         }
     }
 
-    public void editSetting(int _port, int _dataPort, String _dataUser, String _dataPassword,
-            String _dataName, String _dataHost, String _licenzi) {
+    public void editSetting(int _port, String _licenzi, int _dataPort, String _dataUser, String _dataPassword,
+            String _dataName, String _dataHost) {
         config.setPort(_port);
         config.setDataPort(_dataPort);
         config.setDataUser(_dataUser);
@@ -96,7 +114,6 @@ public class ServerSettings {
         def.setDataName("p2_t_db");
         def.setDataHost("localhost");
         def.setLicenzi("demo");
-        def.setSipDefPassword("minitelsy2");
         return def;
     }
 

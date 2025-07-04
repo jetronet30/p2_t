@@ -167,9 +167,29 @@ export function init() {
         }
     });
 
-   
+ document.getElementById("searchField").addEventListener("input", function () {
+    var searchTerm = this.value.toLowerCase();  // საძიებო ველი (საერთო მუყაო)
+    var forms = document.querySelectorAll(".exten-form");  // ყველა ფორმა
+
+    forms.forEach(function (form) {
+        var extInput = form.querySelector('input[name="exten"]');  // მოძებნე "exten" შიდა ინპუტი
+        var extVal = extInput ? extInput.value : '';  // თუ არის "exten" - მისი მნიშვნელობა
+
+        // შეამოწმეთ, რომ "exten" იწყება საძიებო სიტყვისგან
+        if (extVal.toLowerCase().startsWith(searchTerm)) {
+            form.style.display = '';  // აჩვენე ფორმა, თუ ემთხვევა
+            extInput.focus();  // დააფოკუსე "exten" ინპუტი
+            form.scrollIntoView({ behavior: 'smooth', block: 'center' });  // ავტომატურად გაათამაშე ფორმა
+        } else {
+            form.style.display = 'none';  // დამალე ფორმა, თუ არ ემთხვევა
+        }
+    });
+});
+
+
+
 }
 document.addEventListener('DOMContentLoaded', () => {
-  init();
+    init();
 });
 

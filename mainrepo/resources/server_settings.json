@@ -3,8 +3,7 @@
   "dataUser" : "jetronet",
   "dataPassword" : "bostana30",
   "dataName" : "p2_t_db",
-  "dataHost" : "localhost",
+  "dataHost" : "localHost",
   "dataPort" : 5432,
-  "sipDefPassword" : "minitelsy2",
   "licenzi" : "demo"
 }

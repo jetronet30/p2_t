@@ -75,7 +75,7 @@ export function init() {
     });
 
 
-    
+
     // ✅ 2. Edit ღილაკი ("server-settings-container"-ში)
     document.body.addEventListener("click", async (event) => {
         const btn = event.target.closest("button[type='submit']");
@@ -125,7 +125,11 @@ export function init() {
         }
     });
 
+    document.getElementById('ser-edit-btn-clone').addEventListener('click', function () {
+        document.getElementById('ser-edit-btn').click();  // იმ ღილაკს გამოწვევა
+    });
+
 }
 document.addEventListener('DOMContentLoaded', () => {
-  init();
+    init();
 });

@@ -1,4 +1,5 @@
 package com.jaba.p2_t.pbxmodels;
+
 import jakarta.persistence.*;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -15,8 +16,8 @@ public class Extension {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
 
-    @Column(length = 10)
-    private String exten; // eg: "1001"
+    @Column(length = 10, name = "extension_number", nullable = false)
+    private String extensionNumber; // eg: "1001"
 
     @Column(nullable = false)
     private String secret;  // SIP password

@@ -13,13 +13,13 @@
     </form>
 
     <!-- საძიებო ველი -->
-    <input type="text" id="searchField" placeholder="ძიება..." style="margin-top: 15px;">
+    <input type="text" id="searchField" placeholder="find..." style="margin-top: 15px;">
 </div>
 
 <div th:each="ext : ${extensions}" class="ext-form">
     <!-- თითოეული ფორმის ID იქნება დინამიური ext.id-ის მიხედვით -->
-    <form class="exten-form" method="post" th:id="'ext-form' + ${ext.id}">
-        <input type="text" name="exten" th:value="${ext.exten}">
+    <form class="exten-form" method="post"   >
+        <input type="text" name="exten" th:value="${ext.extensionNumber}">
         <input type="text" name="callerId" th:value="${ext.callerId}">
         <input type="text" name="context" th:value="${ext.context}">
         <input type="password" name="secret" th:value="${ext.secret}">

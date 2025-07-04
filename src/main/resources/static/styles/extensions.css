@@ -11,6 +11,8 @@
     margin-bottom: 20px;
     animation: slideDownFade 0.5s ease;
     transition: background-color 0.3s ease, backdrop-filter 0.3s ease;
+    align-items: center; /* Aligns the items vertically */
+    justify-content: space-between; /* Spreads the content */
 }
 
 @keyframes slideDownFade {
@@ -58,6 +60,28 @@
     background-color: #005b99;
 }
 
+/* ----------- Search Field on the Right ----------- */
+#searchField {
+    margin-left: auto;  /* Aligns the search field to the right */
+    padding: 6px 12px;
+    font-size: 0.9rem;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    background-color: #fff;
+    color: #333;
+    width: 180px;
+    transition: border-color 0.3s ease, box-shadow 0.3s ease;
+
+}
+
+#searchField:focus {
+    border-color: #007acc;
+    outline: none;
+    box-shadow: 0 0 3px rgba(0, 122, 204, 0.4);
+}
+
+/* ---------- Extension Forms Styling ---------- */
+
 .ext-form {
     padding: 2px 2px;
     background-color: #f7f7f7;
@@ -89,7 +113,6 @@
     color: #020202;
     width: 14ch;
 }
-
 
 .exten-form input:focus {
     border-color: #007acc;

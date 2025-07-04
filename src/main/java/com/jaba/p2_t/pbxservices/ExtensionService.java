@@ -18,9 +18,9 @@ public class ExtensionService {
     private static final String CONTEXT = "default";
 
     public void addExtension(String exten, String callerId, String context, String secret) {
-        if (!extensionRepo.existsByExten(exten)) {
+        if (!extensionRepo.existsByExtensionNumber(exten)) {
             Extension extension = new Extension();
-            extension.setExten(exten);
+            extension.setExtensionNumber(exten);
             extension.setCallerId((callerId != null && !callerId.isEmpty()) ? callerId : exten);
             extension.setContext((context != null && !context.isEmpty()) ? context : CONTEXT);
             extension.setSecret((secret != null && !secret.isEmpty()) ? secret : SECRET);
@@ -32,11 +32,11 @@ public class ExtensionService {
         Extension current = extensionRepo.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Extension not found"));
 
-        Extension existing = extensionRepo.findByExten(exten);
+        Extension existing = extensionRepo.findByExtensionNumber(exten);
         if (existing != null && !existing.getId().equals(id)) {
             throw new IllegalArgumentException("Exten already exists for another record");
         }
-        current.setExten(exten);
+        current.setExtensionNumber(exten);
         current.setCallerId((callerId != null && !callerId.isEmpty()) ? callerId : exten);
         current.setContext((context != null && !context.isEmpty()) ? context : current.getContext());
         current.setSecret((secret != null && !secret.isEmpty()) ? secret : current.getSecret());
@@ -58,7 +58,7 @@ public class ExtensionService {
     }
 
     public List<Extension> getAllExtensionsSorted() {
-        return extensionRepo.findAll(Sort.by(Sort.Direction.ASC, "exten"));
+        return extensionRepo.findAll(Sort.by(Sort.Direction.ASC, "extensionNumber"));
     }
 
     public void addExtensionsRange(String startExten, String endExten) {
@@ -76,9 +76,9 @@ public class ExtensionService {
 
         for (int i = start; i <= end; i++) {
             String exten = String.valueOf(i);
-            if (!extensionRepo.existsByExten(exten)) {
+            if (!extensionRepo.existsByExtensionNumber(exten)) {
                 Extension extension = new Extension();
-                extension.setExten(exten);
+                extension.setExtensionNumber(exten);
                 extension.setCallerId(exten);
                 extension.setContext(CONTEXT);
                 extension.setSecret(SECRET);
