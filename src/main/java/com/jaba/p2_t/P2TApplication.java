@@ -6,9 +6,6 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import com.jaba.p2_t.bootinit.MainInit;
 
 
-
-
-
 @SpringBootApplication
 
 public class P2TApplication {

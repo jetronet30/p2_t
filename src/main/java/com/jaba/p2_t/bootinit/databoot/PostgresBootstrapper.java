@@ -126,13 +126,21 @@ public class PostgresBootstrapper {
         try {
             // extconfig.conf
             String extconfigContent = """
-                                        [settings]
-                                        ps_endpoints => odbc,asterisk
-                                        ps_auths => odbc,asterisk
-                                        ps_aors => odbc,asterisk
-                                        """;
-
+                    [settings]
+                    ps_endpoints => odbc,asterisk,ps_endpoints
+                    ps_auths => odbc,asterisk,ps_auths
+                    ps_aors => odbc,asterisk,ps_aors
+                    """;
             writeFile("/etc/asterisk/extconfig.conf", extconfigContent);
+
+            // sorcery.conf
+            String sorceryContent = """
+                    [res_pjsip]
+                    endpoint=realtime,ps_endpoints
+                    auth=realtime,ps_auths
+                    aor=realtime,ps_aors
+                    """;
+            writeFile("/etc/asterisk/sorcery.conf", sorceryContent);
 
             // odbc.ini
             String odbcIniContent = """
@@ -150,7 +158,6 @@ public class PostgresBootstrapper {
                     ServerSettings.s_getDataPort(),
                     ServerSettings.s_getDataUser(),
                     ServerSettings.s_getDataPassword());
-
             writeFile("/etc/odbc.ini", odbcIniContent);
 
             // odbcinst.ini
@@ -161,11 +168,9 @@ public class PostgresBootstrapper {
                     Setup=/usr/lib/x86_64-linux-gnu/odbc/libodbcpsqlS.so
                     FileUsage=1
                     """;
-
             writeFile("/etc/odbcinst.ini", odbcInstContent);
 
             System.out.println("✅ ODBC configuration files written successfully.");
-
         } catch (Exception e) {
             System.err.println("❌ Failed to generate ODBC config files: " + e.getMessage());
             e.printStackTrace();

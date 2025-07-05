@@ -32,6 +32,7 @@ public class ServerSettings {
         private String dataHost;
         private int dataPort;
         private String licenzi;
+        private boolean useData;
     }
 
     public static String getFullDBHost() {
@@ -134,6 +135,7 @@ public class ServerSettings {
         def.setDataName("p2_t_db");
         def.setDataHost("localhost");
         def.setLicenzi("demo");
+        def.setUseData(true);
         return def;
     }
 

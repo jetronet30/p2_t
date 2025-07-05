@@ -41,4 +41,8 @@
         <button type="submit" class="submit-btn">Save</button>
     </form>
 </div>
-<script th:src="@{/scripts/networksettings.js}"></script>
+<script th:src="@{/scripts/networksettings.js}" type="module"></script>
+<script type="module">
+    import { init } from '/scripts/networksettings.js';
+    document.addEventListener('DOMContentLoaded', () => init());
+</script>
