@@ -62,6 +62,26 @@ public class ServerSettings {
         return config.getLicenzi();
     }
 
+    public static int s_getPort(){
+        return config.getPort();
+    }
+
+    public static int s_getDataPort(){
+        return config.getDataPort();
+    }
+    public static String s_getDataUser(){
+        return config.getDataUser();
+    }
+    public static String s_getDataPassword(){
+        return config.getDataPassword();
+    }
+    public static String s_getDataName(){
+        return config.getDataName();
+    }
+    public static String s_getDataHost(){
+        return config.getDataHost();
+    }
+
 
     public static void initServerSettings() {
         if (!SETTINGS.exists()) {

@@ -16,4 +16,6 @@ systemctl start asterisk
 systemctl status asterisk
 
 
-sudo apt install odbc-postgresql               დრაივერი  აუცილებელია!!!!!!!!!!!!!!!!!
+sudo apt install odbc-postgresql               დრაივერი  აუცილებელია!!!!!!!!!!!!!!!!!  postgres
+
+sudo apt install unixodbc unixodbc-dev odbc-mariadb     დრაივერი  აუცილებელია!!!!!!!!!!!!!!!!!   mariadb

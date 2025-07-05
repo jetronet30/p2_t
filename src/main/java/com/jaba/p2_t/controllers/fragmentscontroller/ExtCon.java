@@ -30,10 +30,10 @@ public class ExtCon {
             @RequestParam("exten") String exten, @RequestParam("exten-end") String extenEnd) {
         if (extenEnd != null && !extenEnd.isEmpty() && exten != null && !exten.isEmpty()) {
             extensionService.addExtensionsRange(exten, extenEnd);
-            extensionService.generatePjsipConf("/etc/asterisk/pjsip.conf");
+            //extensionService.generatePjsipConf("/etc/asterisk/pjsip.conf");
         } else if (exten != null && !exten.isEmpty()) {
             extensionService.addExtension(exten);
-            extensionService.generatePjsipConf("/etc/asterisk/pjsip.conf");
+            //extensionService.generatePjsipConf("/etc/asterisk/pjsip.conf");
         }
         model.addAttribute("extensions", extensionService.getAllExtensionsSorteId());
         return "fragments/extensions";
@@ -48,6 +48,7 @@ public class ExtCon {
             @RequestParam("context") String context) {
         try {
             extensionService.editExtension(id, callerId, context, password);
+            //extensionService.generatePjsipConf("/etc/asterisk/pjsip.conf");
             Map<String, Object> response = new HashMap<>();
             response.put("success", true);
             return response;
@@ -65,7 +66,7 @@ public class ExtCon {
     public Map<String, Object> deleteExt(@PathVariable("id") String id) {
         Map<String, Object> res = new HashMap<>();
         boolean success = extensionService.deleteExtension(id);
-        extensionService.generatePjsipConf("/etc/asterisk/pjsip.conf");
+        //extensionService.generatePjsipConf("/etc/asterisk/pjsip.conf");
         if (success) {
             res.put("success", true);
         } else {

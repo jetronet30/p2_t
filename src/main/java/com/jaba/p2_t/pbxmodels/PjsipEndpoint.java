@@ -22,11 +22,11 @@ public class PjsipEndpoint {
     private String disallow;
 
     private String allow;
-    
+     @Column(name = "callerid")
     private String callerId;
 
     private String type;
-    private String password;
+    private String shower;
 
 
     @Column(name = "direct_media")

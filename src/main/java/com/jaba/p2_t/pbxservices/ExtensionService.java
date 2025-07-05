@@ -41,7 +41,7 @@ public class ExtensionService {
             endpoint.setDtmfMode("rfc4733");
             endpoint.setDirectMedia(false);
             endpoint.setCallerId(userId + "<" + userId + ">");
-            endpoint.setPassword("12345678");
+            endpoint.setShower("12345678");
             auth.setId(userId);
             auth.setAuthType("userpass");
             auth.setUsername(userId);
@@ -61,7 +61,7 @@ public class ExtensionService {
         if (endpoint != null && auth != null && aor != null) {
             endpoint.setCallerId(callerId);
             endpoint.setContext(context);
-            endpoint.setPassword(password);
+            endpoint.setShower(password);
             auth.setPassword(password);
             pjsipEndpointRepositor.save(endpoint);
             pAuthRepositor.save(auth);
@@ -156,7 +156,7 @@ public class ExtensionService {
                 // Auth block
                 PjsipAuth auth = pAuthRepositor.findById(id).orElse(null);
                 if (auth != null) {
-                    writer.write("[" + id + "_auth]");
+                    writer.write("[" + id + "]");
                     writer.newLine();
                     writer.write("type=auth");
                     writer.newLine();
@@ -172,7 +172,7 @@ public class ExtensionService {
                 // Aor block
                 PjsipAor aor = pAorRepositor.findById(id).orElse(null);
                 if (aor != null) {
-                    writer.write("[" + id + "_aor]");
+                    writer.write("[" + id + "]");
                     writer.newLine();
                     writer.write("type=aor");
                     writer.newLine();
