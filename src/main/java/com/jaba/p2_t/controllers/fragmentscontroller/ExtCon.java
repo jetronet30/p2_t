@@ -21,7 +21,9 @@ public class ExtCon {
 
     @PostMapping("/extensions")
     public String postExt(Model model) {
+        extensionService.updateEndpointsConnIpFromCli();
         model.addAttribute("extensions", extensionService.getAllExtensionsSorteId());
+        
         return "fragments/extensions";
     }
 

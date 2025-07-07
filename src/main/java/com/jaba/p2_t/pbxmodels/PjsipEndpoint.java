@@ -22,12 +22,13 @@ public class PjsipEndpoint {
     private String disallow;
 
     private String allow;
-     @Column(name = "callerid")
+
+    @Column(name = "callerid")
     private String callerId;
 
     private String type;
-    private String shower;
 
+    private String shower;
 
     @Column(name = "direct_media")
     private Boolean directMedia;
@@ -41,5 +42,8 @@ public class PjsipEndpoint {
     @Column(name = "aors")
     private String aorsId;
 
-    
+    @Column(name = "mailboxes")
+    private String mailboxes;
+    @Column(name = "conn_ip") // ახალი ველი IP მისამართისთვის
+    private String connIp;
 }

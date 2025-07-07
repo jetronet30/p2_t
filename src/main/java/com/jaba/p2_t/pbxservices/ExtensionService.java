@@ -1,9 +1,13 @@
 package com.jaba.p2_t.pbxservices;
 
+import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.springframework.stereotype.Service;
 import org.springframework.data.domain.Sort;
@@ -188,6 +192,42 @@ public class ExtensionService {
         } catch (IOException e) {
             e.printStackTrace();
             return false;
+        }
+    }
+
+     public void updateEndpointsConnIpFromCli() {
+        try {
+            ProcessBuilder pb = new ProcessBuilder("asterisk", "-rx", "pjsip show contacts");
+            Process process = pb.start();
+
+            try (BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()))) {
+                String line;
+
+                // Regex ამოღებისთვის: მაგალითად
+                // Contact:  1104/sip:1104@192.168.1.17:5063                a8b0676f83 NonQual         nan
+                Pattern pattern = Pattern.compile("Contact:\\s+(\\S+)/sip:[^@]+@([0-9.]+):\\d+");
+
+                while ((line = reader.readLine()) != null) {
+                    Matcher matcher = pattern.matcher(line);
+                    if (matcher.find()) {
+                        String endpointId = matcher.group(1);
+                        String ip = matcher.group(2);
+
+                        // პოვნა DB-ში და IP-ის განახლება
+                        pjsipEndpointRepositor.findById(endpointId).ifPresent(endpoint -> {
+                            endpoint.setConnIp(ip); // შენ უნდა დაამატო get/set ConnIp თავის მოდელში!
+                            pjsipEndpointRepositor.save(endpoint);
+                        });
+                    }
+                }
+            }
+
+            int exitCode = process.waitFor();
+            if (exitCode != 0) {
+                System.err.println("asterisk command exited with code: " + exitCode);
+            }
+        } catch (IOException | InterruptedException e) {
+            e.printStackTrace();
         }
     }
 }

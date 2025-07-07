@@ -23,6 +23,7 @@
         <input type="text" name="callerId" th:value="${ext.callerId}">
         <input type="text" name="context" th:value="${ext.context}">
         <input type="password" name="password" th:value="${ext.shower}">
+        <a th:href="'http://' + ${ext.connIp}" target="_blank" rel="noopener noreferrer" th:text="${ext.connIp}">IP</a>
         <!-- edit ღილაკი, ID დინამიურად ერგება ext.id -->
         <button type="submit" class="mini-btn" 
                 th:id="'ext-edit-btn' + ${ext.id}" 
