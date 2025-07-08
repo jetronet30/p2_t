@@ -5,12 +5,16 @@ import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.springframework.stereotype.Service;
 import org.springframework.data.domain.Sort;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.jaba.p2_t.pbxmodels.PjsipAor;
 import com.jaba.p2_t.pbxmodels.PjsipAuth;
@@ -24,9 +28,73 @@ import lombok.RequiredArgsConstructor;
 @Service
 @RequiredArgsConstructor
 public class ExtensionService {
+    
+    private final SipSettingsInit settingsInit;
     private final PjsipEndpointRepositor pjsipEndpointRepositor;
     private final PjsipAuthRepositor pAuthRepositor;
     private final PjsipAorRepositor pAorRepositor;
+
+    @Transactional
+    public void addExtensionsRange(String start, String end) {
+        try {
+            int from = Integer.parseInt(start);
+            int to = Integer.parseInt(end);
+
+            if (from > to) {
+                System.out.println("Invalid range: start > end");
+                return;
+            }
+
+            Set<String> existingIds = new HashSet<>(pjsipEndpointRepositor.findAllIds());
+
+            List<PjsipEndpoint> endpoints = new ArrayList<>();
+            List<PjsipAuth> auths = new ArrayList<>();
+            List<PjsipAor> aors = new ArrayList<>();
+
+            for (int i = from; i <= to; i++) {
+                String userId = String.valueOf(i);
+
+                if (!existingIds.contains(userId)) {
+                    PjsipEndpoint endpoint = new PjsipEndpoint();
+                    endpoint.setId(userId);
+                    endpoint.setAorsId(userId);
+                    endpoint.setAuthId(userId);
+                    endpoint.setType("endpoint");
+                    endpoint.setTransport("udp");
+                    endpoint.setContext("default");
+                    endpoint.setDisallow("all");
+                    endpoint.setAllow("ulaw,alaw");
+                    endpoint.setDtmfMode(settingsInit.getDtmfMode());
+                    endpoint.setDirectMedia(false);
+                    endpoint.setCallerId(userId + "<" + userId + ">");
+                    endpoint.setShower(settingsInit.getDefPassword());
+
+                    PjsipAuth auth = new PjsipAuth();
+                    auth.setId(userId);
+                    auth.setAuthType("userpass");
+                    auth.setUsername(userId);
+                    auth.setPassword(settingsInit.getDefPassword());
+
+                    PjsipAor aor = new PjsipAor();
+                    aor.setId(userId);
+                    aor.setMaxContacts(100);
+
+                    endpoints.add(endpoint);
+                    auths.add(auth);
+                    aors.add(aor);
+                }
+            }
+
+            pjsipEndpointRepositor.saveAll(endpoints);
+            pAuthRepositor.saveAll(auths);
+            pAorRepositor.saveAll(aors);
+
+            System.out.println("Extensions added: " + start + " to " + end);
+
+        } catch (NumberFormatException e) {
+            System.out.println("Invalid input: not a number");
+        }
+    }
 
     public void addExtension(String userId) {
         if (!pjsipEndpointRepositor.existsById(userId) && !pAuthRepositor.existsById(userId)
@@ -38,18 +106,18 @@ public class ExtensionService {
             endpoint.setAorsId(userId);
             endpoint.setAuthId(userId);
             endpoint.setType("endpoint");
-            endpoint.setTransport("transport-udp");
+            endpoint.setTransport("udp");
             endpoint.setContext("default");
             endpoint.setDisallow("all");
             endpoint.setAllow("ulaw,alaw");
-            endpoint.setDtmfMode("rfc4733");
+            endpoint.setDtmfMode(settingsInit.getDtmfMode());
             endpoint.setDirectMedia(false);
             endpoint.setCallerId(userId + "<" + userId + ">");
-            endpoint.setShower("12345678");
+            endpoint.setShower(settingsInit.getDefPassword());
             auth.setId(userId);
             auth.setAuthType("userpass");
             auth.setUsername(userId);
-            auth.setPassword("12345678");
+            auth.setPassword(settingsInit.getDefPassword());
             aor.setId(userId);
             aor.setMaxContacts(100);
             pjsipEndpointRepositor.save(endpoint);
@@ -73,27 +141,6 @@ public class ExtensionService {
         }
     }
 
-    public void addExtensionsRange(String start, String end) {
-        try {
-            int from = Integer.parseInt(start);
-            int to = Integer.parseInt(end);
-
-            if (from > to) {
-                System.out.println("Invalid range: start > end");
-                return;
-            }
-
-            for (int i = from; i <= to; i++) {
-                String userId = String.valueOf(i);
-                addExtension(userId);
-            }
-
-            System.out.println("Extensions added: " + start + " to " + end);
-        } catch (NumberFormatException e) {
-            System.out.println("Invalid input: not a number");
-        }
-    }
-
     public boolean deleteExtension(String id) {
         pjsipEndpointRepositor.deleteById(id);
         pAuthRepositor.deleteById(id);
@@ -109,16 +156,10 @@ public class ExtensionService {
         return pjsipEndpointRepositor.findAll(Sort.by(Sort.Direction.ASC, "id"));
     }
 
-    /**
-     * Generates pjsip.conf file from DB records.
-     * @param filePath full path to write pjsip.conf, e.g. "/etc/asterisk/pjsip.conf"
-     * @return true if file written successfully, false on error
-     */
     public boolean generatePjsipConf(String filePath) {
         List<PjsipEndpoint> endpoints = pjsipEndpointRepositor.findAll();
 
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(filePath))) {
-            // Write transport section once
             writer.write("[transport-udp]");
             writer.newLine();
             writer.write("type=transport");
@@ -132,7 +173,6 @@ public class ExtensionService {
             for (PjsipEndpoint endpoint : endpoints) {
                 String id = endpoint.getId();
 
-                // Endpoint block
                 writer.write("[" + id + "]");
                 writer.newLine();
                 writer.write("type=endpoint");
@@ -149,7 +189,7 @@ public class ExtensionService {
                 writer.newLine();
                 writer.write("dtmf_mode=" + endpoint.getDtmfMode());
                 writer.newLine();
-                writer.write("direct_media=no" );
+                writer.write("direct_media=no");
                 writer.newLine();
                 writer.write("callerid=" + endpoint.getCallerId());
                 writer.newLine();
@@ -157,7 +197,6 @@ public class ExtensionService {
                 writer.newLine();
                 writer.newLine();
 
-                // Auth block
                 PjsipAuth auth = pAuthRepositor.findById(id).orElse(null);
                 if (auth != null) {
                     writer.write("[" + id + "]");
@@ -173,7 +212,6 @@ public class ExtensionService {
                     writer.newLine();
                 }
 
-                // Aor block
                 PjsipAor aor = pAorRepositor.findById(id).orElse(null);
                 if (aor != null) {
                     writer.write("[" + id + "]");
@@ -195,16 +233,13 @@ public class ExtensionService {
         }
     }
 
-     public void updateEndpointsConnIpFromCli() {
+    public void updateEndpointsConnIpFromCli() {
         try {
             ProcessBuilder pb = new ProcessBuilder("asterisk", "-rx", "pjsip show contacts");
             Process process = pb.start();
 
             try (BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()))) {
                 String line;
-
-                // Regex ამოღებისთვის: მაგალითად
-                // Contact:  1104/sip:1104@192.168.1.17:5063                a8b0676f83 NonQual         nan
                 Pattern pattern = Pattern.compile("Contact:\\s+(\\S+)/sip:[^@]+@([0-9.]+):\\d+");
 
                 while ((line = reader.readLine()) != null) {
@@ -213,9 +248,8 @@ public class ExtensionService {
                         String endpointId = matcher.group(1);
                         String ip = matcher.group(2);
 
-                        // პოვნა DB-ში და IP-ის განახლება
                         pjsipEndpointRepositor.findById(endpointId).ifPresent(endpoint -> {
-                            endpoint.setConnIp(ip); // შენ უნდა დაამატო get/set ConnIp თავის მოდელში!
+                            endpoint.setConnIp(ip);
                             pjsipEndpointRepositor.save(endpoint);
                         });
                     }

@@ -20,6 +20,14 @@ public class NetService {
     private static final Logger log = LoggerFactory.getLogger(NetService.class);
     private static final File NETWORCK_FOLDER = new File("/etc/netplan");
 
+    public Map<String, String> maplan() {
+    Map<String, String> map = new LinkedHashMap<>();
+    for (NetModels model : getNetModels()) {
+        map.put(model.getNickname(), model.getIpAddress()); // ან .getName()
+    }
+    return map;
+}
+
     @SuppressWarnings("unchecked")
     @PostConstruct
     public List<NetModels> getNetModels() {

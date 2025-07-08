@@ -1,0 +1,50 @@
+<div class="sip-actions">
+    <button type="submit" class="sip-act-btn" id="sip-edit-btn-clone">
+        Edit 
+    </button>
+    <form action="/sip-reboot" method="post" class="sip-form">
+        <button type="submit" class="sip-act-btn" id="sip-reboot-btn">Reboot</button>
+    </form>
+
+    <form action="/sip-factory-reset" method="post" class="range-form">
+        <input type="text" name="key">
+        <button type="submit" class="sip-act-btn" id="sip-factory-btn">Factory Reset</button>
+    </form>
+</div>
+<div id="sip-settings-container">
+    <form action="/sip-settings-set">
+        <label for="sip-udp-port">UDP Port</label>
+        <input type="text" name="sip-udp-port" id="sip-udp-port" th:value="${udpPort}">
+        <label for="sip-port">TCP Port</label>
+        <input type="text" name="sip-tcp-port" id="sip-tcp-port" th:value="${tcpPort}">
+        <label for="sip-port">TLS Port</label>
+        <input type="text" name="sip-tls-port" id="sip-tls-port" th:value="${tlsPort}">
+        <label for="sip-dtmf">DTMF</label>
+        <select name="sip-dtmf" id="sip-dtmf" required>
+            <option th:value="${dtmf}" th:text="${dtmf}"></option>
+            <option value="auto" >auto</option>
+            <option value="rfc4733" >rfc4733</option>
+            <option value="inband" >inband</option>
+            <option value="info" >info</option>
+            </option>
+        </select>
+
+        <label for="sip-bind-addres">Interfaces</label>
+        <select name="sip-bind-addres" id="sip-bind-addres" required>
+            <option th:value="${bindAddress}" th:text="${bindAddress}"></option>
+            <option value="0.0.0.0">0.0.0.0</option>
+            <option th:each="lan : ${lans}" th:value="${lan.value}" th:text="${lan.key + '  ' + lan.value}"></option>
+
+            </option>
+        </select>
+
+        <label for="sip-default-password">Default Password</label>
+        <input type="text" name="sip-default-password" id="sip-default-password" th:value="${defaultPassword}">
+
+
+        <button type="submit" class="sip-btn" id="sip-edit-btn" hidden>
+            Edit
+        </button>
+    </form>
+</div>
+<script th:src="@{/scripts/sipsettings.js}"></script>

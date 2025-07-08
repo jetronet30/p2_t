@@ -152,3 +152,10 @@
     background-color: #ffeb3b;
     color: #007acc;
 }
+
+.conn-link {
+    color: #038018;
+    text-decoration: underline;
+    font-family: 'Courier New', monospace;
+    text-decoration: none;
+}
