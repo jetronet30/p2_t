@@ -30,7 +30,7 @@ import lombok.RequiredArgsConstructor;
 public class ExtensionService {
     private final TrunkService tService;
     
-    private final SipSettingsInit settingsInit;
+    private final SipSettings settingsInit;
     private final PjsipEndpointRepositor pjsipEndpointRepositor;
     private final PjsipAuthRepositor pAuthRepositor;
     private final PjsipAorRepositor pAorRepositor;

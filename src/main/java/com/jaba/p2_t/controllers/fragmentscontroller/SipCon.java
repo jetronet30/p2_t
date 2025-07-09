@@ -10,24 +10,24 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.jaba.p2_t.networck.NetService;
-import com.jaba.p2_t.pbxservices.SipSettingsInit;
+import com.jaba.p2_t.pbxservices.SipSettings;
 
 import lombok.RequiredArgsConstructor;
 
 @Controller
 @RequiredArgsConstructor
 public class SipCon {
-    private final SipSettingsInit sipSettingsInit;
+    private final SipSettings sipSettings;
     private final NetService netService;
 
     @PostMapping("/sipsettings")
     public String postSip(Model m) {
-        m.addAttribute("udpPort", sipSettingsInit.getSipUdpPort());
-        m.addAttribute("tcpPort", sipSettingsInit.getSipTcpPort());
-        m.addAttribute("tlsPort", sipSettingsInit.getSipTlsPort());
-        m.addAttribute("defaultPassword", sipSettingsInit.getDefPassword());
-        m.addAttribute("dtmf", sipSettingsInit.getDtmfMode());
-        m.addAttribute("bindAddress", sipSettingsInit.getBindAddress());
+        m.addAttribute("udpPort", sipSettings.getSipUdpPort());
+        m.addAttribute("tcpPort", sipSettings.getSipTcpPort());
+        m.addAttribute("tlsPort", sipSettings.getSipTlsPort());
+        m.addAttribute("defaultPassword", sipSettings.getDefPassword());
+        m.addAttribute("dtmf", sipSettings.getDtmfMode());
+        m.addAttribute("bindAddress", sipSettings.getBindAddress());
         m.addAttribute("lans", netService.maplan());
         return "fragments/sipsettings";
     }
@@ -41,14 +41,14 @@ public class SipCon {
             @RequestParam("sip-dtmf") String dtmf,
             @RequestParam("sip-bind-addres") String bindAddress,
             @RequestParam("sip-default-password") String defaulPassword) {
-        m.addAttribute("udpPort", sipSettingsInit.getSipUdpPort());
-        m.addAttribute("tcpPort", sipSettingsInit.getSipTcpPort());
-        m.addAttribute("tlsPort", sipSettingsInit.getSipTlsPort());
-        m.addAttribute("defaultPassword", sipSettingsInit.getDefPassword());
-        m.addAttribute("dtmf", sipSettingsInit.getDtmfMode());
-        m.addAttribute("bindAddress", sipSettingsInit.getBindAddress());
+        m.addAttribute("udpPort", sipSettings.getSipUdpPort());
+        m.addAttribute("tcpPort", sipSettings.getSipTcpPort());
+        m.addAttribute("tlsPort", sipSettings.getSipTlsPort());
+        m.addAttribute("defaultPassword", sipSettings.getDefPassword());
+        m.addAttribute("dtmf", sipSettings.getDtmfMode());
+        m.addAttribute("bindAddress", sipSettings.getBindAddress());
         m.addAttribute("lans", netService.maplan());
-        if (sipSettingsInit.editSipSettings(udpPort, tcpPort, tlsPort, defaulPassword, dtmf, bindAddress)) {
+        if (sipSettings.editSipSettings(udpPort, tcpPort, tlsPort, defaulPassword, dtmf, bindAddress)) {
             Map<String, Object> response = new HashMap<>();
             response.put("success", true);
             return response;

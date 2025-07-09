@@ -18,7 +18,7 @@ import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
-public class SipSettingsInit {
+public class SipSettings {
     private final AsteriskManager asteriskManager;
     private final SipSettingsRepo sRepo;
     private static final File SIP_SETTINGS = new File(RepoInit.SERVER_RESOURCES, "sip_settings.json");
