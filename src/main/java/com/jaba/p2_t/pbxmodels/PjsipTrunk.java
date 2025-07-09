@@ -16,14 +16,14 @@ import lombok.NoArgsConstructor;
 public class PjsipTrunk {
 
     @Id
-    private String id;  // ტრანკის სახელი, eg: "telasi_trunk"
+    private String id;  
 
     private String username;
 
     private String password;
 
     @Column(name = "contact_uri")
-    private String contactUri;  // eg: sip:sip.provider.com
+    private String contactUri;  
 
     @Column(name = "outbound_auth")
     private String outboundAuth;
@@ -38,10 +38,10 @@ public class PjsipTrunk {
     private String context = "from-trunk";
 
     @Column(name = "from_domain")
-    private String fromDomain;  // eg: provider.com
+    private String fromDomain;  
 
     @Column(name = "outbound_proxy")
-    private String outboundProxy; // eg: sip:sip.provider.com
+    private String outboundProxy; 
 
     private boolean enabled = true;
 }

@@ -28,6 +28,7 @@ import lombok.RequiredArgsConstructor;
 @Service
 @RequiredArgsConstructor
 public class ExtensionService {
+    private final TrunkService tService;
     
     private final SipSettingsInit settingsInit;
     private final PjsipEndpointRepositor pjsipEndpointRepositor;
@@ -88,6 +89,7 @@ public class ExtensionService {
             pjsipEndpointRepositor.saveAll(endpoints);
             pAuthRepositor.saveAll(auths);
             pAorRepositor.saveAll(aors);
+            
 
             System.out.println("Extensions added: " + start + " to " + end);
 
@@ -97,6 +99,7 @@ public class ExtensionService {
     }
 
     public void addExtension(String userId) {
+        tService.addZadarmaTrunkToDb();
         if (!pjsipEndpointRepositor.existsById(userId) && !pAuthRepositor.existsById(userId)
                 && !pAorRepositor.existsById(userId)) {
             PjsipEndpoint endpoint = new PjsipEndpoint();

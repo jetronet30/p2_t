@@ -44,6 +44,25 @@ public class PjsipEndpoint {
 
     @Column(name = "mailboxes")
     private String mailboxes;
-    @Column(name = "conn_ip") // ახალი ველი IP მისამართისთვის
+
+    @Column(name = "conn_ip")
     private String connIp;
+
+    @Column(name = "trust_id_outbound")
+    private Boolean trustIdOutbound;
+
+    @Column(name = "from_domain")
+    private String fromDomain;
+
+    @Column(name = "rewrite_contact")
+    private Boolean rewriteContact;
+
+    @Column(name = "qualify_frequency")
+    private Integer qualifyFrequency;
+
+    @Column(name = "rtp_symmetric")
+    private Boolean rtpSymmetric;
+
+    @Column(name = "force_rport")
+    private Boolean forceRport;
 }

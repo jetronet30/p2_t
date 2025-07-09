@@ -130,7 +130,6 @@ public class PostgresBootstrapper {
                     ps_endpoints => odbc,asterisk,ps_endpoints
                     ps_auths => odbc,asterisk,ps_auths
                     ps_aors => odbc,asterisk,ps_aors
-                    ps_contacts => odbc,asterisk,ps_contacts
                     """;
             writeFile("/etc/asterisk/extconfig.conf", extconfigContent);
 
@@ -140,7 +139,6 @@ public class PostgresBootstrapper {
                     endpoint=realtime,ps_endpoints
                     auth=realtime,ps_auths
                     aor=realtime,ps_aors
-                    contacts=realtime,ps_contacts
                     """;
                     
             writeFile("/etc/asterisk/sorcery.conf", sorceryContent);

@@ -1,109 +1,107 @@
 package com.jaba.p2_t.pbxservices;
 
-import java.io.BufferedWriter;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.util.List;
-
 import org.springframework.stereotype.Service;
-
-import com.jaba.p2_t.pbxmodels.PjsipTrunk;
-import com.jaba.p2_t.pbxrepos.PjsipTrunkRepositor;
+import com.jaba.p2_t.pbxrepos.PjsipAorRepositor;
+import com.jaba.p2_t.pbxrepos.PjsipAuthRepositor;
+import com.jaba.p2_t.pbxrepos.PjsipEndpointRepositor;
+import com.jaba.p2_t.pbxmodels.PjsipAor;
+import com.jaba.p2_t.pbxmodels.PjsipAuth;
+import com.jaba.p2_t.pbxmodels.PjsipEndpoint;
 
 import lombok.RequiredArgsConstructor;
+
+import java.io.IOException;
+import java.nio.file.*;
 
 @Service
 @RequiredArgsConstructor
 public class TrunkService {
 
-    private final PjsipTrunkRepositor trunkRepositor;
+    private final PjsipAuthRepositor authRepo;
+    private final PjsipAorRepositor aorRepo;
+    private final PjsipEndpointRepositor endpointRepo;
 
-    public void addTrunk(PjsipTrunk trunk) {
-        if (!trunkRepositor.existsById(trunk.getId())) {
-            trunkRepositor.save(trunk);
+    private static final String PJSIP_CONF_PATH = "/etc/asterisk/pjsip.conf";
+
+    public void addZadarmaTrunkToDb() {
+        // --- Auth ---
+        if (!authRepo.existsById("trunk-123403-sip-auth")) {
+            PjsipAuth auth = new PjsipAuth();
+            auth.setId("trunk-123403-sip-auth");
+            auth.setAuthType("userpass");
+            auth.setUsername("123403");
+            auth.setPassword("QtmLfFE7x6");
+            authRepo.save(auth);
         }
-    }
 
-    public boolean deleteTrunk(String id) {
-        if (trunkRepositor.existsById(id)) {
-            trunkRepositor.deleteById(id);
-            return true;
+        // --- AOR ---
+        if (!aorRepo.existsById("trunk-123403-sip-aor")) {
+            PjsipAor aor = new PjsipAor();
+            aor.setId("trunk-123403-sip-aor");
+            aor.setContact("sip:123403@sip.zadarma.com");
+            aor.setMaxContacts(1);
+            aor.setRemoveExisting(true);
+            aorRepo.save(aor);
         }
-        return false;
+
+        // --- Endpoint ---
+        if (!endpointRepo.existsById("trunk-123403-sip")) {
+            PjsipEndpoint ep = new PjsipEndpoint();
+            ep.setId("trunk-123403-sip");
+            ep.setType("endpoint");
+            ep.setTransport("udp");
+            ep.setContext("from-trunk");
+            ep.setDisallow("all");
+            ep.setAllow("ulaw,alaw");
+            ep.setAuthId("trunk-123403-sip-auth");
+            ep.setAorsId("trunk-123403-sip-aor");
+            ep.setCallerId("123403 <123403>");
+            ep.setDirectMedia(false);
+            ep.setDtmfMode("rfc4733");
+            ep.setTrustIdOutbound(true);
+            ep.setFromDomain("sip.zadarma.com");
+            ep.setRewriteContact(true);
+            ep.setQualifyFrequency(60);
+            ep.setRtpSymmetric(true);
+            ep.setForceRport(true);
+            endpointRepo.save(ep);
+        }
+
+        // --- რეგისტრაცია პირდაპირ pjsip.conf-ში ---
+        writeRegistrationToPjsipConf();
     }
 
-    public List<PjsipTrunk> getAllTrunks() {
-        return trunkRepositor.findAll();
-    }
+    private void writeRegistrationToPjsipConf() {
+        String block = """
+                
+                ; Zadarma Trunk Registration (written by TrunkService)
+                [trunk-123403-sip-reg]
+                type=registration
+                outbound_auth=trunk-123403-sip-auth
+                server_uri=sip:sip.zadarma.com
+                client_uri=sip:123403@sip.zadarma.com
+                retry_interval=60
+                forbidden_retry_interval=600
+                expiration=3600
+                transport=udp
+                endpoint=trunk-123403-sip
+                line=yes
+                support_path=yes
 
-    public boolean generatePjsipTrunks(String filePath) {
-        List<PjsipTrunk> trunks = trunkRepositor.findAll();
+                """;
 
-        try (BufferedWriter writer = new BufferedWriter(new FileWriter(filePath))) {
-            for (PjsipTrunk trunk : trunks) {
-                String id = trunk.getId();
+        try {
+            Path path = Paths.get(PJSIP_CONF_PATH);
+            String existing = Files.readString(path);
 
-                // Endpoint
-                writer.write("[" + id + "]");
-                writer.newLine();
-                writer.write("type=endpoint");
-                writer.newLine();
-                writer.write("transport=" + trunk.getTransport());
-                writer.newLine();
-                writer.write("context=" + trunk.getContext());
-                writer.newLine();
-                writer.write("disallow=all");
-                writer.newLine();
-                writer.write("allow=ulaw,alaw");
-                writer.newLine();
-                writer.write("outbound_auth=" + trunk.getOutboundAuth());
-                writer.newLine();
-                writer.write("aors=" + id);
-                writer.newLine();
-                writer.write("callerid=" + trunk.getCallerId());
-                writer.newLine();
-
-                // Optional: outbound_proxy და from_domain
-                if (trunk.getFromDomain() != null && !trunk.getFromDomain().isBlank()) {
-                    writer.write("from_domain=" + trunk.getFromDomain());
-                    writer.newLine();
-                }
-                if (trunk.getOutboundProxy() != null && !trunk.getOutboundProxy().isBlank()) {
-                    writer.write("outbound_proxy=" + trunk.getOutboundProxy());
-                    writer.newLine();
-                }
-
-                writer.newLine();
-
-                // Auth
-                writer.write("[" + trunk.getOutboundAuth() + "]");
-                writer.newLine();
-                writer.write("type=auth");
-                writer.newLine();
-                writer.write("auth_type=userpass");
-                writer.newLine();
-                writer.write("username=" + trunk.getUsername());
-                writer.newLine();
-                writer.write("password=" + trunk.getPassword());
-                writer.newLine();
-                writer.newLine();
-
-                // AOR
-                writer.write("[" + id + "]");
-                writer.newLine();
-                writer.write("type=aor");
-                writer.newLine();
-                writer.write("contact=" + trunk.getContactUri());
-                writer.newLine();
-                writer.newLine();
+            if (!existing.contains("[trunk-123403-sip-reg]")) {
+                Files.writeString(path, block, StandardOpenOption.APPEND);
+                System.out.println("✅ trunk-123403-sip-reg added to pjsip.conf");
+            } else {
+                System.out.println("ℹ️ trunk-123403-sip-reg already exists in pjsip.conf");
             }
-
-            writer.flush();
-            return true;
-
         } catch (IOException e) {
-            e.printStackTrace();
-            return false;
+            System.err.println("❌ ვერ ჩაიწერა pjsip.conf-ში: " + e.getMessage());
         }
     }
 }

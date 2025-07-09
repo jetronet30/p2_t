@@ -111,8 +111,7 @@ public class SipSettingsInit {
             writer.newLine();
             writer.write("type=system");
             writer.newLine();
-            writer.newLine();
-            writer.write("#include_ifexists pjsip_trunks.conf");
+
 
             writer.flush();
             System.out.println("✔ pjsip.conf transport section written.");
