@@ -28,7 +28,6 @@ public class PjsipEndpoint {
 
     private String type;
 
-    private String shower;
 
     @Column(name = "direct_media")
     private Boolean directMedia;

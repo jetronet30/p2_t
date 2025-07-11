@@ -21,10 +21,10 @@
     <form class="exten-form" method="post" >
         <input type="text" name="exten_id" th:value="${ext.id}">
         <input type="text" name="exten" th:value="${ext.id}" hidden>
-        <input type="text" name="callerId" th:value="${ext.callerId}">
-        <input type="text" name="context" th:value="${ext.context}">
-        <input type="password" name="password" th:value="${ext.shower}">
-        <a class="conn-link" th:href="'http://' + ${ext.connIp}" target="_blank" rel="noopener noreferrer" th:text="${ext.connIp}">IP</a>
+        <input type="text" name="callerId" th:value="${ext.displayName}">
+        <input type="text" name="context" th:value="${ext.virContext}">
+        <input type="password" name="password" th:value="${ext.virPass}">
+        <a class="conn-link" th:href="'http://' + ${ext.virUsIp}" target="_blank" rel="noopener noreferrer" th:text="${ext.virUsIp}">IP</a>
         <!-- edit ღილაკი, ID დინამიურად ერგება ext.id -->
         <button type="submit" class="mini-btn" 
                 th:id="'ext-edit-btn' + ${ext.id}" 

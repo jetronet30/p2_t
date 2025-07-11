@@ -1,6 +1,5 @@
 package com.jaba.p2_t.controllers.fragmentscontroller;
 
-import java.util.HashMap;
 import java.util.Map;
 
 import org.springframework.stereotype.Controller;
@@ -10,20 +9,20 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import com.jaba.p2_t.pbxservices.ExtensionService;
+
+import com.jaba.p2_t.pbxservices.VirtExtensionsService;
 
 import lombok.RequiredArgsConstructor;
 
 @Controller
 @RequiredArgsConstructor
 public class ExtCon {
-    private final ExtensionService extensionService;
+    private final VirtExtensionsService virtExtensionsService;
 
     @PostMapping("/extensions")
     public String postExt(Model model) {
-        extensionService.updateEndpointsConnIpFromCli();
-        model.addAttribute("extensions", extensionService.getAllExtensionsSorteId());
-        
+        virtExtensionsService.updateUsreIp();
+        model.addAttribute("extensions", virtExtensionsService.getVirtExts());
         return "fragments/extensions";
     }
 
@@ -31,13 +30,11 @@ public class ExtCon {
     public String addExt(Model model,
             @RequestParam("exten") String exten, @RequestParam("exten-end") String extenEnd) {
         if (extenEnd != null && !extenEnd.isEmpty() && exten != null && !exten.isEmpty()) {
-            extensionService.addExtensionsRange(exten, extenEnd);
-            //extensionService.generatePjsipConf("/etc/asterisk/pjsip.conf");
+            virtExtensionsService.createVirtExtInRange(exten, extenEnd);
         } else if (exten != null && !exten.isEmpty()) {
-            extensionService.addExtension(exten);
-            //extensionService.generatePjsipConf("/etc/asterisk/pjsip.conf");
+            virtExtensionsService.createVirtExt(exten);
         }
-        model.addAttribute("extensions", extensionService.getAllExtensionsSorteId());
+        model.addAttribute("extensions", virtExtensionsService.getVirtExts());
         return "fragments/extensions";
     }
 
@@ -48,33 +45,12 @@ public class ExtCon {
             @RequestParam("password") String password,
             @RequestParam("callerId") String callerId,
             @RequestParam("context") String context) {
-        try {
-            extensionService.editExtension(id, callerId, context, password);
-            //extensionService.generatePjsipConf("/etc/asterisk/pjsip.conf");
-            Map<String, Object> response = new HashMap<>();
-            response.put("success", true);
-            return response;
-        } catch (Exception e) {
-            e.printStackTrace();
-            Map<String, Object> error = new HashMap<>();
-            error.put("success", false);
-            error.put("error", e.getMessage());
-            return error;
-        }
+        return virtExtensionsService.updateVirtExt(id,callerId,context,password,3);
     }
 
     @ResponseBody
     @PostMapping("/delete-exten/{id}")
     public Map<String, Object> deleteExt(@PathVariable("id") String id) {
-        Map<String, Object> res = new HashMap<>();
-        boolean success = extensionService.deleteExtension(id);
-        //extensionService.generatePjsipConf("/etc/asterisk/pjsip.conf");
-        if (success) {
-            res.put("success", true);
-        } else {
-            res.put("success", false);
-            res.put("error", "წაშლა ვერ მოხერხდა");
-        }
-        return res;
+       return virtExtensionsService.deleteVirtExt(id);
     }
 }
