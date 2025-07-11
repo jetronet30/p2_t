@@ -1,4 +1,3 @@
-
 package com.jaba.p2_t.pbxservices;
 
 import java.util.HashMap;
@@ -24,7 +23,8 @@ import lombok.RequiredArgsConstructor;
  * იყენებს Spring Data JPA რეპოზიტორებს მონაცემთა ბაზასთან ურთიერთობისთვის.
  */
 @Service
-@RequiredArgsConstructor // Lombok-ის ანოტაცია, რომელიც ავტომატურად ქმნის კონსტრუქტორს ყველა final ველისთვის.
+@RequiredArgsConstructor // Lombok-ის ანოტაცია, რომელიც ავტომატურად ქმნის კონსტრუქტორს ყველა final
+                         // ველისთვის.
 public class VirtExtensionsService {
 
     private final SipSettings sipSettings; // SIP პარამეტრების ინექცია
@@ -37,7 +37,8 @@ public class VirtExtensionsService {
      * ქმნის ახალ ვირტუალურ გაფართოებას.
      *
      * @param extensionId გაფართოების უნიკალური ID.
-     * @return true თუ გაფართოება წარმატებით შეიქმნა, false თუ ასეთი ID უკვე არსებობს.
+     * @return true თუ გაფართოება წარმატებით შეიქმნა, false თუ ასეთი ID უკვე
+     *         არსებობს.
      */
     @Transactional // უზრუნველყოფს, რომ მეთოდის ყველა ოპერაცია შესრულდეს ერთ ტრანზაქციაში.
     public boolean createVirtExt(String extensionId) {
@@ -92,13 +93,14 @@ public class VirtExtensionsService {
      *
      * @param extensionId გაფართოების ID.
      * @param displayName გაფართოების ახალი სახელი.
-     * @param virContext ვირტუალური კონტექსტი.
-     * @param virPass ვირტუალური პაროლი.
-     * @param outPermit გამავალი ზარების ნებართვა.
+     * @param virContext  ვირტუალური კონტექსტი.
+     * @param virPass     ვირტუალური პაროლი.
+     * @param outPermit   გამავალი ზარების ნებართვა.
      * @return Map, რომელიც შეიცავს "success" სტატუსს (true/false).
      */
     @Transactional // უზრუნველყოფს, რომ მეთოდის ყველა ოპერაცია შესრულდეს ერთ ტრანზაქციაში.
-    public Map<String, Object> updateVirtExt(String extensionId, String displayName, String virContext, String virPass, int outPermit) {
+    public Map<String, Object> updateVirtExt(String extensionId, String displayName, String virContext, String virPass,
+            int outPermit) {
         Map<String, Object> response = new HashMap<>();
 
         // ყველა საჭირო ობიექტის მოძიება findById-ის გამოყენებით.
@@ -115,7 +117,8 @@ public class VirtExtensionsService {
         if (viModelOpt.isEmpty() || endpointOpt.isEmpty() || authOpt.isEmpty() || aorOpt.isEmpty()) {
             response.put("success", false);
             // სურვილისამებრ, შეგიძლიათ დაამატოთ უფრო დეტალური შეტყობინება:
-            // response.put("message", "ერთი ან მეტი დაკავშირებული ობიექტი ვერ მოიძებნა extensionId-ისთვის: " + extensionId);
+            // response.put("message", "ერთი ან მეტი დაკავშირებული ობიექტი ვერ მოიძებნა
+            // extensionId-ისთვის: " + extensionId);
             return response;
         }
 
@@ -126,7 +129,8 @@ public class VirtExtensionsService {
         PjsipAor aor = aorOpt.get(); // 'aor' გადაეცემა saveModels-ს, თუმცა ამ მეთოდში პირდაპირ არ მოდიფიცირდება.
 
         // ExtenViModel-ის პარამეტრების განახლება
-        // viModel.setId(extensionId); // ეს ხაზი ამოღებულია, რადგან ID არ უნდა შეიცვალოს განახლების დროს.
+        // viModel.setId(extensionId); // ეს ხაზი ამოღებულია, რადგან ID არ უნდა
+        // შეიცვალოს განახლების დროს.
         viModel.setDisplayName(displayName);
         viModel.setVirContext(virContext);
         viModel.setVirPass(virPass);
@@ -146,13 +150,35 @@ public class VirtExtensionsService {
         return response;
     }
 
+    public Map<String, Object> deleteVirtExt(String extensionId) {
+        Map<String, Object> response = new HashMap<>();
+        Optional<ExtenViModel> viModelOpt = extenVirtualRepo.findById(extensionId);
+        Optional<PjsipEndpoint> endpointOpt = pjsipEndpointRepositor.findById(extensionId);
+        Optional<PjsipAuth> authOpt = pjsipAuthRepositor.findById(extensionId);
+        Optional<PjsipAor> aorOpt = pjsipAorRepositor.findById(extensionId);
+
+        if (viModelOpt.isEmpty() || endpointOpt.isEmpty() || authOpt.isEmpty() || aorOpt.isEmpty()) {
+            response.put("success", false);
+            // სურვილისამებრ, შეგიძლიათ დაამატოთ უფრო დეტალური შეტყობინება:
+            // response.put("message", "ერთი ან მეტი დაკავშირებული ობიექტი ვერ მოიძებნა
+            // extensionId-ისთვის: " + extensionId);
+            return response;
+        }
+        extenVirtualRepo.delete(viModelOpt.get());
+        pjsipEndpointRepositor.delete(endpointOpt.get());
+        pjsipAuthRepositor.delete(authOpt.get());
+        pjsipAorRepositor.delete(aorOpt.get());
+        response.put("success", true); // დამხმარება წარმატებით დასრულდა
+        return response;
+    }
+
     /**
      * დამხმარე მეთოდი ყველა დაკავშირებული მოდელის მონაცემთა ბაზაში შესანახად.
      *
-     * @param viModel ExtenViModel ობიექტი.
+     * @param viModel  ExtenViModel ობიექტი.
      * @param endpoint PjsipEndpoint ობიექტი.
-     * @param auth PjsipAuth ობიექტი.
-     * @param aor PjsipAor ობიექტი.
+     * @param auth     PjsipAuth ობიექტი.
+     * @param aor      PjsipAor ობიექტი.
      */
     private void saveModels(ExtenViModel viModel, PjsipEndpoint endpoint, PjsipAuth auth, PjsipAor aor) {
         extenVirtualRepo.save(viModel);
