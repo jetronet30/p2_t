@@ -28,7 +28,6 @@ public class PjsipEndpoint {
 
     private String type;
 
-
     @Column(name = "direct_media")
     private Boolean directMedia;
 
@@ -64,4 +63,10 @@ public class PjsipEndpoint {
 
     @Column(name = "force_rport")
     private Boolean forceRport;
+
+    @Column(name = "from_user")
+    private String fromUser;
+
+    @Column(name = "outbound_auth")
+    private String outboundAuth;
 }

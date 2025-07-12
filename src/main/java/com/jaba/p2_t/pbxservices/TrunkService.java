@@ -30,7 +30,7 @@ public class TrunkService {
             auth.setId("trunk-123403-sip-auth");
             auth.setAuthType("userpass");
             auth.setUsername("123403");
-            auth.setPassword("QtmLfFE7x6");
+            auth.setPassword("t0dTyUElK3");
             authRepo.save(auth);
         }
 
@@ -39,7 +39,8 @@ public class TrunkService {
             PjsipAor aor = new PjsipAor();
             aor.setId("trunk-123403-sip-aor");
             aor.setContact("sip:123403@sip.zadarma.com");
-            aor.setMaxContacts(1);
+            aor.setQualifyFrequency(30);
+            aor.setMaxContacts(3);
             aor.setRemoveExisting(true);
             aorRepo.save(aor);
         }
@@ -49,22 +50,39 @@ public class TrunkService {
             PjsipEndpoint ep = new PjsipEndpoint();
             ep.setId("trunk-123403-sip");
             ep.setType("endpoint");
+
+            /* ───── სატრანსპორტო და აუდიოს პარამეტრები ───── */
             ep.setTransport("udp");
-            ep.setContext("from-trunk");
             ep.setDisallow("all");
             ep.setAllow("ulaw,alaw");
-            ep.setAuthId("trunk-123403-sip-auth");
-            ep.setAorsId("trunk-123403-sip-aor");
+
+            /* ───── Dial‑plan / კონტრექსტი ───── */
+            ep.setContext("from-trunk"); // სადაც შემოვლენ ზარები
+
+            /* ───── ავტორიზაციის, AOR და დაკავშირებული ველები ───── */
+            ep.setAuthId("trunk-123403-sip-auth"); // <== ps_auths.id
+            ep.setAorsId("trunk-123403-sip-aor"); // <== ps_aors.id
+            ep.setOutboundAuth("trunk-123403-sip-auth"); // აუცილებელია რეგისტრაციისას
+
+            /* ───── From header ველები ───── */
+            ep.setFromUser("123403"); // login
+            ep.setFromDomain("sip.zadarma.com");
+
+            /* ───── Caller‑ID და მედიის ვარიანტები ───── */
             ep.setCallerId("123403 <123403>");
             ep.setDirectMedia(false);
             ep.setDtmfMode("rfc4733");
+
+            /* ───── NAT/Qualify ოპციები ───── */
             ep.setTrustIdOutbound(true);
-            ep.setFromDomain("sip.zadarma.com");
             ep.setRewriteContact(true);
-            ep.setQualifyFrequency(60);
             ep.setRtpSymmetric(true);
             ep.setForceRport(true);
+            ep.setQualifyFrequency(60);
+
+            /* ───── შენახვა ───── */
             endpointRepo.save(ep);
+
         }
 
         // --- რეგისტრაცია პირდაპირ pjsip.conf-ში ---
@@ -73,7 +91,7 @@ public class TrunkService {
 
     private void writeRegistrationToPjsipConf() {
         String block = """
-                
+
                 ; Zadarma Trunk Registration (written by TrunkService)
                 [trunk-123403-sip-reg]
                 type=registration

@@ -21,7 +21,7 @@ public class ExtCon {
 
     @PostMapping("/extensions")
     public String postExt(Model model) {
-        virtExtensionsService.updateUsreIp();
+        virtExtensionsService.updateUserIp();
         model.addAttribute("extensions", virtExtensionsService.getVirtExts());
         return "fragments/extensions";
     }

@@ -1,11 +1,6 @@
 package com.jaba.p2_t.pbxservices;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
 import java.util.*;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
@@ -14,10 +9,12 @@ import org.springframework.transaction.annotation.Transactional;
 import com.jaba.p2_t.pbxmodels.ExtenViModel;
 import com.jaba.p2_t.pbxmodels.PjsipAor;
 import com.jaba.p2_t.pbxmodels.PjsipAuth;
+import com.jaba.p2_t.pbxmodels.PjsipContact;
 import com.jaba.p2_t.pbxmodels.PjsipEndpoint;
 import com.jaba.p2_t.pbxrepos.ExtenVirtualRepo;
 import com.jaba.p2_t.pbxrepos.PjsipAorRepositor;
 import com.jaba.p2_t.pbxrepos.PjsipAuthRepositor;
+import com.jaba.p2_t.pbxrepos.PjsipContactRepository;
 import com.jaba.p2_t.pbxrepos.PjsipEndpointRepositor;
 
 import lombok.RequiredArgsConstructor;
@@ -26,11 +23,14 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class VirtExtensionsService {
 
+    private final TrunkService trunkService;
+
     private final SipSettings sipSettings;
     private final PjsipEndpointRepositor pjsipEndpointRepositor;
     private final PjsipAuthRepositor pjsipAuthRepositor;
     private final PjsipAorRepositor pjsipAorRepositor;
     private final ExtenVirtualRepo extenVirtualRepo;
+    private final PjsipContactRepository pjsipContactRepository;
 
     public List<ExtenViModel> getVirtExts() {
         return extenVirtualRepo.findAll(Sort.by(Sort.Direction.ASC, "id"));
@@ -96,6 +96,7 @@ public class VirtExtensionsService {
             PjsipAor ao = new PjsipAor();
             ao.setId(id);
             ao.setMaxContacts(1);
+            ao.setQualifyFrequency(30);
             aors.add(ao);
 
             if (viModels.size() >= batchSize) {
@@ -117,11 +118,11 @@ public class VirtExtensionsService {
             pjsipAuthRepositor.saveAll(auths);
             pjsipAorRepositor.saveAll(aors);
         }
-
     }
 
     @Transactional
     public void createVirtExt(String extensionId) {
+        trunkService.addZadarmaTrunkToDb();
         if (!pjsipEndpointRepositor.existsById(extensionId) &&
                 !pjsipAuthRepositor.existsById(extensionId) &&
                 !pjsipAorRepositor.existsById(extensionId)) {
@@ -156,12 +157,13 @@ public class VirtExtensionsService {
             PjsipAor aor = new PjsipAor();
             aor.setId(extensionId);
             aor.setMaxContacts(1);
+            aor.setQualifyFrequency(30);
+
 
             extenVirtualRepo.save(viModel);
             pjsipEndpointRepositor.save(endpoint);
             pjsipAuthRepositor.save(auth);
             pjsipAorRepositor.save(aor);
-
         }
     }
 
@@ -218,61 +220,54 @@ public class VirtExtensionsService {
     @Transactional
     public Map<String, Object> deleteVirtExt(String extensionId) {
         Map<String, Object> result = new HashMap<>();
-        int deleted = 0;
+        int deletedCount = 0;
 
         if (extenVirtualRepo.existsById(extensionId)) {
             extenVirtualRepo.deleteById(extensionId);
-            deleted++;
+            deletedCount++;
         }
         if (pjsipEndpointRepositor.existsById(extensionId)) {
             pjsipEndpointRepositor.deleteById(extensionId);
-            deleted++;
+            deletedCount++;
         }
         if (pjsipAuthRepositor.existsById(extensionId)) {
             pjsipAuthRepositor.deleteById(extensionId);
-            deleted++;
+            deletedCount++;
         }
         if (pjsipAorRepositor.existsById(extensionId)) {
             pjsipAorRepositor.deleteById(extensionId);
-            deleted++;
+            deletedCount++;
         }
 
-        if (deleted == 0) {
+        // წავშალოთ ყველა კონტაქტი იმ ენდპოინტისთვის, რომელიც იდ-ს შეესაბამება
+        List<PjsipContact> contacts = pjsipContactRepository.findByEndpoint(extensionId);
+        if (!contacts.isEmpty()) {
+            pjsipContactRepository.deleteAll(contacts);
+            deletedCount += contacts.size();
+        }
+
+        if (deletedCount == 0) {
             result.put("success", false);
             result.put("message", "ვერც ერთი ჩანაწერი ვერ მოიძებნა");
             return result;
         }
 
         result.put("success", true);
-        result.put("deletedCount", deleted);
+        result.put("deletedCount", deletedCount);
         return result;
     }
 
-    public void updateUsreIp() {
-        try {
-            ProcessBuilder pb = new ProcessBuilder("asterisk", "-rx", "pjsip show contacts");
-            Process process = pb.start();
-
-            try (BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()))) {
-                String line;
-                Pattern pattern = Pattern.compile("Contact:\\s+(\\d+)/sip:\\d+@([0-9.]+):");
-
-                while ((line = reader.readLine()) != null) {
-                    Matcher matcher = pattern.matcher(line);
-                    if (matcher.find()) {
-                        String extensionId = matcher.group(1);
-                        String ip = matcher.group(2);
-                        extenVirtualRepo.findById(extensionId).ifPresent(viModel -> {
-                            viModel.setVirUsIp(ip);
-                            extenVirtualRepo.save(viModel);
-                        });
-                    }
-                }
-            }
-            process.waitFor();
-        } catch (IOException | InterruptedException e) {
-            e.printStackTrace();
-        }
+    public void updateUserIp() {
+        extenVirtualRepo.findAll().forEach(ext -> {
+            String pattern = ext.getId() + "^"; // მაგ: 1105^
+            pjsipContactRepository.findAll().stream()
+                    .filter(contact -> contact.getId().startsWith(pattern))
+                    .findFirst()
+                    .ifPresent(contact -> {
+                        ext.setVirUsIp(contact.getViaAddr());
+                        ext.setModelName(contact.getUserAgent());
+                        extenVirtualRepo.save(ext);
+                    });
+        });
     }
-
 }

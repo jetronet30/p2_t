@@ -20,6 +20,10 @@ public class PjsipAor {
 
     @Column(name = "remove_existing")
     private Boolean removeExisting;
+
     @Column(name = "contact")
     private String contact;
+
+    @Column(name = "qualify_frequency")
+    private Integer qualifyFrequency;  // ✅ დაამატე ეს
 }

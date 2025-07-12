@@ -27,7 +27,12 @@ public class ExtenViModel {
     private String virUsIp;
     @Column(name = "outPermit")
     private int outPermit = 3;
-    @Column(name = "active")
-    private boolean active;
+
+
+    @Column(name = "active")///////////////
+    private boolean active;////////////////
+    @Column(name = "modelName")
+    private String modelName;
+
 
 }

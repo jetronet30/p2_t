@@ -93,19 +93,19 @@ public class SipSettings {
             writer.newLine();
 
             // TLS
-            writer.write("[tls]");
-            writer.newLine();
-            writer.write("type=transport");
-            writer.newLine();
-            writer.write("protocol=tls");
-            writer.newLine();
-            writer.write("bind=" + bindAddress + ":" + sipTlsPort);
-            writer.newLine();
-            writer.write("cert_file=/etc/asterisk/keys/asterisk.pem");
-            writer.newLine();
-            writer.write("priv_key_file=/etc/asterisk/keys/asterisk.key");
-            writer.newLine();
-            writer.newLine();
+           // writer.write("[tls]");
+           // writer.newLine();
+           // writer.write("type=transport");
+           // writer.newLine();
+          //  writer.write("protocol=tls");
+          //  writer.newLine();
+          //  writer.write("bind=" + bindAddress + ":" + sipTlsPort);
+          //  writer.newLine();
+          //  writer.write("cert_file=/etc/asterisk/keys/asterisk.pem");
+          //  writer.newLine();
+         //   writer.write("priv_key_file=/etc/asterisk/keys/asterisk.key");
+          //  writer.newLine();
+          //  writer.newLine();
 
             writer.write("[system]");
             writer.newLine();
