@@ -1,0 +1,58 @@
+<div class="trunk-actions">
+    <form action="/trunk-add" method="post" class="trunk-inline-form">
+        <button type="submit" formaction="/trunk-program" class="action-btn">Program</button>
+
+        <div class="form-group">
+            <label for="login">Login</label>
+            <input type="text" name="login" id="login" placeholder="login">
+        </div>
+        <div class="form-group">
+            <label for="password">Password</label>
+            <input type="password" name="password" id="password" placeholder="password">
+        </div>
+        <div class="form-group">
+            <label for="server">Server</label>
+            <input type="text" name="server" id="server" placeholder="server">
+        </div>
+        <div class="form-group">
+            <label for="forbidden_retry_interval">for in</label>
+            <input type="number" name="forbidden_retry_interval" id="forbidden_retry_interval" value="600">
+        </div>
+
+        <div class="form-group">
+            <label for="expiration">expir</label>
+            <input type="number" name="expiration" id="expiration" value="3200">
+        </div>
+        <div class="form-group">
+            <label for="qualify">qualify</label>
+            <input type="number" name="qualify" id="qualify" value="60">
+        </div>
+        <div class="form-group">
+            <label for="channels">channels</label>
+            <input type="number" name="channels" id="channels" value="30">
+        </div>
+        <div class="form-group">
+            <label for="fromdomain">from domain</label>
+            <input type="text" name="fromdomain" id="fromdomain" placeholder="fromdomain">
+        </div>
+        <div class="form-group">
+            <label for="transport">transport</label>
+            <input type="text" name="transport" id="transport" value="udp">
+        </div>
+
+
+        <button type="submit" class="trunk-action-btn">Add</button>
+    </form>
+</div>
+<div th:each="trunk : ${trunks}" class="trunk-form">
+
+    <form class="trunk-form" method="post">
+        <input type="text" name="trunk-id" th:value="${trunk.id}" readonly>
+        <input type="text" name="trunk-status" th:value="${trunk.status}" readonly>
+        <button type="submit" th:id="'trunk-delete-btn' + ${trunk.id}" id="trunk-delete-btn"
+            th:formaction="@{/delete-trunk/{id}(id=${trunk.id})}">
+            Delete
+        </button>
+    </form>
+</div>
+<script th:src="@{/scripts/trunks.js}"></script>

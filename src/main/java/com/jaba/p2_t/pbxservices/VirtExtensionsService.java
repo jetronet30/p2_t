@@ -23,8 +23,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class VirtExtensionsService {
 
-    private final TrunkService trunkService;
-
+    
     private final SipSettings sipSettings;
     private final PjsipEndpointRepositor pjsipEndpointRepositor;
     private final PjsipAuthRepositor pjsipAuthRepositor;
@@ -122,7 +121,7 @@ public class VirtExtensionsService {
 
     @Transactional
     public void createVirtExt(String extensionId) {
-        trunkService.addZadarmaTrunkToDb();
+    
         if (!pjsipEndpointRepositor.existsById(extensionId) &&
                 !pjsipAuthRepositor.existsById(extensionId) &&
                 !pjsipAorRepositor.existsById(extensionId)) {
@@ -158,7 +157,6 @@ public class VirtExtensionsService {
             aor.setId(extensionId);
             aor.setMaxContacts(1);
             aor.setQualifyFrequency(30);
-
 
             extenVirtualRepo.save(viModel);
             pjsipEndpointRepositor.save(endpoint);
@@ -265,9 +263,17 @@ public class VirtExtensionsService {
                     .findFirst()
                     .ifPresent(contact -> {
                         ext.setVirUsIp(contact.getViaAddr());
-                        ext.setModelName(contact.getUserAgent());
+                        ext.setModelName(getFirstPart(contact.getUserAgent()));
                         extenVirtualRepo.save(ext);
                     });
         });
     }
+
+    private  String getFirstPart(String input) {
+        if (input == null || input.isEmpty())
+            return "";
+        String[] parts = input.split("[ ./,]", 2); 
+        return parts[0];
+    }
+
 }

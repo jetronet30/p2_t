@@ -19,7 +19,7 @@
 <div th:each="ext : ${extensions}" class="ext-form">
     <!-- თითოეული ფორმის ID იქნება დინამიური ext.id-ის მიხედვით -->
     <form class="exten-form" method="post" >
-        <input type="text" name="exten_id" th:value="${ext.id}">
+        <input type="text" name="exten_id" th:value="${ext.id}" readonly>
         <input type="text" name="exten" th:value="${ext.id}" hidden>
         <input type="text" name="callerId" th:value="${ext.displayName}">
         <input type="text" name="context" th:value="${ext.virContext}">

@@ -24,14 +24,6 @@ public class TrunkViModel {
     @Column(name = "username")
     private String username;
 
-    @Column(name = "password")
-    private String password;
-
-    @Column(name = "domain")
-    private String domain;
-
-    @Column(name = "context")
-    private String context;
 
     @Column(name = "outboundProxy")
     private String outboundProxy;
@@ -42,7 +34,5 @@ public class TrunkViModel {
     @Column(name = "active")
     private boolean active;
 
-    @Column(name = "description")
-    private String description;
 
 }
