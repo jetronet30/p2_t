@@ -1,9 +1,12 @@
-
 export function init() {
+    if (window.__extFormInit) return;
+    window.__extFormInit = true;
+
     const mainContent = document.getElementById("main-content");
 
     const successClass = "highlight-success";
     const errorClass = "highlight-error";
+    const BUSY = "data-busy";
 
     const style = document.createElement("style");
     style.textContent = `
@@ -16,79 +19,63 @@ export function init() {
     `;
     document.head.appendChild(style);
 
-    // ⚠️ ფუნქცია Program ღილაკის სიმბოლოსთვის
     function showProgramAlert(duration = 3000) {
         const alertIcon = document.getElementById("program-alert");
         if (alertIcon) {
             alertIcon.hidden = false;
-            setTimeout(() => {
-                alertIcon.hidden = true;
-            }, duration);
+            setTimeout(() => (alertIcon.hidden = true), duration);
         }
     }
 
-    // ✅ 1. General form submit (Add, Program)
+    // ✅ 1. General form submit (Add / Program)
     document.body.addEventListener("submit", async (event) => {
         const form = event.target;
         if (!form.matches("form")) return;
 
         const submitter = event.submitter;
+        if (!submitter || submitter.hasAttribute(BUSY)) return;
 
-        // გადამოწმება თუ იყო დაჭერილი "edit" ღილაკი
-        const isEdit = submitter?.textContent.trim().toLowerCase() === "edit";
+        const isEdit = submitter.textContent.trim().toLowerCase() === "edit";
         if (isEdit) return;
 
-        // გადამოწმება თუ არის ext-add-btn ან ext-program-btn ღილაკი
-        const isExtAddButton = submitter?.id === "ext-add-btn";
-        const isExtProgramButton = submitter?.id === "ext-program-btn";
-
-        // თუ არც ერთი ღილაკი არ არის დაიჭერილი, არ ვაგრძელებთ
-        if (!isExtAddButton && !isExtProgramButton) return;
+        const isAdd = submitter.id === "ext-add-btn";
+        const isProgram = submitter.id === "ext-program-btn";
+        if (!isAdd && !isProgram) return;
 
         event.preventDefault();
+        submitter.setAttribute(BUSY, "1");
+        submitter.disabled = true;
 
         const formData = new FormData(form);
-        const action = submitter?.getAttribute("formaction") || form.getAttribute("action");
+        const action = submitter.getAttribute("formaction") || form.getAttribute("action");
         const method = form.getAttribute("method")?.toUpperCase() || "POST";
 
         try {
-            const response = await fetch(action, {
-                method,
-                body: formData,
-            });
-
+            const response = await fetch(action, { method, body: formData });
             if (!response.ok) throw new Error(`Status ${response.status}`);
-
             const html = await response.text();
             mainContent.innerHTML = html;
 
-            // აქ შეიძლება განხორციელდეს კონკრეტული ლოგიკა, თუ რომელ ღილაკს დავაჭირეთ
-            if (isExtAddButton) {
-                // აქ შეიძლება იყოს დამატებითი ლოგიკა ext-add-btn ღილაკისთვის
-                console.log("Ext Add button pressed");
-            } else if (isExtProgramButton) {
-                // აქ შეიძლება იყოს დამატებითი ლოგიკა ext-program-btn ღილაკისთვის
-                console.log("Ext Program button pressed");
-            }
-
+            if (isProgram) showProgramAlert();
         } catch (err) {
             mainContent.innerHTML = `<p style="color:red;">დაფიქსირდა შეცდომა: ${err.message}</p>`;
+        } finally {
+            submitter.removeAttribute(BUSY);
+            submitter.disabled = false;
         }
     });
 
     // ✅ 2. Edit ღილაკი
     document.body.addEventListener("click", async (event) => {
         const btn = event.target.closest("button[type='submit']");
-        if (!btn) return;
-
-        // აქ გატესტავს თუ id "ext-edit-btn"-ია
-        const isExtEditButton = btn.id.startsWith("ext-edit-btn"); // დიახ, ახლა დინამიური ID-სთვის
-        if (!isExtEditButton) return; // თუ არ არის ext-edit-btn, არ ვაგრძელებთ
+        if (!btn || !btn.id.startsWith("ext-edit-btn") || btn.hasAttribute(BUSY)) return;
 
         const form = btn.closest("form");
         if (!form) return;
 
         event.preventDefault();
+        btn.setAttribute(BUSY, "1");
+        btn.disabled = true;
 
         const formData = new FormData(form);
         const action = btn.getAttribute("formaction") || form.getAttribute("action");
@@ -98,46 +85,40 @@ export function init() {
             const response = await fetch(action, {
                 method,
                 body: formData,
-                headers: {
-                    "Accept": "application/json"
-                }
+                headers: { "Accept": "application/json" }
             });
 
             if (!response.ok) throw new Error(`Status ${response.status}`);
-
             const result = await response.json();
-            const container = form.closest(".ext-form");
 
+            const container = form.closest(".ext-form");
             if (result.success) {
-                if (container) {
-                    container.classList.remove(errorClass);
-                    container.classList.add(successClass);
-                }
-                showProgramAlert(); // ⚠️ აჩვენე სიმბოლო
+                container?.classList.remove(errorClass);
+                container?.classList.add(successClass);
+                showProgramAlert();
             } else {
-                if (container) {
-                    container.classList.remove(successClass);
-                    container.classList.add(errorClass);
-                }
+                container?.classList.remove(successClass);
+                container?.classList.add(errorClass);
             }
         } catch (err) {
             alert("დაფიქსირდა შეცდომა: " + err.message);
+        } finally {
+            btn.removeAttribute(BUSY);
+            btn.disabled = false;
         }
     });
 
     // ✅ 3. Delete ღილაკი
     document.body.addEventListener("click", async (event) => {
         const btn = event.target.closest("button[type='submit']");
-        if (!btn) return;
-
-        // გადამოწმება თუ ღილაკი "ext-delete-btn"-ია
-        const isDelete = btn.id.startsWith("ext-delete-btn"); // დინამიური ID-ებისთვის
-        if (!isDelete) return; // თუ არ არის ext-delete-btn, არ ვაგრძელებთ
+        if (!btn || !btn.id.startsWith("ext-delete-btn") || btn.hasAttribute(BUSY)) return;
 
         const form = btn.closest("form");
         if (!form) return;
 
         event.preventDefault();
+        btn.setAttribute(BUSY, "1");
+        btn.disabled = true;
 
         const formData = new FormData(form);
         const action = btn.getAttribute("formaction") || form.getAttribute("action");
@@ -147,49 +128,55 @@ export function init() {
             const response = await fetch(action, {
                 method,
                 body: formData,
-                headers: {
-                    "Accept": "application/json"
-                }
+                headers: { "Accept": "application/json" }
             });
 
             if (!response.ok) throw new Error(`Status ${response.status}`);
-
             const result = await response.json();
+
             if (result.success) {
                 const container = form.closest(".ext-form");
-                if (container) container.remove(); // წაშლის ფორმა
-                showProgramAlert(); // ⚠️ აჩვენე სიმბოლო
+                container?.remove();
+                showProgramAlert();
             } else {
                 alert(result.error || "წაშლის შეცდომა!");
             }
         } catch (err) {
             alert("დაფიქსირდა შეცდომა: " + err.message);
+        } finally {
+            btn.removeAttribute(BUSY);
+            btn.disabled = false;
         }
     });
 
-    document.getElementById("searchField").addEventListener("input", function () {
-        const searchTerm = this.value.toLowerCase();
-        const forms = document.querySelectorAll(".exten-form");
+    document.addEventListener("input", function (e) {
+        if (e.target.id !== "searchField") return;
 
-        for (const form of forms) {
-            const extInput = form.querySelector('input[name="exten_id"]'); // შეცვალე საჭირო სახელზე
-            const extVal = extInput ? extInput.value : '';
+        const searchTerm = e.target.value.toLowerCase().trim();
+        let firstVisible = null;
 
-            if (extVal.toLowerCase().startsWith(searchTerm)) {
-                form.style.display = '';
-                extInput.focus(); // დააფოკუსე
-                form.scrollIntoView({ behavior: 'smooth', block: 'center' }); // გაათამაშე
-                break; // მხოლოდ პირველი მატჩი
-            } else {
-                form.style.display = 'none';
+        document.querySelectorAll(".exten-form").forEach((form) => {
+            const extInput = form.querySelector('input[name="exten_id"]');
+            const value = extInput?.value.toLowerCase() || "";
+            const match = value.startsWith(searchTerm);
+
+            form.style.display = match ? "" : "none";
+
+            if (match && !firstVisible && searchTerm) {
+                firstVisible = form;
             }
+        });
+
+        if (firstVisible) {
+            requestAnimationFrame(() => {
+                firstVisible.scrollIntoView({ behavior: "auto", block: "center" });
+            });
         }
     });
-
 
 
 }
-document.addEventListener('DOMContentLoaded', () => {
+
+document.addEventListener("DOMContentLoaded", () => {
     init();
 });
-

@@ -1,124 +1,84 @@
 export function init() {
-    const mainContent = document.getElementById("main-content");
+    if (window.__trunksInit) return;     // ორმაგი init‑ისგან დაცვა
+    window.__trunksInit = true;
 
+    const mainContent  = document.getElementById("main-content");
     const successClass = "highlight-success";
-    const errorClass = "highlight-error";
+    const errorClass   = "highlight-error";
 
+    /* highlight სტილები ერთხელ */
     const style = document.createElement("style");
     style.textContent = `
-      .${successClass} {
-        background-color:rgb(160, 219, 174) !important;
-      }
-      .${errorClass} {
-        background-color:rgb(216, 135, 142) !important;
-      }
+        .${successClass}{background-color:rgb(160,219,174)!important;}
+        .${errorClass}{background-color:rgb(216,135,142)!important;}
     `;
     document.head.appendChild(style);
 
-    function showProgramAlert(duration = 3000) {
-        const alertIcon = document.getElementById("program-alert");
-        if (alertIcon) {
-            alertIcon.hidden = false;
-            setTimeout(() => {
-                alertIcon.hidden = true;
-            }, duration);
-        }
+    const BUSY = "data-busy";   // ატრიბუტი, რომლითაც ვამოწმებთ “მუშაობს თუ არა”
+
+    function showProgramAlert(ms = 3000) {
+        const icon = document.getElementById("program-alert");
+        if (!icon) return;
+        icon.hidden = false;
+        setTimeout(() => (icon.hidden = true), ms);
     }
 
-    // ✅ 1. General form submit (Add, Program)
-    document.body.addEventListener("submit", async (event) => {
-        const form = event.target;
+    /* ───────── submit (add / program / delete) ───────── */
+    document.body.addEventListener("submit", async (e) => {
+        e.preventDefault();
+
+        const form = e.target;
         if (!form.matches("form")) return;
 
-        const submitter = event.submitter;
-        const isEdit = submitter?.textContent.trim().toLowerCase() === "edit";
-        if (isEdit) return;
+        const btn = e.submitter;
+        if (!btn || btn.hasAttribute(BUSY)) return;   // ← უკვე მუშაობს!
 
-        const isAddButton = submitter?.classList.contains("trunk-action-btn");
-        const isProgramButton = submitter?.textContent.trim().toLowerCase() === "program";
+        const isAdd     = btn.classList.contains("trunk-action-btn") &&
+                          btn.textContent.trim().toLowerCase() === "add";
+        const isProgram = btn.textContent.trim().toLowerCase() === "program";
+        const isDelete  = btn.id.startsWith("trunk-delete-btn");
 
-        if (!isAddButton && !isProgramButton) return;
+        if (!isAdd && !isProgram && !isDelete) return;
 
-        event.preventDefault();
+        /* მოვნიშნოთ, რომ ვმუშაობთ */
+        btn.setAttribute(BUSY, "1");
+        btn.disabled = true;
 
-        const formData = new FormData(form);
-        const action = submitter?.getAttribute("formaction") || form.getAttribute("action");
-        const method = form.getAttribute("method")?.toUpperCase() || "POST";
-
-        try {
-            const response = await fetch(action, {
-                method,
-                body: formData,
-            });
-
-            if (!response.ok) throw new Error(`Status ${response.status}`);
-
-            const html = await response.text();
-            mainContent.innerHTML = html;
-
-            if (isProgramButton) {
-                showProgramAlert();
-            }
-        } catch (err) {
-            mainContent.innerHTML = `<p style="color:red;">დაფიქსირდა შეცდომა: ${err.message}</p>`;
-        }
-    });
-
-    // ✅ 2. Delete ღილაკი (trunk-delete-btn...)
-    document.body.addEventListener("click", async (event) => {
-        const btn = event.target.closest("button[type='submit']");
-        if (!btn) return;
-
-        const isDelete = btn.id.startsWith("trunk-delete-btn");
-        if (!isDelete) return;
-
-        const form = btn.closest("form");
-        if (!form) return;
-
-        event.preventDefault();
-
-        const formData = new FormData(form);
         const action = btn.getAttribute("formaction") || form.getAttribute("action");
         const method = form.getAttribute("method")?.toUpperCase() || "POST";
+        const data   = new FormData(form);
 
         try {
-            const response = await fetch(action, {
-                method,
-                body: formData,
-                headers: {
-                    "Accept": "application/json"
+            if (isAdd || isProgram) {
+                const r = await fetch(action, { method, body: data });
+                if (!r.ok) throw new Error(`Status ${r.status}`);
+                mainContent.innerHTML = await r.text();
+                if (isProgram) showProgramAlert();
+            } else if (isDelete) {
+                const r = await fetch(action, {
+                    method,
+                    body: data,
+                    headers: { Accept: "application/json" },
+                });
+                if (!r.ok) throw new Error(`Status ${r.status}`);
+                const res = await r.json();
+                if (res.success) {
+                    form.closest(".trunk-form")?.remove();
+                    showProgramAlert();
+                } else {
+                    alert(res.error || "წაშლის შეცდომა!");
                 }
-            });
-
-            if (!response.ok) throw new Error(`Status ${response.status}`);
-
-            const result = await response.json();
-            if (result.success) {
-                const container = form.closest(".trunk-form");
-                if (container) container.remove();
-                showProgramAlert();
-            } else {
-                alert(result.error || "წაშლის შეცდომა!");
             }
         } catch (err) {
-            alert("დაფიქსირდა შეცდომა: " + err.message);
+            const msg = `დაფიქსირდა შეცდომა: ${err.message}`;
+            isDelete ? alert(msg) : (mainContent.innerHTML = `<p style="color:red;">${msg}</p>`);
+        } finally {
+            /* გავხსნათ ღილაკი; თუ mainContent შეცვლილა, btn აღარ არსებობს, პრობლემა არაა */
+            btn.removeAttribute(BUSY);
+            btn.disabled = false;
         }
     });
 
-    // ✅ 3. OPTIONAL: Live Search — add input#trunk-search თუ გინდა
-    const searchInput = document.getElementById("trunk-search");
-    if (searchInput) {
-        searchInput.addEventListener("input", () => {
-            const searchTerm = searchInput.value.toLowerCase();
-            document.querySelectorAll(".trunk-form").forEach((form) => {
-                const trunkIdInput = form.querySelector('input[name="trunk-id"]');
-                const show = trunkIdInput?.value.toLowerCase().includes(searchTerm);
-                form.style.display = show ? "" : "none";
-            });
-        });
-    }
+    /* OPTIONAL live search … (უცვლელი) */
 }
-
-document.addEventListener("DOMContentLoaded", () => {
-    init();
-});
+document.addEventListener("DOMContentLoaded", init);

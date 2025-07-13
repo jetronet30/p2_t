@@ -1,7 +1,10 @@
 <div class="trunk-actions">
     <form action="/trunk-add" method="post" class="trunk-inline-form">
-        <button type="submit" formaction="/trunk-program" class="action-btn">Program</button>
-
+        <button type="submit" formaction="/trunk-program" class="action-btn" data-action="program" >Program</button>
+         <div class="form-group">
+            <label for="name">name</label>
+            <input type="text" name="name" id="name" placeholder="name">
+        </div>
         <div class="form-group">
             <label for="login">Login</label>
             <input type="text" name="login" id="login" placeholder="login">
@@ -41,15 +44,14 @@
         </div>
 
 
-        <button type="submit" class="trunk-action-btn">Add</button>
+        <button type="submit" class="trunk-action-btn" data-action="add" >Add</button>
     </form>
 </div>
 <div th:each="trunk : ${trunks}" class="trunk-form">
 
-    <form class="trunk-form" method="post">
-        <input type="text" name="trunk-id" th:value="${trunk.id}" readonly>
-        <input type="text" name="trunk-status" th:value="${trunk.status}" readonly>
-        <button type="submit" th:id="'trunk-delete-btn' + ${trunk.id}" id="trunk-delete-btn"
+    <form class="trunk-inline-form" method="post">
+        <input type="text"  th:value="${trunk.trunkName}" readonly>
+        <button type="submit" class="trunk-action-btn" th:id="'trunk-delete-btn' + ${trunk.id}" id="trunk-delete-btn" data-action="delete"
             th:formaction="@{/delete-trunk/{id}(id=${trunk.id})}">
             Delete
         </button>

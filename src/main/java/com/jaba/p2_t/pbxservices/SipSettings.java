@@ -111,6 +111,9 @@ public class SipSettings {
             writer.newLine();
             writer.write("type=system");
             writer.newLine();
+            writer.newLine();
+
+            writer.write("#include pjsip_registrations.conf");
 
 
             writer.flush();

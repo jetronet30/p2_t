@@ -3,6 +3,7 @@ package com.jaba.p2_t.controllers.fragmentscontroller;
 import java.util.Map;
 
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -18,7 +19,8 @@ public class TrunCon {
     private final TrunkService trunkService;
 
     @PostMapping("/trunks")
-    public String postTrunk(){
+    public String postTrunk(Model m){
+        m.addAttribute("trunks", trunkService.getAllTrunk());
         return "fragments/trunks";
     }
 
@@ -31,8 +33,9 @@ public class TrunCon {
                             @RequestParam("channels") int channels,
                             @RequestParam("forbidden_retry_interval")int forbiddenInterval,
                             @RequestParam("expiration") int expiration,
-                            @RequestParam("transport") String transport){
-        trunkService.addTrunk(login, password, server,fromdomain, qualify, channels, forbiddenInterval, expiration, transport);
+                            @RequestParam("transport") String transport,
+                            @RequestParam("name")String name){
+        trunkService.addTrunk(login, password, server,fromdomain, qualify, channels, forbiddenInterval, expiration, transport,name);
         System.out.println(login);
         return "fragments/trunks";
     }
