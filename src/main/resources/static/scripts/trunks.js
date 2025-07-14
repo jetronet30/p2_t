@@ -1,10 +1,10 @@
 export function init() {
-    if (window.__trunksInit) return;     // ორმაგი init‑ისგან დაცვა
+    if (window.__trunksInit) return; // ორმაგი init‑ისგან დაცვა
     window.__trunksInit = true;
 
-    const mainContent  = document.getElementById("main-content");
+    const mainContent = document.getElementById("main-content");
     const successClass = "highlight-success";
-    const errorClass   = "highlight-error";
+    const errorClass = "highlight-error";
 
     /* highlight სტილები ერთხელ */
     const style = document.createElement("style");
@@ -14,7 +14,7 @@ export function init() {
     `;
     document.head.appendChild(style);
 
-    const BUSY = "data-busy";   // ატრიბუტი, რომლითაც ვამოწმებთ “მუშაობს თუ არა”
+    const BUSY = "data-busy";
 
     function showProgramAlert(ms = 3000) {
         const icon = document.getElementById("program-alert");
@@ -23,7 +23,6 @@ export function init() {
         setTimeout(() => (icon.hidden = true), ms);
     }
 
-    /* ───────── submit (add / program / delete) ───────── */
     document.body.addEventListener("submit", async (e) => {
         e.preventDefault();
 
@@ -31,22 +30,21 @@ export function init() {
         if (!form.matches("form")) return;
 
         const btn = e.submitter;
-        if (!btn || btn.hasAttribute(BUSY)) return;   // ← უკვე მუშაობს!
+        if (!btn || btn.hasAttribute(BUSY)) return;
 
-        const isAdd     = btn.classList.contains("trunk-action-btn") &&
-                          btn.textContent.trim().toLowerCase() === "add";
+        const isAdd = btn.classList.contains("trunk-action-btn") &&
+            btn.textContent.trim().toLowerCase() === "add";
         const isProgram = btn.textContent.trim().toLowerCase() === "program";
-        const isDelete  = btn.id.startsWith("trunk-delete-btn");
+        const isDelete = btn.id.startsWith("trunk-delete-btn");
 
         if (!isAdd && !isProgram && !isDelete) return;
 
-        /* მოვნიშნოთ, რომ ვმუშაობთ */
         btn.setAttribute(BUSY, "1");
         btn.disabled = true;
 
         const action = btn.getAttribute("formaction") || form.getAttribute("action");
         const method = form.getAttribute("method")?.toUpperCase() || "POST";
-        const data   = new FormData(form);
+        const data = new FormData(form);
 
         try {
             if (isAdd || isProgram) {
@@ -63,7 +61,8 @@ export function init() {
                 if (!r.ok) throw new Error(`Status ${r.status}`);
                 const res = await r.json();
                 if (res.success) {
-                    form.closest(".trunk-form")?.remove();
+                    const container = form.closest(".trunk-edit-div") || form;
+                    container.remove();
                     showProgramAlert();
                 } else {
                     alert(res.error || "წაშლის შეცდომა!");
@@ -71,14 +70,14 @@ export function init() {
             }
         } catch (err) {
             const msg = `დაფიქსირდა შეცდომა: ${err.message}`;
-            isDelete ? alert(msg) : (mainContent.innerHTML = `<p style="color:red;">${msg}</p>`);
+            isDelete
+                ? alert(msg)
+                : (mainContent.innerHTML = `<p style="color:red;">${msg}</p>`);
         } finally {
-            /* გავხსნათ ღილაკი; თუ mainContent შეცვლილა, btn აღარ არსებობს, პრობლემა არაა */
             btn.removeAttribute(BUSY);
             btn.disabled = false;
         }
     });
-
-    /* OPTIONAL live search … (უცვლელი) */
 }
+
 document.addEventListener("DOMContentLoaded", init);

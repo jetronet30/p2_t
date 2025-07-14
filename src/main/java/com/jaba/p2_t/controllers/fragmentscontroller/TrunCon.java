@@ -25,7 +25,8 @@ public class TrunCon {
     }
 
     @PostMapping("/trunk-add")
-    public String addTrunk(@RequestParam("login") String login,
+    public String addTrunk( Model m,
+                            @RequestParam("login") String login,
                             @RequestParam("password") String password,
                             @RequestParam("server") String server,
                             @RequestParam("fromdomain") String fromdomain,
@@ -36,13 +37,14 @@ public class TrunCon {
                             @RequestParam("transport") String transport,
                             @RequestParam("name")String name){
         trunkService.addTrunk(login, password, server,fromdomain, qualify, channels, forbiddenInterval, expiration, transport,name);
-        System.out.println(login);
+        m.addAttribute("trunks", trunkService.getAllTrunk());
         return "fragments/trunks";
     }
 
     @ResponseBody
     @PostMapping("/delete-trunk/{id}")
     public Map<String, Object>  deleteTrunk(@PathVariable("id") String id){
+        
         return trunkService.deleteTrunk(id);
     }
 

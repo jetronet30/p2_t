@@ -1,3 +1,4 @@
+/* ─────────── საერთო wrapper ─────────── */
 .trunk-actions {
     position: sticky;
     top: 0;
@@ -10,28 +11,38 @@
     overflow-x: auto;
 }
 
-.trunk-inline-form {
+/* ─────────── ფორმების საერთო სტილი ─────────── */
+/* ორივე ფორმა—დამატების და რედაქტირების—ერთი წესით ვმართავთ */
+.trunk-inline-form,
+.trunk-edit-form {
     display: flex;
-    align-items: flex-end;
+    align-items: flex-end;   /* ღილაკი დაფიქსირდეს ერთ ხაზზე, field‑ებთან */
     gap: 16px;
     flex-wrap: wrap;
 }
 
-.trunk-inline-form .form-group {
+.trunk-inline-form .form-group,
+.trunk-edit-form  .form-group {
     display: flex;
     flex-direction: column;
 }
 
-.trunk-inline-form label {
+/* ლეიბლები */
+.trunk-inline-form label,
+.trunk-edit-form  label {
     font-size: 0.75rem;
     color: #f8f406;
     font-family: 'Courier New', monospace;
     margin-bottom: 3px;
 }
 
+/* ინპუტები */
 .trunk-inline-form input[type="text"],
 .trunk-inline-form input[type="password"],
-.trunk-inline-form input[type="number"] {
+.trunk-inline-form input[type="number"],
+.trunk-edit-form  input[type="text"],
+.trunk-edit-form  input[type="password"],
+.trunk-edit-form  input[type="number"] {
     height: 30px;
     padding: 4px 8px;
     font-size: 0.85rem;
@@ -57,8 +68,10 @@ input#fromdomain {
     width: 300px;
 }
 
+/* ღილაკები */
 .trunk-inline-form .action-btn,
-.trunk-inline-form .trunk-action-btn {
+.trunk-inline-form .trunk-action-btn,
+.trunk-edit-form  .trunk-action-btn {
     height: 30px;
     padding: 0 16px;
     font-size: 0.85rem;
@@ -72,6 +85,16 @@ input#fromdomain {
 }
 
 .trunk-inline-form .action-btn:hover,
-.trunk-inline-form .trunk-action-btn:hover {
+.trunk-inline-form .trunk-action-btn:hover,
+.trunk-edit-form  .trunk-action-btn:hover {
     background-color: #005b99;
+}
+
+/* ─────────── ცალკეული ჩანაწერის კონტეინერი ─────────── */
+.trunk-edit-div {
+    margin-bottom: 16px;
+    padding: 10px 15px;
+    border: 1px solid #333;
+    border-radius: 6px;
+    background-color: rgba(255, 255, 255, 0.05);
 }

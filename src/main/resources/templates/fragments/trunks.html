@@ -47,10 +47,11 @@
         <button type="submit" class="trunk-action-btn" data-action="add" >Add</button>
     </form>
 </div>
-<div th:each="trunk : ${trunks}" class="trunk-form">
+<div th:each="trunk : ${trunks}" class="trunk-edit-div">
 
-    <form class="trunk-inline-form" method="post">
+    <form class="trunk-edit-form" method="post">
         <input type="text"  th:value="${trunk.trunkName}" readonly>
+        <input type="hidden" name="id" th:value="${trunk.id}">
         <button type="submit" class="trunk-action-btn" th:id="'trunk-delete-btn' + ${trunk.id}" id="trunk-delete-btn" data-action="delete"
             th:formaction="@{/delete-trunk/{id}(id=${trunk.id})}">
             Delete
