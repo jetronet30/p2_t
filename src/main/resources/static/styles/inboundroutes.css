@@ -1,0 +1,71 @@
+/* ─────────── საერთო wrapper ─────────── */
+.inbound-actions {
+    position: sticky;
+    top: 0;
+    backdrop-filter: blur(8px);
+    background-color: rgba(17, 17, 17, 0.7);
+    padding: 15px 20px;
+    z-index: 100;
+    border-bottom: 1px solid #333;
+    margin-bottom: 20px;
+    overflow-x: auto;
+}
+
+/* ─────────── ფორმების საერთო სტილი ─────────── */
+.inbound-inline-form,
+.inbound-edit-form {
+    display: flex;
+    align-items: flex-end;
+    gap: 16px;
+    flex-wrap: wrap;
+    font-family: 'Courier New', monospace;
+}
+
+/* ლეიბლები (მომავალში თუ დაგჭირდება) */
+.inbound-inline-form label,
+.inbound-edit-form  label {
+    font-size: 0.75rem;
+    color: #f8f406;
+    margin-bottom: 3px;
+}
+
+/* ტექსტური ინპუტები (readonly name) */
+.inbound-edit-form input[type="text"] {
+    height: 30px;
+    padding: 4px 8px;
+    font-size: 0.85rem;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    background-color: #eee;
+    color: #000;
+    text-align: center;
+}
+
+/* ღილაკები */
+.inbound-btn,
+.inbound-action-btn {
+    height: 30px;
+    padding: 0 16px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    background-color: #007acc;
+    color: white;
+    transition: background-color 0.3s ease;
+}
+
+.inbound-btn:hover,
+.inbound-action-btn:hover {
+    background-color: #005b99;
+}
+
+/* ─────────── ცალკეული ჩანაწერის კონტეინერი ─────────── */
+.inbound-edit-div {
+    margin-bottom: 16px;
+    padding: 10px 15px;
+    border: 1px solid #333;
+    border-radius: 6px;
+    background-color: rgba(255, 255, 255, 0.05);
+}
