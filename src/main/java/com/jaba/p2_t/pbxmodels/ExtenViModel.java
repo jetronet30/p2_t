@@ -11,7 +11,7 @@ import lombok.NoArgsConstructor;
 @Data
 @Entity
 @NoArgsConstructor
-@AllArgsConstructor 
+@AllArgsConstructor
 @Table(name = "ExtenViModel")
 public class ExtenViModel {
 
@@ -28,11 +28,15 @@ public class ExtenViModel {
     @Column(name = "outPermit")
     private int outPermit = 3;
 
-
-    @Column(name = "active")///////////////
+    @Column(name = "active") ///////////////
     private boolean active;////////////////
     @Column(name = "modelName")
     private String modelName;
 
+    @Column(name = "rezerve_1")
+    private String rezerve1;
+
+    @Column(name = "rezerve_2")
+    private String rezerve2;
 
 }

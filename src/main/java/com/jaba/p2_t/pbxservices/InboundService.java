@@ -1,7 +1,8 @@
 package com.jaba.p2_t.pbxservices;
 
-import java.util.LinkedHashMap;
-import java.util.Map;
+import java.util.ArrayList;
+
+import java.util.List;
 
 import org.springframework.stereotype.Service;
 
@@ -15,10 +16,11 @@ public class InboundService {
     private final VirtExtensionsService extensionsService;
 
 
-    public Map<String, String> inboundCandidates() {
-        Map<String, String> candidates = new LinkedHashMap<>();
+    public List<String> inboundCandidates() {
+        List<String> candidates = new ArrayList<>();
+        candidates.clear();
         for (ExtenViModel ext : extensionsService.getVirtExts()) {
-            candidates.put( ext.getId()+"-extension",ext.getId());
+            candidates.add(ext.getId()+"-extension");
         }
         return candidates;
     }

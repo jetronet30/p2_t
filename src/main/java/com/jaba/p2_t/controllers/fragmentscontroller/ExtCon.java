@@ -44,8 +44,10 @@ public class ExtCon {
             @PathVariable("id") String id,
             @RequestParam("password") String password,
             @RequestParam("callerId") String callerId,
-            @RequestParam("context") String context) {
-        return virtExtensionsService.updateVirtExt(id,callerId,context,password,3);
+            @RequestParam("context") String context,
+            @RequestParam("rezerve1")String rezerve1,
+            @RequestParam("rezerve2")String rezreve2) {
+        return virtExtensionsService.updateVirtExt(id,callerId,context,password,3,rezerve1,rezreve2);
     }
 
     @ResponseBody

@@ -40,5 +40,8 @@ public class TrunkViModel {
     @Column(name = "outboundRoute")
     private String outboundRoute;
 
+    @Column(name = "voiceMessage")
+    private String voiceMessage;
+
 
 }

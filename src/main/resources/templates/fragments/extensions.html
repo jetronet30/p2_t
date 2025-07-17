@@ -18,32 +18,28 @@
 
 <div th:each="ext : ${extensions}" class="ext-form">
     <!-- თითოეული ფორმის ID იქნება დინამიური ext.id-ის მიხედვით -->
-    <form class="exten-form" method="post" >
+    <form class="exten-form" method="post">
         <input type="text" name="exten_id" th:value="${ext.id}" readonly>
         <input type="text" name="exten" th:value="${ext.id}" hidden>
         <input type="text" name="callerId" th:value="${ext.displayName}">
         <input type="text" name="context" th:value="${ext.virContext}">
         <input type="password" name="password" th:value="${ext.virPass}">
-        <input type="text"  th:value="${ext.modelName}">
-        <a class="conn-link" th:href="'http://' + ${ext.virUsIp}" target="_blank" rel="noopener noreferrer" th:text="${ext.virUsIp}">IP</a>
+        <input type="text" name="rezerve1" th:value="${ext.rezerve1}" placeholder="Reserve 1">
+        <input type="text" name="rezerve2" th:value="${ext.rezerve2}" placeholder="Reserve 2">
+        <input type="text" th:value="${ext.modelName}">
+        <a class="conn-link" th:href="'http://' + ${ext.virUsIp}" target="_blank" rel="noopener noreferrer"
+            th:text="${ext.virUsIp}">IP</a>
         <!-- edit ღილაკი, ID დინამიურად ერგება ext.id -->
-        <button type="submit" class="mini-btn" 
-                th:id="'ext-edit-btn' + ${ext.id}" 
-                id="ext-edit-btn" 
-                th:formaction="@{/edit-exten/{id}(id=${ext.id})}">
+        <button type="submit" class="mini-btn" th:id="'ext-edit-btn' + ${ext.id}" id="ext-edit-btn"
+            th:formaction="@{/edit-exten/{id}(id=${ext.id})}">
             Edit
         </button>
 
         <!-- delete ღილაკი, ID დინამიურად ერგება ext.id -->
-        <button type="submit" class="mini-btn" 
-                th:id="'ext-delete-btn' + ${ext.id}" 
-                id="ext-delete-btn" 
-                th:formaction="@{/delete-exten/{id}(id=${ext.id})}">
+        <button type="submit" class="mini-btn" th:id="'ext-delete-btn' + ${ext.id}" id="ext-delete-btn"
+            th:formaction="@{/delete-exten/{id}(id=${ext.id})}">
             Delete
         </button>
     </form>
 </div>
 <script th:src="@{/scripts/extensions.js}"></script>
-
-
-
