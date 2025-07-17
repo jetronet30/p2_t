@@ -1,15 +1,19 @@
 <div class="inbound-actions">
     <form action="/trunk-add" method="post" class="inbound-inline-form">
-        <button type="submit" formaction="/inbound-program" class="inbound-btn" data-action="program" >Program</button>
+        <button type="submit" formaction="/inbound-program" class="inbound-btn" data-action="program">Program</button>
     </form>
 </div>
 <div th:each="trunk : ${trunks}" class="inbound-edit-div">
 
     <form class="inbound-edit-form" method="post">
-        <input type="text"  th:value="${trunk.trunkName}" readonly>
+        <input type="text" th:value="${trunk.trunkName}" readonly>
         <input type="hidden" name="id" th:value="${trunk.id}">
-        <button type="submit" class="inbound-action-btn" th:id="'inbound-set-btn' + ${trunk.id}" id="inbound-set-btn" data-action="set"
-            th:formaction="@{/setinboundroute/{id}(id=${trunk.id})}">
+        <select name="candidates" id="candidateSelector">
+            <option th:each="candidate : ${candidates}" th:value="${candidate.key}" th:text="${candidate.value}">
+            </option>
+        </select>
+        <button type="submit" class="inbound-action-btn" th:id="'inbound-set-btn' + ${trunk.id}" id="inbound-set-btn"
+            data-action="set" th:formaction="@{/setinboundroute/{id}(id=${trunk.id})}">
             Set
         </button>
     </form>

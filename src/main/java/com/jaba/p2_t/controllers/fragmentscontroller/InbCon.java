@@ -5,6 +5,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 
+import com.jaba.p2_t.pbxservices.InboundService;
 import com.jaba.p2_t.pbxservices.TrunkService;
 
 import lombok.RequiredArgsConstructor;
@@ -13,10 +14,12 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class InbCon {
     private final TrunkService trunkService;
+    private final InboundService inboundService;
 
     @PostMapping("/inboundroutes")
     public String postInboundRoutes(Model m){
         m.addAttribute("trunks", trunkService.getAllTrunk());
+        m.addAttribute("candidates", inboundService.inboundCandidates());
         return "fragments/inboundroutes";
     }
 
