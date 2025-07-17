@@ -4,6 +4,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import com.jaba.p2_t.pbxservices.InboundService;
 import com.jaba.p2_t.pbxservices.TrunkService;
@@ -25,8 +26,11 @@ public class InbCon {
 
     @PostMapping("/setinboundroute/{id}")
     public String setInboundRoute(Model m,
-                                  @PathVariable("id") String id){
+                                  @PathVariable("id") String id,
+                                  @RequestParam("candidate")String candidate) {
+        trunkService.setInboundRoute(id, candidate);
         m.addAttribute("trunks", trunkService.getAllTrunk());
+        m.addAttribute("candidates", inboundService.inboundCandidates());
         return "fragments/inboundroutes";
     }
 

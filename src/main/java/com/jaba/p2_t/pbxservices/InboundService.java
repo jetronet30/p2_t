@@ -12,15 +12,13 @@ import lombok.RequiredArgsConstructor;
 @Service
 @RequiredArgsConstructor
 public class InboundService {
-    private final TrunkService trunkService;
     private final VirtExtensionsService extensionsService;
-
 
 
     public Map<String, String> inboundCandidates() {
         Map<String, String> candidates = new LinkedHashMap<>();
         for (ExtenViModel ext : extensionsService.getVirtExts()) {
-            candidates.put(ext.getId(), "extension " + ext.getId());
+            candidates.put( ext.getId()+"-extension",ext.getId());
         }
         return candidates;
     }

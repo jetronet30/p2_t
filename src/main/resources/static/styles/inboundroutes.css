@@ -21,9 +21,9 @@
     font-family: 'Courier New', monospace;
 }
 
-/* ლეიბლები (მომავალში თუ დაგჭირდება) */
+/* ლეიბლები */
 .inbound-inline-form label,
-.inbound-edit-form  label {
+.inbound-edit-form label {
     font-size: 0.75rem;
     color: #f8f406;
     margin-bottom: 3px;
@@ -34,17 +34,40 @@
     height: 30px;
     padding: 4px 8px;
     font-size: 0.85rem;
-    border: 1px solid #ccc;
+    border: 1px solid #555;
     border-radius: 4px;
-    background-color: #eee;
-    color: #000;
+    background-color: #f0f0f0;
     text-align: center;
+}
+
+/* ფარული input */
+.inbound-edit-form input[type="hidden"] {
+    display: none;
+}
+
+/* Select dropdown */
+.inbound-edit-form select {
+    height: 32px;
+    padding: 4px 8px;
+    font-size: 0.85rem;
+    border-radius: 4px;
+    border: 1px solid #555;
+    background-color: #f0f0f0;
+    font-family: 'Courier New', monospace;
+    cursor: pointer;
+    transition: border-color 0.2s ease;
+}
+
+.inbound-edit-form select:focus {
+    outline: none;
+    border-color: #f8f406;
+    box-shadow: 0 0 4px #f8f40666;
 }
 
 /* ღილაკები */
 .inbound-btn,
 .inbound-action-btn {
-    height: 30px;
+    height: 32px;
     padding: 0 16px;
     font-size: 0.85rem;
     font-weight: 600;
@@ -53,12 +76,18 @@
     cursor: pointer;
     background-color: #007acc;
     color: white;
-    transition: background-color 0.3s ease;
+    transition: background-color 0.3s ease, transform 0.1s ease;
 }
 
 .inbound-btn:hover,
 .inbound-action-btn:hover {
     background-color: #005b99;
+    transform: scale(1.02);
+}
+
+.inbound-btn:active,
+.inbound-action-btn:active {
+    transform: scale(0.98);
 }
 
 /* ─────────── ცალკეული ჩანაწერის კონტეინერი ─────────── */
@@ -68,4 +97,9 @@
     border: 1px solid #333;
     border-radius: 6px;
     background-color: rgba(255, 255, 255, 0.05);
+    transition: background-color 0.3s ease;
+}
+
+.inbound-edit-div:hover {
+    background-color: rgba(255, 255, 255, 0.08);
 }

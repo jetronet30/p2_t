@@ -8,8 +8,9 @@
     <form class="inbound-edit-form" method="post">
         <input type="text" th:value="${trunk.trunkName}" readonly>
         <input type="hidden" name="id" th:value="${trunk.id}">
-        <select name="candidates" id="candidateSelector">
-            <option th:each="candidate : ${candidates}" th:value="${candidate.key}" th:text="${candidate.value}">
+        <select name="candidate" id="candidateSelector">
+        <option th:value="${trunk.inboundRoute}" th:text="${trunk.inboundRoute}"></option>
+            <option th:each="candidate : ${candidates}" th:value="${candidate.value}" th:text="${candidate.key}">
             </option>
         </select>
         <button type="submit" class="inbound-action-btn" th:id="'inbound-set-btn' + ${trunk.id}" id="inbound-set-btn"

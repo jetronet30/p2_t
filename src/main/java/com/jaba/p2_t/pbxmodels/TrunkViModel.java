@@ -34,5 +34,11 @@ public class TrunkViModel {
     @Column(name = "active")
     private boolean active;
 
+    @Column(name = "inboundRoute")
+    private String inboundRoute;
+
+    @Column(name = "outboundRoute")
+    private String outboundRoute;
+
 
 }

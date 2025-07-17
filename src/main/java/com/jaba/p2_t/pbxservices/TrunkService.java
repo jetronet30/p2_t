@@ -19,18 +19,17 @@ import java.util.regex.Pattern;
 @RequiredArgsConstructor
 public class TrunkService {
 
-    private final PjsipAuthRepositor      authRepo;
-    private final PjsipAorRepositor       aorRepo;
-    private final PjsipEndpointRepositor  endpointRepo;
-    private final TrunkViModelRepository  trunkRepo;
-    private final PjsipContactRepository  contactRepo;
+    private final PjsipAuthRepositor authRepo;
+    private final PjsipAorRepositor aorRepo;
+    private final PjsipEndpointRepositor endpointRepo;
+    private final TrunkViModelRepository trunkRepo;
+    private final PjsipContactRepository contactRepo;
 
-    private static final File PJSIP_CONF_PATH =
-            new File("/etc/asterisk/pjsip_registrations.conf");
+    private static final File PJSIP_CONF_PATH = new File("/etc/asterisk/pjsip_registrations.conf");
+    private static final File EXTENSIONS_CONF_PATH = new File("/etc/asterisk/extensions.conf");
 
     /** მხოლოდ a‑z, A‑Z, 0‑9, _ - . სიმბოლოებს ვრთავთ. */
-    private static final Pattern SAFE_PATTERN =
-            Pattern.compile("^[A-Za-z0-9_.-]+$");
+    private static final Pattern SAFE_PATTERN = Pattern.compile("^[A-Za-z0-9_.-]+$");
 
     /* ─────────────────────── Public API ─────────────────────── */
 
@@ -48,13 +47,12 @@ public class TrunkService {
             String password,
             String server,
             String fromdomain,
-            int    qualify,
-            int    channels,
-            int    forbiddenInterval,
-            int    expiration,
+            int qualify,
+            int channels,
+            int forbiddenInterval,
+            int expiration,
             String transport,
-            String name
-    ) {
+            String name) {
 
         /* ---------- ჰარდ‑ველიდაცია ---------- */
         if (!isSafe(login) || !isSafe(server) || !isSafe(name)) {
@@ -67,10 +65,10 @@ public class TrunkService {
         }
 
         /* =========== იდენტების შექმნა =========== */
-        final String epId   = "trunk-" + login + "-sip";
+        final String epId = "trunk-" + login + "-sip";
         final String authId = epId + "-auth";
-        final String aorId  = epId + "-aor";
-        final String regId  = epId + "-reg";
+        final String aorId = epId + "-aor";
+        final String regId = epId + "-reg";
 
         /* =========== 1. UI მონაცემი =========== */
         trunkRepo.findById(login).orElseGet(() -> {
@@ -134,13 +132,14 @@ public class TrunkService {
         writeRegistrationToPjsipConf(
                 regId, authId, login, server,
                 qualify, forbiddenInterval, expiration,
-                transport, epId
-        );
+                transport, epId);
     }
 
     /* ─────────────────────── Helpers ─────────────────────── */
 
-    /** მხოლოდ მაშინ true, როცა ტექსტი არა‑ცარიელია და აკმაყოფილებს SAFE_PATTERN‑ს */
+    /**
+     * მხოლოდ მაშინ true, როცა ტექსტი არა‑ცარიელია და აკმაყოფილებს SAFE_PATTERN‑ს
+     */
     private static boolean isSafe(String s) {
         return StringUtils.hasText(s) && SAFE_PATTERN.matcher(s).matches();
     }
@@ -155,8 +154,7 @@ public class TrunkService {
             int forbiddenInterval,
             int expiration,
             String transport,
-            String endpointName
-    ) {
+            String endpointName) {
 
         try {
             if (!PJSIP_CONF_PATH.exists()) {
@@ -172,8 +170,7 @@ public class TrunkService {
                 return;
             }
 
-            String block =
-                    "\n; -------- AUTO‑GENERATED TRUNK (" + login + ") ----------\n" +
+            String block = "\n; -------- AUTO‑GENERATED TRUNK (" + login + ") ----------\n" +
                     "[" + regId + "]\n" +
                     "type=registration\n" +
                     "outbound_auth=" + authId + "\n" +
@@ -200,16 +197,28 @@ public class TrunkService {
     @Transactional
     public Map<String, Object> deleteTrunk(String login) {
 
-        final String epId   = "trunk-" + login + "-sip";
+        final String epId = "trunk-" + login + "-sip";
         final String authId = epId + "-auth";
-        final String aorId  = epId + "-aor";
+        final String aorId = epId + "-aor";
 
         int deleted = 0;
 
-        if (trunkRepo.existsById(login))   { trunkRepo.deleteById(login);   deleted++; }
-        if (endpointRepo.existsById(epId)) { endpointRepo.deleteById(epId); deleted++; }
-        if (authRepo.existsById(authId))   { authRepo.deleteById(authId);   deleted++; }
-        if (aorRepo.existsById(aorId))     { aorRepo.deleteById(aorId);     deleted++; }
+        if (trunkRepo.existsById(login)) {
+            trunkRepo.deleteById(login);
+            deleted++;
+        }
+        if (endpointRepo.existsById(epId)) {
+            endpointRepo.deleteById(epId);
+            deleted++;
+        }
+        if (authRepo.existsById(authId)) {
+            authRepo.deleteById(authId);
+            deleted++;
+        }
+        if (aorRepo.existsById(aorId)) {
+            aorRepo.deleteById(aorId);
+            deleted++;
+        }
 
         /* contacts */
         List<PjsipContact> contacts = contactRepo.findByEndpoint(epId);
@@ -234,7 +243,8 @@ public class TrunkService {
 
     /** შლის «AUTO‑GENERATED TRUNK (login)» ბლოკს და მის შემდეგ [regId] სექციას */
     private void removeRegistrationFromPjsipConf(String login) {
-        if (!PJSIP_CONF_PATH.exists()) return;
+        if (!PJSIP_CONF_PATH.exists())
+            return;
 
         final String regId = "trunk-" + login + "-sip-reg";
 
@@ -248,15 +258,16 @@ public class TrunkService {
             for (String line : in) {
                 /* ბლოკის დასაწყისი — ჰედერი ან [regId] */
                 if (line.contains("AUTO‑GENERATED TRUNK (" + login + ")") ||
-                    line.trim().equals("[" + regId + "]")) {
+                        line.trim().equals("[" + regId + "]")) {
                     inside = true;
-                    continue;        // skip
+                    continue; // skip
                 }
                 /* ბლოკის ბოლო — როცა ახალი [section] იწყება */
                 if (inside && line.startsWith("[") && !line.trim().equals("[" + regId + "]")) {
                     inside = false;
                 }
-                if (!inside) out.add(line);
+                if (!inside)
+                    out.add(line);
             }
 
             Files.write(p, out, StandardCharsets.UTF_8, StandardOpenOption.TRUNCATE_EXISTING);
@@ -266,4 +277,78 @@ public class TrunkService {
             System.err.println("❌ pjsip.conf გაწმენდა ვერ მოხერხდა: " + e.getMessage());
         }
     }
+
+    @Transactional
+    public boolean setInboundRoute(String trunkId, String candidate) {
+        if (!isSafe(trunkId) || !StringUtils.hasText(candidate)) {
+            System.err.println("❌ setInboundRoute(): trunkId ან candidate არასწორია");
+            return false;
+        }
+
+        Optional<TrunkViModel> opt = trunkRepo.findById(trunkId);
+        if (opt.isEmpty()) {
+            System.err.println("❌ setInboundRoute(): Trunk არ არსებობს: " + trunkId);
+            return false;
+        }
+
+        TrunkViModel model = opt.get();
+        model.setInboundRoute(candidate);
+        trunkRepo.save(model); // ბაზაში ვინახავთ ახალ inboundRoute-ს
+
+        try {
+            if (!EXTENSIONS_CONF_PATH.exists()) {
+                EXTENSIONS_CONF_PATH.getParentFile().mkdirs();
+                EXTENSIONS_CONF_PATH.createNewFile();
+            }
+
+            Path path = EXTENSIONS_CONF_PATH.toPath();
+            List<String> lines = Files.readAllLines(path, StandardCharsets.UTF_8);
+            List<String> updated = new ArrayList<>();
+
+            String markerStart = "; >>> INBOUND " + trunkId;
+            String markerEnd = "; <<< END INBOUND " + trunkId;
+            boolean inside = false;
+
+            for (String line : lines) {
+                if (line.trim().equals(markerStart)) {
+                    inside = true;
+                    continue;
+                }
+                if (line.trim().equals(markerEnd)) {
+                    inside = false;
+                    continue;
+                }
+                if (!inside) {
+                    updated.add(line);
+                }
+            }
+
+            // დავადგინოთ Goto ფორმატი
+            boolean isNumeric = candidate.matches("^\\d+$");
+            String gotoTarget = isNumeric
+                    ? "Goto(" + candidate + ",1)"
+                    : "Goto(" + candidate + ",s,1)";
+
+            String context = "from-" + trunkId;
+            String dialplanBlock = String.join("\n",
+                    "",
+                    markerStart,
+                    "[" + context + "]",
+                    "exten => _X.,1,NoOp(Inbound call from trunk: " + trunkId + ")",
+                    " same => n," + gotoTarget,
+                    markerEnd,
+                    "");
+
+            updated.add(dialplanBlock);
+
+            Files.write(path, updated, StandardCharsets.UTF_8, StandardOpenOption.TRUNCATE_EXISTING);
+            System.out.println("📥 inbound route განახლდა ტრანკისთვის: " + trunkId);
+            return true;
+
+        } catch (IOException e) {
+            System.err.println("❌ setInboundRoute(): შეცდომა dialplan-ში: " + e.getMessage());
+            return false;
+        }
+    }
+
 }
