@@ -13,10 +13,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
-import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
@@ -27,6 +25,7 @@ import java.util.regex.Pattern;
 @Service
 @RequiredArgsConstructor
 public class TrunkService {
+    private static final File TRUNKS_CONF = new File("/etc/asterisk/custom_trunks.conf");
 
     private static final Logger log = LoggerFactory.getLogger(TrunkService.class);
 
@@ -323,14 +322,7 @@ public class TrunkService {
         }
     }
 
-    /**
-     * ტრანსაქციული მეთოდი, რომელიც აკეთებს:
-     * - extensions.conf-ში inbound dialplan-ის დამატება/განახლება
-     * - ბაზაში ტრანკის inboundRoute და voiceMessage ველების განახლება
-     *
-     * destination და voicemessage ველებს უწევს დამატებითი ვალიდაცია და
-     * ფრაგმენტაციის დაცვას
-     */
+  
     @Transactional
     public Map<String, Object> setInboundRoute(String trunkId, String destination, String voicemessage) {
         if (!StringUtils.hasText(trunkId)) {
@@ -354,102 +346,51 @@ public class TrunkService {
             log.error("setInboundRoute(): extensions.conf არ არსებობს: {}", EXTENSIONS_CONF_PATH.getAbsolutePath());
             return Map.of("success", false, "error", "extensions-conf-not-found");
         }
-
-        List<String> updated = new ArrayList<>();
-        String markerStart = "; >>> AUTOGEN-INBOUND-" + trunkId;
-        String markerEnd = "; <<< AUTOGEN-INBOUND-" + trunkId;
-
-        // წაკითხვისას წავშალოთ ძველი ავტოგენერირებული ბლოკი
-        try (BufferedReader reader = new BufferedReader(new FileReader(EXTENSIONS_CONF_PATH, StandardCharsets.UTF_8))) {
-            String line;
-            boolean insideBlock = false;
-
-            while ((line = reader.readLine()) != null) {
-                if (line.trim().equals(markerStart)) {
-                    insideBlock = true;
-                    continue;
-                }
-                if (line.trim().equals(markerEnd)) {
-                    insideBlock = false;
-                    continue;
-                }
-                if (!insideBlock) {
-                    updated.add(line);
-                }
-            }
-        } catch (IOException e) {
-            log.error("setInboundRoute(): extensions.conf წაკითხვის შეცდომა", e);
-            return Map.of("success", false, "error", "read-fail");
-        }
-
-        String cleanDest = destination.replaceAll("-(extension|ivr|queue|callgroup)$", "").trim();
-
-        String type = "default";
-        if (destination.endsWith("-extension"))
-            type = "extension";
-        else if (destination.endsWith("-ivr"))
-            type = "ivr";
-        else if (destination.endsWith("-queue"))
-            type = "queue";
-        else if (destination.endsWith("-callgroup"))
-            type = "callgroup";
-
-        String context = "from-" + trunkId;
-        List<String> dialplan = new ArrayList<>();
-
-        dialplan.add("");
-        dialplan.add(markerStart);
-        dialplan.add("[" + context + "]");
-        dialplan.add("exten => _X.,1,NoOp(Inbound call from trunk: " + trunkId + ")");
-        dialplan.add(" same => n,Answer()");
-
-        if ("extension".equals(type)) {
-            if (StringUtils.hasText(voicemessage)) {
-                // თუ voicemessage არის, დაკრავს voicemessage-ს და შემდეგ გადადის დეფაულტ
-                // კონტექსტში ნომერზე
-                dialplan.add(" same => n,Playback(voicemessages/" + voicemessage + ")");
-                dialplan.add(" same => n,Goto(default," + cleanDest + ",1)");
-            } else {
-                // voicemessage არ არის, პირდაპირ რეკავს ნომერზე
-                dialplan.add(" same => n,Goto(default," + cleanDest + ",1)");
-            }
-        } else {
-            if (StringUtils.hasText(voicemessage)) {
-                dialplan.add(" same => n,Playback(voicemessages/" + voicemessage + ")");
-            }
-            switch (type) {
-                case "ivr" -> dialplan.add(" same => n,Goto(" + cleanDest + "-ivr,s,1)");
-                case "queue" -> dialplan.add(" same => n,Goto(" + cleanDest + "-queue,s,1)");
-                case "callgroup" -> dialplan.add(" same => n,Goto(" + cleanDest + ",s,1)");
-                default -> dialplan.add(" same => n,Hangup()");
-            }
-        }
-
-        dialplan.add(markerEnd);
-        dialplan.add("");
-
-        updated.addAll(dialplan);
-
-        try (BufferedWriter writer = new BufferedWriter(new FileWriter(EXTENSIONS_CONF_PATH, StandardCharsets.UTF_8))) {
-            for (String line : updated) {
-                writer.write(line);
-                writer.newLine();
-            }
-        } catch (IOException e) {
-            log.error("setInboundRoute(): extensions.conf წერის შეცდომა", e);
-            return Map.of("success", false, "error", "write-fail");
-        }
-
         Optional<TrunkViModel> optTrunk = trunkRepo.findById(trunkId);
         if (optTrunk.isPresent()) {
             TrunkViModel trunk = optTrunk.get();
             trunk.setInboundRoute(destination);
             trunk.setVoiceMessage(voicemessage);
             trunkRepo.save(trunk);
+            writeInTrunksInboudDialPlan();
             return Map.of("success", true);
         } else {
             log.warn("setInboundRoute(): ტრანკი '{}' ვერ მოიძებნა ბაზაში", trunkId);
             return Map.of("success", false, "error", "trunk-not-found");
+        }
+
+    }
+
+    private void writeInTrunksInboudDialPlan() {
+        if (TRUNKS_CONF.exists())
+            TRUNKS_CONF.delete();
+        try {
+            TRUNKS_CONF.createNewFile();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(TRUNKS_CONF, true))) {
+            writer.write("\n[from-trunk]\n\n");
+            for (TrunkViModel tr : trunkRepo.findAll()) {
+                if (!tr.getInboundRoute().isEmpty()) {
+                    // ამოიღე "-" მარჯვნიდან და დატოვე მისი მარცხნიდან მხოლოდ
+                    String inboundRoute = tr.getInboundRoute();
+                    int dashIndex = inboundRoute.indexOf("-");
+                    if (dashIndex != -1) {
+                        inboundRoute = inboundRoute.substring(0, dashIndex); // ამოაქვს მხოლოდ მარცხენა ნაწილი
+                    }
+
+                    writer.write("exten => _X.,1,NoOp(Inbound call from trunk: " + tr.getId() + ")\n");
+                    writer.write("same => n,Answer()\n");
+                    if (!tr.getVoiceMessage().isEmpty())
+                        writer.write("same => n,Playback(voicemessages/" + tr.getVoiceMessage() + ")\n");
+                    writer.write("same => n,Goto(default," + inboundRoute + ",1)\n");
+                    writer.write("same => n,Hangup()\n\n");
+                }
+            }
+
+        } catch (IOException e) {
+            e.printStackTrace();
         }
     }
 

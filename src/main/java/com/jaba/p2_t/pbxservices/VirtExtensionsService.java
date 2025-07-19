@@ -4,9 +4,6 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.*;
 
 import org.springframework.data.domain.Sort;
@@ -169,6 +166,7 @@ public class VirtExtensionsService {
             pjsipEndpointRepositor.save(endpoint);
             pjsipAuthRepositor.save(auth);
             pjsipAorRepositor.save(aor);
+            writeAutoForvarding();
         }
     }
 
@@ -220,98 +218,7 @@ public class VirtExtensionsService {
         pjsipEndpointRepositor.save(endpoint);
         pjsipAuthRepositor.save(auth);
 
-        try {
-            Path dialplanFile = Paths.get("/etc/asterisk/extensions.conf");
-            List<String> lines = Files.readAllLines(dialplanFile);
-            String markerStart = "; start auto-forward " + extensionId;
-            String markerEnd = "; end auto-forward " + extensionId;
-
-            // ძველი ჩანაწერის წაშლა
-            int startIdx = -1, endIdx = -1;
-            for (int i = 0; i < lines.size(); i++) {
-                if (lines.get(i).trim().equals(markerStart))
-                    startIdx = i;
-                if (lines.get(i).trim().equals(markerEnd)) {
-                    endIdx = i;
-                    break;
-                }
-            }
-            if (startIdx != -1 && endIdx != -1 && endIdx > startIdx) {
-                lines.subList(startIdx, endIdx + 1).clear();
-            }
-
-            boolean hasReserve1 = rezerve_1 != null && !rezerve_1.isBlank();
-            boolean hasReserve2 = rezerve_2 != null && !rezerve_2.isBlank();
-
-            // თუ პირველი რეზერვი არ არის, მეორე გადავინაცვლოთ პირველზე
-            if (!hasReserve1 && hasReserve2) {
-                rezerve_1 = rezerve_2;
-                rezerve_2 = null;
-                hasReserve1 = true;
-                hasReserve2 = false;
-            }
-
-            // თუ არცერთი რეზერვი არ არის, ჩანაწერს ვშლი და ვაბრუნებთ წარმატებას
-            if (!hasReserve1) {
-                Files.write(dialplanFile, lines);
-                result.put("extensions_updated", true);
-                result.put("message", "არ არის რეზერვები, ჩანაწერი წაიშალა");
-                result.put("success", true);
-                return result;
-            }
-
-            List<String> newBlock = new ArrayList<>();
-            newBlock.add(markerStart);
-
-            // კონტექსტი არ უნდა გამეორდეს, თუ default არის
-            if (!"default".equalsIgnoreCase(virContext)) {
-                newBlock.add("[" + virContext + "]");
-            }
-
-            newBlock.add("exten => " + extensionId + ",1,NoOp(Forward check for " + extensionId + ")");
-            newBlock.add(" same => n,Dial(PJSIP/" + extensionId + ",30)");
-
-            // რეზერვული გადამისამართების ლოგიკა
-            if (hasReserve1) {
-                newBlock.add(
-                        " same => n,GotoIf($[\"${DIALSTATUS}\" = \"BUSY\" | \"${DIALSTATUS}\" = \"NOANSWER\"]?firstres)");
-                newBlock.add(" same => n(firstres),NoOp(Forwarding to first reserve " + rezerve_1 + ")");
-                newBlock.add(" same => n,Dial(PJSIP/" + rezerve_1 + ",30)");
-
-                if (hasReserve2) {
-                    newBlock.add(
-                            " same => n,GotoIf($[\"${DIALSTATUS}\" = \"BUSY\" | \"${DIALSTATUS}\" = \"NOANSWER\"]?secondres)");
-                } else {
-                    newBlock.add(" same => n,Hangup()");
-                }
-            }
-
-            if (hasReserve2) {
-                newBlock.add(" same => n(secondres),NoOp(Forwarding to second reserve " + rezerve_2 + ")");
-                newBlock.add(" same => n,Dial(PJSIP/" + rezerve_2 + ",30)");
-                newBlock.add(" same => n,Hangup()");
-            } else if (!hasReserve1) {
-                // თუ არც პირველი და არც მეორე არ არის, აქაც უნდა დაიხუროს ზარი
-                newBlock.add(" same => n,Hangup()");
-            } else if (!hasReserve2) {
-                // თუ არის პირველი რეზერვი და არაა მეორე, მხოლოდ ერთი Hangup
-                // ეს უკვე მიყვანილია ზემოთ.
-                // აქ არაფერი არ გვინდა დამატება.
-            }
-
-            newBlock.add(markerEnd);
-
-            lines.add("");
-            lines.addAll(newBlock);
-
-            Files.write(dialplanFile, lines);
-            result.put("extensions_updated", true);
-
-        } catch (IOException e) {
-            result.put("extensions_updated", false);
-            result.put("error_extensions", e.getMessage());
-        }
-
+        writeAutoForvarding();
         result.put("success", true);
         return result;
     }
@@ -338,41 +245,10 @@ public class VirtExtensionsService {
             deletedCount++;
         }
 
-        // წავშალოთ ყველა კონტაქტი იმ ენდპოინტისთვის, რომელიც იდ-ს შეესაბამება
         List<PjsipContact> contacts = pjsipContactRepository.findByEndpoint(extensionId);
         if (!contacts.isEmpty()) {
             pjsipContactRepository.deleteAll(contacts);
             deletedCount += contacts.size();
-        }
-
-        // დამატებითი ლოგიკა: წაშალე extensions.conf-დან ავტომატური ფორვარდის ჩანაწერი
-        try {
-            Path dialplanFile = Paths.get("/etc/asterisk/extensions.conf"); // საჭიროებისამებრ შეცვალე
-            List<String> lines = Files.readAllLines(dialplanFile);
-            String markerStart = "; start auto-forward " + extensionId;
-            String markerEnd = "; end auto-forward " + extensionId;
-
-            int startIdx = -1, endIdx = -1;
-            for (int i = 0; i < lines.size(); i++) {
-                if (lines.get(i).trim().equals(markerStart))
-                    startIdx = i;
-                if (lines.get(i).trim().equals(markerEnd)) {
-                    endIdx = i;
-                    break;
-                }
-            }
-
-            if (startIdx != -1 && endIdx != -1 && endIdx > startIdx) {
-                lines.subList(startIdx, endIdx + 1).clear();
-                Files.write(dialplanFile, lines);
-                result.put("extensions_updated", true);
-            } else {
-                result.put("extensions_updated", false);
-                result.put("extensions_message", "Extensions dialplan block not found for deletion");
-            }
-        } catch (IOException e) {
-            result.put("extensions_updated", false);
-            result.put("error_extensions", e.getMessage());
         }
 
         if (deletedCount == 0) {
@@ -383,6 +259,7 @@ public class VirtExtensionsService {
 
         result.put("success", true);
         result.put("deletedCount", deletedCount);
+        writeAutoForvarding();
         return result;
     }
 
@@ -417,15 +294,13 @@ public class VirtExtensionsService {
         }
 
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(FORWARDING_CONF, true))) {
-            writer.write("\n[default]\n");
+            writer.write("\n[default]\n\n");
 
-            // აქ თქვენ ციკლში იღებთ ყველა ExtenViModel-თაგან
             for (ExtenViModel ex : extenVirtualRepo.findAll()) {
 
-                // თუ არც ერთი რეზერვი არ არსებობს, გამოტოვე ჩაწერა
                 if ((ex.getRezerve1() == null || ex.getRezerve1().isEmpty()) &&
                         (ex.getRezerve2() == null || ex.getRezerve2().isEmpty())) {
-                    continue; // გამოტოვე ამ ExtenViModel-ს
+                    continue;
                 }
 
                 writer.write("exten => " + ex.getId() + ",1,NoOp(Forward check for " + ex.getId() + ")\n");
