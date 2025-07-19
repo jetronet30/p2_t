@@ -1,5 +1,8 @@
 package com.jaba.p2_t.pbxservices;
 
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -26,6 +29,7 @@ import lombok.RequiredArgsConstructor;
 @Service
 @RequiredArgsConstructor
 public class VirtExtensionsService {
+    private static final File FORWARDING_CONF = new File("/etc/asterisk/autoforwarding.conf");
 
     private final SipSettings sipSettings;
     private final PjsipEndpointRepositor pjsipEndpointRepositor;
@@ -401,6 +405,68 @@ public class VirtExtensionsService {
             return "";
         String[] parts = input.split("[ ./,]", 2);
         return parts[0];
+    }
+
+    private void writeAutoForvarding() {
+        if (FORWARDING_CONF.exists())
+            FORWARDING_CONF.delete();
+        try {
+            FORWARDING_CONF.createNewFile();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(FORWARDING_CONF, true))) {
+            writer.write("\n[default]\n");
+
+            // აქ თქვენ ციკლში იღებთ ყველა ExtenViModel-თაგან
+            for (ExtenViModel ex : extenVirtualRepo.findAll()) {
+
+                // თუ არც ერთი რეზერვი არ არსებობს, გამოტოვე ჩაწერა
+                if ((ex.getRezerve1() == null || ex.getRezerve1().isEmpty()) &&
+                        (ex.getRezerve2() == null || ex.getRezerve2().isEmpty())) {
+                    continue; // გამოტოვე ამ ExtenViModel-ს
+                }
+
+                writer.write("exten => " + ex.getId() + ",1,NoOp(Forward check for " + ex.getId() + ")\n");
+                writer.write("same => n,Dial(PJSIP/" + ex.getId() + ",30)\n");
+
+                // დარეკვის სტატუსის შემოწმება
+                writer.write(
+                        "same => n,GotoIf($[\"${DIALSTATUS}\" = \"BUSY\" | \"${DIALSTATUS}\" = \"NOANSWER\"]?firstres)\n");
+
+                // თუ პირველი რეზერვი არსებობს
+                if (ex.getRezerve1() != null && !ex.getRezerve1().isEmpty()) {
+                    writer.write("same => n(firstres),NoOp(Forwarding to first reserve " + ex.getRezerve1() + ")\n");
+                    writer.write("same => n,Dial(PJSIP/" + ex.getRezerve1() + ",30)\n");
+
+                    // მეორე რეზერვის შემოწმება
+                    if (ex.getRezerve2() != null && !ex.getRezerve2().isEmpty()) {
+                        writer.write(
+                                "same => n,GotoIf($[\"${DIALSTATUS}\" = \"BUSY\" | \"${DIALSTATUS}\" = \"NOANSWER\"]?secondres)\n");
+
+                        // მეორე რეზერვის მიმართულება
+                        writer.write(
+                                "same => n(secondres),NoOp(Forwarding to second reserve " + ex.getRezerve2() + ")\n");
+                        writer.write("same => n,Dial(PJSIP/" + ex.getRezerve2() + ",30)\n");
+                    } else {
+                        writer.write("same => n,Hangup()\n"); // თუ მეორე რეზერვი არ არსებობს, შეწყვიტე ზარი
+                    }
+                }
+                // თუ პირველი რეზერვი არ არსებობს, მაგრამ მეორე რეზერვი არსებობს
+                else if (ex.getRezerve2() != null && !ex.getRezerve2().isEmpty()) {
+                    writer.write("same => n(firstres),NoOp(Forwarding to second reserve " + ex.getRezerve2() + ")\n");
+                    writer.write("same => n,Dial(PJSIP/" + ex.getRezerve2() + ",30)\n");
+                }
+
+                // რეზერვის შემდეგ ჰანგაპი
+                writer.write("same => n,Hangup()\n\n");
+            }
+
+            writer.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
 }
