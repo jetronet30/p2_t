@@ -59,7 +59,8 @@ export function init() {
             const rawInput = textarea.value.trim(); // raw ტექსტის მოპოვება
             formData.append("members", rawInput); // მთელი მნიშვნელობა იგზავნება ერთიანად
 
-            // strategy პარამეტრის დამატება
+            const voiceMessage = form.querySelector('select[name="voiceMessage"]').value;
+            formData.append("voiceMessage", voiceMessage);
             const strategy = form.querySelector('select[name="addStrategy"]').value;
             formData.append("addStrategy", strategy); // strategy წყვილი
         } else {

@@ -6,12 +6,14 @@
 
     <form action="/callgroup-add" method="post" id="callgroup-form" class="callgroup-add-form">
         <select name="voiceMessage" class="voice-selector">
-            <option value="">Voice Message</option>
+            <option value="voiceMessage">voiceMessage</option>
             <option th:each="message : ${messages}" th:value="${message}" th:text="${message}"></option>
         </select>
         <select name="addStrategy" class="add-strategy-selector">
-            <option value="covered">covered</option>
-            <option value="paralel">paralel</option>
+            <option value="RoundRobin">RoundRobin</option>
+            <option value="RingAll">RingAll</option>
+            <option value="RingGroup">RingGroup</option>
+            <option value="FirstAvailable">FirstAvailable</option>
         </select>
 
         <textarea name="members" id="membersInput" class="members-textarea"
@@ -32,14 +34,16 @@
 
         <select name="voiceMessage" class="voice-selector">
             <option th:value="${group.voiceMessage}" th:text="${group.voiceMessage}"></option>
-            <option value=""></option>
+            <option value="voiceMessage">voiceMessage</option>
             <option th:each="message : ${messages}" th:value="${message}" th:text="${message}"></option>
         </select>
 
         <select name="editStrategy" class="edit-strategy-selector">
             <option th:value="${group.strategy}" th:text="${group.strategy}"></option>
-            <option value="covered">covered</option>
-            <option value="paralel">paralel</option>
+            <option value="RoundRobin">RoundRobin</option>
+            <option value="RingAll">RingAll</option>
+            <option value="RingGroup">RingGroup</option>
+            <option value="FirstAvailable">FirstAvailable</option>
         </select>
 
         <input type="text" name="context" th:value="${group.context}" placeholder="Context">
