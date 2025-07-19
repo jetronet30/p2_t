@@ -420,7 +420,7 @@ public class TrunkService {
             switch (type) {
                 case "ivr" -> dialplan.add(" same => n,Goto(" + cleanDest + "-ivr,s,1)");
                 case "queue" -> dialplan.add(" same => n,Goto(" + cleanDest + "-queue,s,1)");
-                case "callgroup" -> dialplan.add(" same => n,Goto(" + cleanDest + "-callgroup,s,1)");
+                case "callgroup" -> dialplan.add(" same => n,Goto(" + cleanDest + ",s,1)");
                 default -> dialplan.add(" same => n,Hangup()");
             }
         }

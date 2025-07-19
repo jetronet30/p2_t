@@ -22,6 +22,8 @@ public class PjsipEndpoint {
     private String disallow;
 
     private String allow;
+    @Column
+    private String callGroupId;
 
     @Column(name = "callerid")
     private String callerId;

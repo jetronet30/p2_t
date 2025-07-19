@@ -14,6 +14,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class InboundService {
     private final VirtExtensionsService extensionsService;
+    private final CallGroupService callGroupService;
 
 
     public List<String> inboundCandidates() {
@@ -21,6 +22,9 @@ public class InboundService {
         candidates.clear();
         for (ExtenViModel ext : extensionsService.getVirtExts()) {
             candidates.add(ext.getId()+"-extension");
+        }
+        for (String callGroupId: callGroupService.getGroupIdSortedById()) {
+            candidates.add(callGroupId+"-callgroup");
         }
         return candidates;
     }

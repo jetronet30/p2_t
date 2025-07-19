@@ -219,8 +219,8 @@ public class VirtExtensionsService {
         try {
             Path dialplanFile = Paths.get("/etc/asterisk/extensions.conf");
             List<String> lines = Files.readAllLines(dialplanFile);
-            String markerStart = ";-- start auto-forward " + extensionId;
-            String markerEnd = ";-- end auto-forward " + extensionId;
+            String markerStart = "; start auto-forward " + extensionId;
+            String markerEnd = "; end auto-forward " + extensionId;
 
             // ძველი ჩანაწერის წაშლა
             int startIdx = -1, endIdx = -1;
@@ -345,8 +345,8 @@ public class VirtExtensionsService {
         try {
             Path dialplanFile = Paths.get("/etc/asterisk/extensions.conf"); // საჭიროებისამებრ შეცვალე
             List<String> lines = Files.readAllLines(dialplanFile);
-            String markerStart = ";-- start auto-forward " + extensionId;
-            String markerEnd = ";-- end auto-forward " + extensionId;
+            String markerStart = "; start auto-forward " + extensionId;
+            String markerEnd = "; end auto-forward " + extensionId;
 
             int startIdx = -1, endIdx = -1;
             for (int i = 0; i < lines.size(); i++) {

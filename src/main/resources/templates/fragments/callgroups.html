@@ -1,48 +1,61 @@
+<!-- Top Actions Bar -->
 <div class="callgroup-actions-div">
     <form action="/callgroup-program" class="callgroup-program-form" method="post">
         <button type="submit" class="action-btn" id="callgroup-program-btn">Program</button>
     </form>
+
     <form action="/callgroup-add" method="post" id="callgroup-form" class="callgroup-add-form">
+        <select name="voiceMessage" class="voice-selector">
+            <option value="">Voice Message</option>
+            <option th:each="message : ${messages}" th:value="${message}" th:text="${message}"></option>
+        </select>
+        <select name="addStrategy" class="add-strategy-selector">
+            <option value="covered">covered</option>
+            <option value="paralel">paralel</option>
+        </select>
 
-            <textarea name="members" id="membersInput" class="members-textarea"
-                placeholder="110021, 110032.110025 or space-separated" required></textarea>
+        <textarea name="members" id="membersInput" class="members-textarea"
+            placeholder="110021, 110032, 110025 or space-separated" required></textarea>
+           
 
-            <span id="member-count" class="member-count">0 members / 10 max</span>
+        <span id="member-count" class="member-count">0 members </span>
 
-            <button type="submit" class="action-btn">Add</button>
-        </div>
+        <button type="submit" class="action-btn">Add</button>
     </form>
 </div>
 
-<!-- CallGroup სიები -->
+<!-- Existing CallGroup List -->
 <div th:each="group : ${callgroups}" class="callgroup-edit-div">
-    <form class="callgroup-edit-form" method="post">
+    <form class="callgroup-edit-form" method="post" th:action="@{/edit-callgroup/{id}(id=${group.id})}">
+        <input type="hidden" name="id" th:value="${group.id}" />
         <input type="text" name="group_id" th:value="${group.id}" readonly>
+
+        <select name="voiceMessage" class="voice-selector">
+            <option th:value="${group.voiceMessage}" th:text="${group.voiceMessage}"></option>
+            <option value=""></option>
+            <option th:each="message : ${messages}" th:value="${message}" th:text="${message}"></option>
+        </select>
+
+        <select name="editStrategy" class="edit-strategy-selector">
+            <option th:value="${group.strategy}" th:text="${group.strategy}"></option>
+            <option value="covered">covered</option>
+            <option value="paralel">paralel</option>
+        </select>
+
         <input type="text" name="context" th:value="${group.context}" placeholder="Context">
 
-        <!-- წევრები -->
-        <input type="text" name="member1" th:value="${group.member1}" placeholder="Member 1">
-        <input type="text" name="member2" th:value="${group.member2}" placeholder="Member 2">
-        <input type="text" name="member3" th:value="${group.member3}" placeholder="Member 3">
-        <input type="text" name="member4" th:value="${group.member4}" placeholder="Member 4">
-        <input type="text" name="member5" th:value="${group.member5}" placeholder="Member 5">
-        <input type="text" name="member6" th:value="${group.member6}" placeholder="Member 6">
-        <input type="text" name="member7" th:value="${group.member7}" placeholder="Member 7">
-        <input type="text" name="member8" th:value="${group.member8}" placeholder="Member 8">
-        <input type="text" name="member9" th:value="${group.member9}" placeholder="Member 9">
-        <input type="text" name="member10" th:value="${group.member10}" placeholder="Member 10">
+        <textarea name="members" class="members-textarea" rows="3"
+    th:text="${#strings.replace(group.members, '[', '').replace(']', '')}"></textarea>
 
-        <!-- Edit ღილაკი -->
-        <button type="submit" class="callgroup-edit-btn" th:id="'callgroup-edit-btn' + ${group.id}"
-            th:formaction="@{/edit-callgroup/{id}(id=${group.id})}">
+        <button type="submit" class="callgroup-edit-btn" th:id="'callgroup-edit-btn' + ${group.id}">
             Edit
         </button>
 
-        <!-- Delete ღილაკი -->
         <button type="submit" class="callgroup-delete-btn" th:id="'callgroup-delete-btn' + ${group.id}"
             th:formaction="@{/delete-callgroup/{id}(id=${group.id})}">
             Delete
         </button>
     </form>
 </div>
+
 <script th:src="@{/scripts/callgroups.js}"></script>
