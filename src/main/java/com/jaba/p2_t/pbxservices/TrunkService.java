@@ -1,5 +1,6 @@
 package com.jaba.p2_t.pbxservices;
 
+import com.jaba.p2_t.asteriskmanager.AsteriskManager;
 import com.jaba.p2_t.pbxmodels.PjsipAor;
 import com.jaba.p2_t.pbxmodels.PjsipAuth;
 import com.jaba.p2_t.pbxmodels.PjsipContact;
@@ -25,6 +26,7 @@ import java.util.regex.Pattern;
 @Service
 @RequiredArgsConstructor
 public class TrunkService {
+    private final AsteriskManager asteriskManager;
     private static final File TRUNKS_CONF = new File("/etc/asterisk/custom_trunks.conf");
 
     private static final Logger log = LoggerFactory.getLogger(TrunkService.class);
@@ -388,6 +390,8 @@ public class TrunkService {
         } catch (IOException e) {
             e.printStackTrace();
         }
+        asteriskManager.reloadDialplan();
+        
     }
 
 }

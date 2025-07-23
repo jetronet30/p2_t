@@ -10,6 +10,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.jaba.p2_t.asteriskmanager.AsteriskManager;
 import com.jaba.p2_t.pbxmodels.ExtenViModel;
 import com.jaba.p2_t.pbxmodels.PjsipAor;
 import com.jaba.p2_t.pbxmodels.PjsipAuth;
@@ -26,6 +27,8 @@ import lombok.RequiredArgsConstructor;
 @Service
 @RequiredArgsConstructor
 public class VirtExtensionsService {
+
+    private final AsteriskManager asteriskManager;
     private static final File FORWARDING_CONF = new File("/etc/asterisk/autoforwarding.conf");
 
     private final SipSettings sipSettings;
@@ -287,61 +290,67 @@ public class VirtExtensionsService {
     private void writeAutoForvarding() {
         if (FORWARDING_CONF.exists())
             FORWARDING_CONF.delete();
+
         try {
             FORWARDING_CONF.createNewFile();
         } catch (IOException e) {
             e.printStackTrace();
         }
 
-        try (BufferedWriter writer = new BufferedWriter(new FileWriter(FORWARDING_CONF, true))) {
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(FORWARDING_CONF, false))) {
             writer.write("\n[default]\n\n");
 
             for (ExtenViModel ex : extenVirtualRepo.findAll()) {
+                String id = ex.getId();
+                String res1 = ex.getRezerve1();
+                String res2 = ex.getRezerve2();
 
-                if ((ex.getRezerve1() == null || ex.getRezerve1().isEmpty()) &&
-                        (ex.getRezerve2() == null || ex.getRezerve2().isEmpty())) {
+                if ((res1 == null || res1.isEmpty()) && (res2 == null || res2.isEmpty())) {
                     continue;
                 }
 
-                writer.write("exten => " + ex.getId() + ",1,NoOp(Forward check for " + ex.getId() + ")\n");
-                writer.write("same => n,Dial(PJSIP/" + ex.getId() + ",30)\n");
+                writer.write("exten => " + id + ",1,NoOp(Forward check for " + id + ")\n");
+                writer.write("same => n,Dial(PJSIP/" + id + ",30)\n");
 
-                // დარეკვის სტატუსის შემოწმება
-                writer.write(
-                        "same => n,GotoIf($[\"${DIALSTATUS}\" = \"BUSY\" | \"${DIALSTATUS}\" = \"NOANSWER\"]?firstres)\n");
+                writer.write("same => n,GotoIf($[\"${DIALSTATUS}\" = \"BUSY\" || " +
+                        "\"${DIALSTATUS}\" = \"NOANSWER\" || " +
+                        "\"${DIALSTATUS}\" = \"UNAVAIL\" || " +
+                        "\"${DIALSTATUS}\" = \"CHANUNAVAIL\" || " +
+                        "\"${DIALSTATUS}\" = \"CONGESTION\"]?firstres)\n");
 
-                // თუ პირველი რეზერვი არსებობს
-                if (ex.getRezerve1() != null && !ex.getRezerve1().isEmpty()) {
-                    writer.write("same => n(firstres),NoOp(Forwarding to first reserve " + ex.getRezerve1() + ")\n");
-                    writer.write("same => n,Dial(PJSIP/" + ex.getRezerve1() + ",30)\n");
-
-                    // მეორე რეზერვის შემოწმება
-                    if (ex.getRezerve2() != null && !ex.getRezerve2().isEmpty()) {
-                        writer.write(
-                                "same => n,GotoIf($[\"${DIALSTATUS}\" = \"BUSY\" | \"${DIALSTATUS}\" = \"NOANSWER\"]?secondres)\n");
-
-                        // მეორე რეზერვის მიმართულება
-                        writer.write(
-                                "same => n(secondres),NoOp(Forwarding to second reserve " + ex.getRezerve2() + ")\n");
-                        writer.write("same => n,Dial(PJSIP/" + ex.getRezerve2() + ",30)\n");
-                    } else {
-                        writer.write("same => n,Hangup()\n"); // თუ მეორე რეზერვი არ არსებობს, შეწყვიტე ზარი
-                    }
-                }
-                // თუ პირველი რეზერვი არ არსებობს, მაგრამ მეორე რეზერვი არსებობს
-                else if (ex.getRezerve2() != null && !ex.getRezerve2().isEmpty()) {
-                    writer.write("same => n(firstres),NoOp(Forwarding to second reserve " + ex.getRezerve2() + ")\n");
-                    writer.write("same => n,Dial(PJSIP/" + ex.getRezerve2() + ",30)\n");
-                }
-
-                // რეზერვის შემდეგ ჰანგაპი
                 writer.write("same => n,Hangup()\n\n");
+
+                if (res1 != null && !res1.isEmpty()) {
+                    writer.write("same => n(firstres),NoOp(Forwarding to first reserve " + res1 + ")\n");
+                    writer.write("same => n,Dial(PJSIP/" + res1 + ",30)\n");
+
+                    writer.write("same => n,GotoIf($[\"${DIALSTATUS}\" = \"BUSY\" || " +
+                            "\"${DIALSTATUS}\" = \"NOANSWER\" || " +
+                            "\"${DIALSTATUS}\" = \"UNAVAIL\" || " +
+                            "\"${DIALSTATUS}\" = \"CHANUNAVAIL\" || " +
+                            "\"${DIALSTATUS}\" = \"CONGESTION\"]?secondres)\n");
+
+                    writer.write("same => n,Hangup()\n\n");
+                } else {
+                    // fallback to res2 if only one reserve exists
+                    writer.write("same => n(firstres),NoOp(Forwarding to second reserve " + res2 + ")\n");
+                    writer.write("same => n,Dial(PJSIP/" + res2 + ",30)\n");
+                    writer.write("same => n,Hangup()\n\n");
+                    continue;
+                }
+
+                if (res2 != null && !res2.isEmpty()) {
+                    writer.write("same => n(secondres),NoOp(Forwarding to second reserve " + res2 + ")\n");
+                    writer.write("same => n,Dial(PJSIP/" + res2 + ",30)\n");
+                    writer.write("same => n,Hangup()\n\n");
+                }
             }
 
-            writer.close();
         } catch (IOException e) {
             e.printStackTrace();
         }
+
+        asteriskManager.reloadDialplan();
     }
 
 }

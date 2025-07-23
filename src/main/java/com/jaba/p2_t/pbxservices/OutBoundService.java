@@ -11,6 +11,7 @@ import java.util.Optional;
 
 import org.springframework.stereotype.Service;
 
+import com.jaba.p2_t.asteriskmanager.AsteriskManager;
 import com.jaba.p2_t.pbxmodels.OutBoundRouteModel;
 import com.jaba.p2_t.pbxrepos.OutBoundRepo;
 
@@ -21,6 +22,7 @@ import lombok.RequiredArgsConstructor;
 public class OutBoundService {
     private static final File OUT_BOUND_ROUTES_CONF = new File("/etc/asterisk/outbounds.conf");
     private final OutBoundRepo oBoundRepo;
+    private final AsteriskManager asteriskManager;
 
     public boolean addOutBondRoute(String name, String prefix, String autoAdd, String digits, String trunkId) {
         // უკვე ხომ არ არსებობს იგივე prefix-ით და trunkId-ით
@@ -94,7 +96,7 @@ public class OutBoundService {
         }
 
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(OUT_BOUND_ROUTES_CONF, true))) {
-            writer.write("\n");
+            writer.write("\n\n[default]\n\n");
 
             for (OutBoundRouteModel ob : oBoundRepo.findAll()) {
                 String digits = ob.getDigits(); // ვალიდურია
@@ -126,6 +128,7 @@ public class OutBoundService {
         } catch (Exception e) {
             e.printStackTrace();
         }
+        asteriskManager.reloadDialplan();
     }
 
 }

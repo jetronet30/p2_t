@@ -72,7 +72,7 @@ public class CallGroupService {
         // CallGroup-ის შენახვა რეპოზიტორიუმში
         callGroupRepo.save(group);
         writeConfForCallGroup();
-        asteriskManager.reloadPJSIP();
+
 
 
     }
@@ -211,6 +211,7 @@ public class CallGroupService {
         } catch (IOException e) {
             e.printStackTrace();
         } 
+        asteriskManager.reloadDialplan();
 
     }
 

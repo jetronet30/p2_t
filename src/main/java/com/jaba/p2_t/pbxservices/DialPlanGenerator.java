@@ -7,10 +7,15 @@ import java.io.IOException;
 
 import org.springframework.stereotype.Service;
 
+import com.jaba.p2_t.asteriskmanager.AsteriskManager;
+
 import jakarta.annotation.PostConstruct;
+import lombok.RequiredArgsConstructor;
 
 @Service
+@RequiredArgsConstructor
 public class DialPlanGenerator {
+    private final AsteriskManager asteriskManager;
     private static final File EXTENSIONS_CONF = new File("/etc/asterisk/extensions.conf");
     private static final File CALL_GROUP_CONF = new File("/etc/asterisk/custom_callgroup.conf");
     private static final File TRUNKS_CONF = new File("/etc/asterisk/custom_trunks.conf");
@@ -71,6 +76,7 @@ public class DialPlanGenerator {
             } catch (IOException e) {
                 e.printStackTrace();
             }
+            asteriskManager.reloadDialplan();
 
         }
 
