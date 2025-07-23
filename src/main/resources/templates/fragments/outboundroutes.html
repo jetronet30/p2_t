@@ -1,0 +1,34 @@
+<div class="outbbound-actions">
+    <form action="/outbound-add" method="post" class="range-form">
+        <input type="text" name="outboundName" placeholder="name">
+        <input type="text" name="prefix" placeholder="9">
+        <input type="text" name="autoAdd" placeholder="+995">
+        <input type="text" name="digits" placeholder="XXXXXXXXX">
+        <select name="trunk" id="">
+            <option th:each="trunk : ${trunks}" th:value="${trunk.userName}" th:text="${trunk.userName}">
+        </select>
+        <button type="submit" class="outbound-add-btn" id="outbound-add-btn">Add</button>
+    </form>
+</div>
+<div th:each="outbound : ${outbounds}" class="outbound-edit-div">
+    <!-- თითოეული ფორმის ID იქნება დინამიური ext.id-ის მიხედვით -->
+    <form class="outbound-edit-form" method="post">
+        <input type="text" name="outboundId" th:value="${outbound.id}" hidden>
+        <input type="text" name="outboundName" th:value="${outbound.outboundName}" readonly>
+        <input type="text" name="prefix" th:value="${outbound.prefix}" hidden>
+        <input type="text" name="autoAdd" th:value="${outbound.autoAdd}">
+        <input type="text" name="digits" th:value="${outbound.digits}">
+
+        <button type="submit" class="outbound-edit-btn" th:id="'outbound-edit-btn' + ${outbound.id}" 
+            th:formaction="@{/edit-outbound/{id}(id=${outbound.id})}">
+            Edit
+        </button>
+
+
+        <button type="submit" class="outbound-delete-btn" th:id="'outbound-delete-btn' + ${outbound.id}" 
+            th:formaction="@{/delete-outbound/{id}(id=${outbound.id})}">
+            Delete
+        </button>
+    </form>
+</div>
+<script th:src="@{/scripts/outboundroutes.js}"></script>
