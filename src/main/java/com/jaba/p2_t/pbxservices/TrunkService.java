@@ -47,10 +47,6 @@ public class TrunkService {
         return trunkRepo.findAll();
     }
 
-    /**
-     * დამატება ან განახლება Zadarma სტილის ტრანკისთვის.
-     * უარს ამბობს, თუ აუცილებელი ველები არ არის ვალიდური.
-     */
     @Transactional
     public void addTrunk(
             String login,
