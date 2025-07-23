@@ -20,5 +20,7 @@ public class OutBoundRouteModel {
     private String autoAdd;
     @Column(name = "digits")
     private String digits;
+    @Column(name = "trunk_id")
+    private String trunkId;
 
 }

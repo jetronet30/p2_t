@@ -48,6 +48,7 @@ public class DialPlanGenerator {
                 writer.write("#include /etc/asterisk/autoforwarding.conf\n");
                 writer.write("#include /etc/asterisk/custom_callgroup.conf\n");
                 writer.write("#include /etc/asterisk/custom_trunks.conf\n");
+                writer.write("#include /etc/asterisk/outbounds.conf\n");
 
                 writer.write("\n[default]\n");
                 writer.write("exten => _X.,1,NoOp(Calling number: ${CALLERID(num)} → ${EXTEN})\n");

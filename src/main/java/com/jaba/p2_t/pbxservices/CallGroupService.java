@@ -1,5 +1,6 @@
 package com.jaba.p2_t.pbxservices;
 
+import com.jaba.p2_t.asteriskmanager.AsteriskManager;
 import com.jaba.p2_t.pbxmodels.CallGroup;
 import com.jaba.p2_t.pbxrepos.CallGroupRepo;
 import com.jaba.p2_t.pbxrepos.ExtenVirtualRepo;
@@ -16,6 +17,7 @@ import java.util.stream.Collectors;
 @Service
 @RequiredArgsConstructor
 public class CallGroupService {
+    private final AsteriskManager asteriskManager;
 
     // ფაილის გზამკვლევი
     private static final File CALL_GROUP_CONF = new File("/etc/asterisk/custom_callgroup.conf");
@@ -70,6 +72,7 @@ public class CallGroupService {
         // CallGroup-ის შენახვა რეპოზიტორიუმში
         callGroupRepo.save(group);
         writeConfForCallGroup();
+        asteriskManager.reloadPJSIP();
 
 
     }
@@ -140,6 +143,7 @@ public class CallGroupService {
 
 
 
+
             response.put("success", true);
             response.put("id", group.getId());
         } catch (Exception e) {
@@ -206,7 +210,8 @@ public class CallGroupService {
             writer.close();
         } catch (IOException e) {
             e.printStackTrace();
-        }
+        } 
+
     }
 
 }

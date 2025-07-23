@@ -1,11 +1,11 @@
 <div class="outbbound-actions">
-    <form action="/outbound-add" method="post" class="range-form">
-        <input type="text" name="outboundName" placeholder="name">
-        <input type="text" name="prefix" placeholder="9">
+    <form action="/outbound-add" method="post" class="range-form" >
+        <input type="text" name="outboundName" placeholder="name" required>
+        <input type="text" name="prefix" placeholder="9" >
         <input type="text" name="autoAdd" placeholder="+995">
         <input type="text" name="digits" placeholder="XXXXXXXXX">
         <select name="trunk" id="">
-            <option th:each="trunk : ${trunks}" th:value="${trunk.userName}" th:text="${trunk.userName}">
+            <option th:each="trunk : ${trunks}" th:value="${trunk.id}" th:text="${trunk.id}">
         </select>
         <button type="submit" class="outbound-add-btn" id="outbound-add-btn">Add</button>
     </form>
@@ -13,11 +13,14 @@
 <div th:each="outbound : ${outbounds}" class="outbound-edit-div">
     <!-- თითოეული ფორმის ID იქნება დინამიური ext.id-ის მიხედვით -->
     <form class="outbound-edit-form" method="post">
-        <input type="text" name="outboundId" th:value="${outbound.id}" hidden>
-        <input type="text" name="outboundName" th:value="${outbound.outboundName}" readonly>
-        <input type="text" name="prefix" th:value="${outbound.prefix}" hidden>
+        <input type="text" name="outboundId" th:value="${outbound.id}" readonly>
+        <input type="text" name="prefix" th:value="${outbound.prefix}" >
         <input type="text" name="autoAdd" th:value="${outbound.autoAdd}">
         <input type="text" name="digits" th:value="${outbound.digits}">
+        <select name="trunk" >
+            <option th:value="${outbound.trunkId}" th:text="${outbound.trunkId}"></option>
+            <option th:each="trunk : ${trunks}" th:value="${trunk.id}" th:text="${trunk.id}"></option>
+        </select>
 
         <button type="submit" class="outbound-edit-btn" th:id="'outbound-edit-btn' + ${outbound.id}" 
             th:formaction="@{/edit-outbound/{id}(id=${outbound.id})}">
