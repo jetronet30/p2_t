@@ -1,0 +1,101 @@
+.outbbound-actions {
+    position: sticky;
+    top: 0;
+    backdrop-filter: blur(8px);
+    background-color: rgba(17, 17, 17, 0.7);
+    padding: 10px 20px;
+    z-index: 100;
+    display: flex;
+    gap: 10px;
+    border-bottom: 1px solid #333;
+    margin-bottom: 20px;
+    animation: slideDownFade 0.5s ease;
+    justify-content: flex-start;
+    align-items: center;
+}
+
+.range-form {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    align-items: center;
+}
+
+.range-form input[type="text"],
+.range-form select {
+    height: 30px;
+    padding: 4px 8px;
+    font-size: 0.85rem;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    background-color: #fff;
+    color: #333;
+    width: 120px;
+}
+
+.range-form select {
+    min-width: 120px;
+}
+
+.outbound-add-btn {
+    height: 32px;
+    padding: 0 14px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    background-color: #007acc;
+    color: white;
+    transition: background-color 0.3s ease;
+}
+
+.outbound-add-btn:hover {
+    background-color: #005b99;
+}
+
+/* -------- Edit / Delete Forms -------- */
+.outbound-edit-div {
+    margin-bottom: 10px;
+}
+
+.outbound-edit-form {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 10px;
+    padding: 10px;
+    background-color: #f7f7f7;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+}
+
+.outbound-edit-form input[type="text"] {
+    height: 26px;
+    padding: 2px 6px;
+    font-size: 0.85rem;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    background-color: #fff;
+    color: #333;
+    width: 130px;
+}
+
+.outbound-edit-form button {
+    height: 28px;
+    padding: 0 10px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    background-color: #007acc;
+    color: #ffeb3b;
+    transition: background-color 0.2s ease;
+}
+
+.outbound-edit-form button:hover {
+    background-color: #ffeb3b;
+    color: #007acc;
+}
