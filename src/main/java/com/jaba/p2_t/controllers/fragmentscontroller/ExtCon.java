@@ -43,11 +43,12 @@ public class ExtCon {
     public Map<String, Object> editExt(
             @PathVariable("id") String id,
             @RequestParam("password") String password,
+            @RequestParam("permit") int permit,
             @RequestParam("callerId") String callerId,
             @RequestParam("context") String context,
             @RequestParam("rezerve1")String rezerve1,
-            @RequestParam("rezerve2")String rezreve2) {
-        return virtExtensionsService.updateVirtExt(id,callerId,context,password,3,rezerve1,rezreve2);
+            @RequestParam("rezerve2")String rezerve2) {
+        return virtExtensionsService.updateVirtExt(id,callerId,context,password,permit,rezerve1,rezerve2);
     }
 
     @ResponseBody

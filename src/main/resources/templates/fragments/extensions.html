@@ -24,6 +24,13 @@
         <input type="text" name="callerId" th:value="${ext.displayName}">
         <input type="text" name="context" th:value="${ext.virContext}">
         <input type="password" name="password" th:value="${ext.virPass}">
+        <select  name="permit" class="permit-selector">
+            <option th:value="${ext.outPermit}" th:text="${ext.outPermit}"></option>
+            <option value="0">0</option>
+            <option value="1">1</option>
+            <option value="2">2</option>
+            <option value="3">3</option>
+        </select>
         <input type="text" name="rezerve1" th:value="${ext.rezerve1}" placeholder="Reserve 1">
         <input type="text" name="rezerve2" th:value="${ext.rezerve2}" placeholder="Reserve 2">
         <input type="text" th:value="${ext.modelName}">

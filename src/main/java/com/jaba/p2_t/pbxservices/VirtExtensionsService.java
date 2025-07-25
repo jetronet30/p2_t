@@ -30,7 +30,7 @@ public class VirtExtensionsService {
 
     private final AsteriskManager asteriskManager;
     private static final File FORWARDING_CONF = new File("/etc/asterisk/autoforwarding.conf");
-
+    private static final File PERMIT_CONF = new File("/etc/asterisk/outpermit.conf");
     private final SipSettings sipSettings;
     private final PjsipEndpointRepositor pjsipEndpointRepositor;
     private final PjsipAuthRepositor pjsipAuthRepositor;
@@ -222,6 +222,7 @@ public class VirtExtensionsService {
         pjsipAuthRepositor.save(auth);
 
         writeAutoForvarding();
+        writeoutPermit();
         result.put("success", true);
         return result;
     }
@@ -263,6 +264,7 @@ public class VirtExtensionsService {
         result.put("success", true);
         result.put("deletedCount", deletedCount);
         writeAutoForvarding();
+        writeoutPermit();
         return result;
     }
 
@@ -346,6 +348,32 @@ public class VirtExtensionsService {
                 }
             }
 
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        asteriskManager.reloadDialplan();
+    }
+
+    private void writeoutPermit() {
+        if (PERMIT_CONF.exists())
+            PERMIT_CONF.delete();
+
+        try {
+            PERMIT_CONF.createNewFile();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(PERMIT_CONF, false))) {
+            writer.write("\n[allow-outbound-users]\n");
+
+            for (ExtenViModel ex : extenVirtualRepo.findAll()) {
+                if (ex.getOutPermit() == 0)
+                    writer.write(" exten =>" + ex.getId() + ",1,Return()\n");
+            }
+            writer.write("exten => _X.,1,Playback(en/ss-noservice)\n");
+            writer.write("same => n,Hangup()\n");
         } catch (IOException e) {
             e.printStackTrace();
         }

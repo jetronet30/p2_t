@@ -140,6 +140,7 @@ public class TrunkService {
                 regId, authId, login, server,
                 qualify, forbiddenInterval, expiration,
                 transport, epId);
+        asteriskManager.reloadPJSIP();        
     }
 
     /* ─────────────────────── Helpers ─────────────────────── */
@@ -233,6 +234,7 @@ public class TrunkService {
 
         removeRegistrationFromPjsipConf(login);
         removeInboundRoute(login);
+        asteriskManager.reloadPJSIP();
 
         Map<String, Object> res = new HashMap<>();
         if (deleted == 0) {
