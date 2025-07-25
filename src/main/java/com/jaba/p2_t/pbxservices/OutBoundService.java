@@ -25,11 +25,6 @@ public class OutBoundService {
     private final AsteriskManager asteriskManager;
 
     public boolean addOutBondRoute(String name, String prefix, String autoAdd, String digits, String trunkId) {
-        // უკვე ხომ არ არსებობს იგივე prefix-ით და trunkId-ით
-        boolean exists = oBoundRepo.findByPrefixAndTrunkId(prefix, trunkId).isPresent();
-        if (exists) {
-            return false; // აღარ შეინახოს
-        }
 
         OutBoundRouteModel routeModel = new OutBoundRouteModel();
         routeModel.setId(name);
@@ -96,7 +91,7 @@ public class OutBoundService {
         }
 
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(OUT_BOUND_ROUTES_CONF, true))) {
-            writer.write("\n\n[outbound]\n\n");
+            writer.write("\n\n[default]\n\n");
 
             for (OutBoundRouteModel ob : oBoundRepo.findAll()) {
                 String digits = ob.getDigits(); // ვალიდურია
