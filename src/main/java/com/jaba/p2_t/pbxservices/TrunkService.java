@@ -368,7 +368,7 @@ public class TrunkService {
             e.printStackTrace();
         }
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(TRUNKS_CONF, true))) {
-            writer.write("\n[from-trunk]\n\n");
+            
             for (TrunkViModel tr : trunkRepo.findAll()) {
                 if (!tr.getInboundRoute().isEmpty()) {
                     // ამოიღე "-" მარჯვნიდან და დატოვე მისი მარცხნიდან მხოლოდ
@@ -377,7 +377,7 @@ public class TrunkService {
                     if (dashIndex != -1) {
                         inboundRoute = inboundRoute.substring(0, dashIndex); // ამოაქვს მხოლოდ მარცხენა ნაწილი
                     }
-
+                    writer.write("\n\n[inbound-"+tr.getId()+"]\n");
                     writer.write("exten => s,1,NoOp(Fallback from trunk: ${CALLERID(num)})\n");
                     writer.write(" same => n,Set(raw_from=${PJSIP_HEADER(read,From)})\n");
                     writer.write(" same => n,Set(clean_num=${CUT(CUT(raw_from,@,1),:,2)})\n");
