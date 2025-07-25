@@ -385,8 +385,8 @@ public class TrunkService {
                     writer.write(" same => n,NoOp(Final CallerID: ${CALLERID(num)})\n");
                     if (!tr.getVoiceMessage().isEmpty())
                         writer.write("same => n,Playback(voicemessages/" + tr.getVoiceMessage() + ")\n");
-                    writer.write("same => n,Goto(default," + inboundRoute + ",1)\n");
-                    writer.write("same => n,Hangup()\n\n");
+                    writer.write(" same => n,Goto(default," + inboundRoute + ",1)\n");
+                    writer.write(" same => n,Hangup()\n\n");
                 }
             }
 
