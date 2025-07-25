@@ -96,7 +96,7 @@ public class OutBoundService {
         }
 
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(OUT_BOUND_ROUTES_CONF, true))) {
-            writer.write("\n\n[default]\n\n");
+            writer.write("\n\n[outbound]\n\n");
 
             for (OutBoundRouteModel ob : oBoundRepo.findAll()) {
                 String digits = ob.getDigits(); // ვალიდურია

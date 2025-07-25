@@ -378,8 +378,11 @@ public class TrunkService {
                         inboundRoute = inboundRoute.substring(0, dashIndex); // ამოაქვს მხოლოდ მარცხენა ნაწილი
                     }
 
-                    writer.write("exten => _X.,1,NoOp(Inbound call from trunk: " + tr.getId() + ")\n");
-                    writer.write("same => n,Answer()\n");
+                    writer.write("exten => s,1,NoOp(Fallback from trunk: ${CALLERID(num)})\n");
+                    writer.write(" same => n,Set(raw_from=${PJSIP_HEADER(read,From)})\n");
+                    writer.write(" same => n,Set(clean_num=${CUT(CUT(raw_from,@,1),:,2)})\n");
+                    writer.write(" same => n,Set(CALLERID(num)=${clean_num})\n");
+                    writer.write(" same => n,NoOp(Final CallerID: ${CALLERID(num)})\n");
                     if (!tr.getVoiceMessage().isEmpty())
                         writer.write("same => n,Playback(voicemessages/" + tr.getVoiceMessage() + ")\n");
                     writer.write("same => n,Goto(default," + inboundRoute + ",1)\n");
