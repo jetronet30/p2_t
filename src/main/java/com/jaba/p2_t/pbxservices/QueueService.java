@@ -156,11 +156,21 @@ public class QueueService {
 
             for (QueueModel que : qRepo.findAll()) {
                 writer.write("\n\n[queue-"+que.getId()+"]\n");
+                writer.write("setlanguage = en\n");
                 writer.write("musiconhold = default\n");
                 writer.write("strategy = "+que.getStrategy()+"\n");
                 writer.write("timeout = 15\n");
                 writer.write("retry = 5\n");
                 writer.write("maxlen = 0\n");
+                writer.write("announce-frequency=30\n");
+                writer.write("announce-position=yes\n");
+                writer.write("announce-holdtime=no\n");
+                writer.write("periodic-announce=queue-periodic-announce\n");
+                writer.write("periodic-announce-frequency=30\n");
+                writer.write("queue-youarenext=queue-youarenext\n");
+                writer.write("queue-thereare=queue-thereare\n");
+                writer.write("queue-callswaiting=queue-quantity\n");
+                writer.write("queue-thankyou=queue-thankyou\n");
                 for (String mem : que.getMembers()) {
                     writer.write("member => PJSIP/"+mem+"\n");
                 }
@@ -184,8 +194,11 @@ public class QueueService {
             writer.write("\n[default]\n\n");
             for (QueueModel que : qRepo.findAll()) {
                 writer.write("exten => "+que.getId()+",1,NoOp(Queue queue-"+que.getId()+"  Call)\n");
-                if (!que.getVoiceMessage().equals("")) writer.write("same => n,Playback(voicemessages/" + que.getVoiceMessage() + ")\n");
                 writer.write(" same => n,Answer()\n");
+                if (!que.getVoiceMessage().equals("")) writer.write(" same => n,Playback(voicemessages/" + que.getVoiceMessage() + ")\n");
+                writer.write(" same => n,Set(CHANNEL(language)=en)\n");
+                writer.write(" same => n,Wait(1)\n");
+                writer.write(" same => n,Playback(queue-thankyou)\n");
                 writer.write(" same => n,Queue(queue-"+que.getId()+")\n");
                 writer.write(" same => n,Hangup()\n");
                 
