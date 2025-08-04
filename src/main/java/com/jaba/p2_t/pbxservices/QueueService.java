@@ -31,6 +31,7 @@ public class QueueService {
     private final ExtenVirtualRepo extenVirtualRepo;
     private final AsteriskManager asteriskManager;
     private static final File QUEUES_FILE = new File("/etc/asterisk/queues.conf");
+    private static final File QUEUES_DIAL_FILE = new File("/etc/asterisk/queues_dial.conf");
 
     public List<QueueModel> getAllQueue() {
         return qRepo.findAll();
@@ -152,14 +153,49 @@ public class QueueService {
             e.printStackTrace();
         }
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(QUEUES_FILE, true))) {
-            writer.write("\n[default]\n\n");
-            for (QueueModel que : qRepo.findAll()) {
 
+            for (QueueModel que : qRepo.findAll()) {
+                writer.write("\n\n[queue-"+que.getId()+"]\n");
+                writer.write("musiconhold = default\n");
+                writer.write("strategy = "+que.getStrategy()+"\n");
+                writer.write("timeout = 15\n");
+                writer.write("retry = 5\n");
+                writer.write("maxlen = 0\n");
+                for (String mem : que.getMembers()) {
+                    writer.write("member => PJSIP/"+mem+"\n");
+                }
+                writer.write("\n\n");
             }
+
             writer.close();
         } catch (IOException e) {
             e.printStackTrace();
         }
+
+        if (QUEUES_DIAL_FILE.exists())
+            QUEUES_DIAL_FILE.delete();
+        try {
+            QUEUES_DIAL_FILE.createNewFile();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+         try (BufferedWriter writer = new BufferedWriter(new FileWriter(QUEUES_DIAL_FILE, true))) {
+            writer.write("\n[default]\n\n");
+            for (QueueModel que : qRepo.findAll()) {
+                writer.write("exten => "+que.getId()+",1,NoOp(Queue queue-"+que.getId()+"  Call)\n");
+                if (!que.getVoiceMessage().equals("")) writer.write("same => n,Playback(voicemessages/" + que.getVoiceMessage() + ")\n");
+                writer.write(" same => n,Answer()\n");
+                writer.write(" same => n,Queue(queue-"+que.getId()+")\n");
+                writer.write(" same => n,Hangup()\n");
+                
+            }
+
+            writer.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
         asteriskManager.reloadDialplan();
     }
 

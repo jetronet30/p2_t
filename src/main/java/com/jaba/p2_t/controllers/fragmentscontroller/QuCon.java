@@ -35,18 +35,18 @@ public class QuCon {
         queueService.createQueue(voiceMessage,members,strategy);
         m.addAttribute("queues", queueService.getAllQueue());
         m.addAttribute("messages", voicesService.getVoiceFileNames());
-        return "fragments/callgroups";
+        return "fragments/queues";
     }
 
-    @PostMapping("/delete-queue/{id}")
     @ResponseBody
+    @PostMapping("/delete-queue/{id}")
     public Map<String, Object> deleteQueue(@PathVariable("id") String id) {
         return queueService.deleteQueueById(id);
     }
 
     @ResponseBody
     @PostMapping("/edit-queue/{id}")
-    public Map<String,Object> editCallGroup(@PathVariable("id") String id,
+    public Map<String,Object> editQueue(@PathVariable("id") String id,
             @RequestParam(value = "voiceMessage", required = false) String voiceMessage,
             @RequestParam(value = "context", required = false) String context,
             @RequestParam(value = "members", required = false) String members,

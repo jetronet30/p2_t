@@ -46,7 +46,7 @@
             <option value="FirstAvailable">FirstAvailable</option>
         </select>
 
-        <input type="text" name="context" th:value="${group.context}" placeholder="Context">
+        <input type="text" name="context" th:value="${group.context}" placeholder="Context" hidden>
 
         <textarea name="members" class="members-textarea" rows="3"
     th:text="${#strings.replace(group.members, '[', '').replace(']', '')}"></textarea>

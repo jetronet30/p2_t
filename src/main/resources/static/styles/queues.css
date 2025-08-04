@@ -1,0 +1,169 @@
+.queue-actions-div {
+    position: sticky;
+    top: 0;
+    backdrop-filter: blur(8px);
+    background-color: rgba(17, 17, 17, 0.7);
+    padding: 10px 20px;
+    z-index: 100;
+    display: flex;
+    gap: 10px;
+    border-bottom: 1px solid #333;
+    margin-bottom: 20px;
+    animation: slideDownFade 0.5s ease;
+    transition: background-color 0.3s ease, backdrop-filter 0.3s ease;
+    align-items: center;
+    justify-content: space-between;
+}
+
+@keyframes slideDownFade {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.queue-program-form,
+.queue-add-form {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.voice-selector,
+.add-strategy-selector,
+.edit-strategy-selector {
+    height: 36px;
+    padding: 4px 10px;
+    font-size: 0.9rem;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    background-color: #fff;
+    color: #333;
+    font-family: 'Courier New', monospace;
+}
+
+.voice-selector:focus {
+    outline: none;
+    border-color: #007acc;
+    box-shadow: 0 0 4px rgba(0, 122, 204, 0.4);
+}
+
+.members-textarea {
+    width: 360px;
+    height: 48px;
+    padding: 6px 10px;
+    font-size: 0.9rem;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    resize: vertical;
+    font-family: 'Courier New', monospace;
+    color: #222;
+    background-color: #fff;
+}
+
+.member-count {
+    font-size: 0.85rem;
+    color: #fff59d;
+    user-select: none;
+    min-width: 140px;
+    text-align: center;
+}
+
+.action-btn {
+    height: 36px;
+    padding: 0 18px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    background-color: #007acc;
+    color: white;
+    transition: background-color 0.3s ease;
+}
+
+.action-btn:hover {
+    background-color: #005b99;
+}
+
+/* ---------- CallGroup Edit Styling ---------- */
+
+.queue-edit-div {
+    background-color: #f7f7f7;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.05);
+    margin-bottom: 12px;
+    padding: 12px 16px;
+}
+
+.queue-edit-form {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    align-items: center;
+}
+
+.queue-edit-form input[type="text"] {
+    height: 28px;
+    padding: 4px 8px;
+    font-size: 0.9rem;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    background-color: #fff;
+    color: #111;
+    text-align: center;
+    min-width: 90px;
+    font-family: 'Courier New', monospace;
+    width: 10pt;
+}
+
+.queue-edit-form input[name="context"] {
+    min-width: 130px;
+    text-align: left;
+    padding-left: 10px;
+    text-align: center;
+    width: 10pt;
+}
+
+.queue-edit-form input:focus {
+    border-color: #007acc;
+    outline: none;
+    box-shadow: 0 0 4px rgba(0, 122, 204, 0.5);
+}
+
+.queue-edit-btn,
+.queue-delete-btn {
+    height: 28px;
+    padding: 0 16px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: background-color 0.25s ease;
+}
+
+.queue-edit-btn {
+    background-color: #007acc;
+    color: #ffeb3b;
+}
+
+.queue-edit-btn:hover {
+    background-color: #ffeb3b;
+    color: #007acc;
+}
+
+.queue-delete-btn {
+    background-color: #d32f2f;
+    color: white;
+}
+
+.queue-delete-btn:hover {
+    background-color: #b71c1c;
+}

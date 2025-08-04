@@ -363,7 +363,8 @@ public class VirtExtensionsService {
 
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(PERMIT_CONF, false))) {
             writer.write("\n[allow-outbound-users]\n");
-
+            writer.write(" exten => _+X.,1,Return()\n");
+            writer.write(" exten => _00X.,1,Return()\n");
             for (ExtenViModel ex : extenVirtualRepo.findAll()) {
                 if (ex.getOutPermit() == 0)
                     writer.write(" exten =>" + ex.getId() + ",1,Return()\n");

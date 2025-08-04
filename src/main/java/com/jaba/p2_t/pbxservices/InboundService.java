@@ -15,16 +15,19 @@ import lombok.RequiredArgsConstructor;
 public class InboundService {
     private final VirtExtensionsService extensionsService;
     private final CallGroupService callGroupService;
-
+    private final QueueService queueService;
 
     public List<String> inboundCandidates() {
         List<String> candidates = new ArrayList<>();
         candidates.clear();
         for (ExtenViModel ext : extensionsService.getVirtExts()) {
-            candidates.add(ext.getId()+"-extension");
+            candidates.add(ext.getId() + "-extension");
         }
-        for (String callGroupId: callGroupService.getGroupIdSortedById()) {
-            candidates.add(callGroupId+"-callgroup");
+        for (String callGroupId : callGroupService.getGroupIdSortedById()) {
+            candidates.add(callGroupId + "-callgroup");
+        }
+        for (String qe : queueService.getQueueSortedById()) {
+            candidates.add(qe + "-queue");
         }
         return candidates;
     }
