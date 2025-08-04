@@ -15,6 +15,7 @@
   <link rel="stylesheet" th:href="@{/styles/inboundroutes.css}">
   <link rel="stylesheet" th:href="@{/styles/outboundroutes.css}">
   <link rel="stylesheet" th:href="@{/styles/callgroups.css}">
+  <link rel="stylesheet" th:href="@{/styles/queues.css}">
   <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 </head>
 
@@ -37,14 +38,13 @@
       <div class="submenu">
         <button class="submenu-button" onclick="loadContent('/callgroups', this)">Call Groups</button>
         <button class="submenu-button" onclick="loadContent('/queues', this)">Queues</button>
-        <button class="submenu-button" onclick="loadContent('/conferences', this)">Conferences</button>
+        <button class="submenu-button" onclick="loadContent('/ivr', this)">IVR</button>
       </div>
     </div>
 
     <div class="dropdown">
       <button class="menu-button" onclick="toggleMenu(this)">Applications &#x25BE;</button>
       <div class="submenu">
-        <button class="submenu-button" onclick="loadContent('/ivr', this)">IVR</button>
         <button class="submenu-button" onclick="loadContent('/announcements', this)">Announcements</button>
         <button class="submenu-button" onclick="loadContent('/call-parking', this)">Call Parking</button>
         <button class="submenu-button" onclick="loadContent('/call-forwarding', this)">Call Forwarding</button>

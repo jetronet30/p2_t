@@ -303,48 +303,43 @@ public class VirtExtensionsService {
             writer.write("\n[default]\n\n");
 
             for (ExtenViModel ex : extenVirtualRepo.findAll()) {
-                String id = ex.getId();
-                String res1 = ex.getRezerve1();
-                String res2 = ex.getRezerve2();
-
-                if ((res1 == null || res1.isEmpty()) && (res2 == null || res2.isEmpty())) {
-                    continue;
-                }
-
-                writer.write("exten => " + id + ",1,NoOp(Forward check for " + id + ")\n");
-                writer.write("same => n,Dial(PJSIP/" + id + ",30)\n");
-
-                writer.write("same => n,GotoIf($[\"${DIALSTATUS}\" = \"BUSY\" || " +
-                        "\"${DIALSTATUS}\" = \"NOANSWER\" || " +
-                        "\"${DIALSTATUS}\" = \"UNAVAIL\" || " +
-                        "\"${DIALSTATUS}\" = \"CHANUNAVAIL\" || " +
-                        "\"${DIALSTATUS}\" = \"CONGESTION\"]?firstres)\n");
-
-                writer.write("same => n,Hangup()\n\n");
-
-                if (res1 != null && !res1.isEmpty()) {
-                    writer.write("same => n(firstres),NoOp(Forwarding to first reserve " + res1 + ")\n");
-                    writer.write("same => n,Dial(PJSIP/" + res1 + ",30)\n");
-
-                    writer.write("same => n,GotoIf($[\"${DIALSTATUS}\" = \"BUSY\" || " +
-                            "\"${DIALSTATUS}\" = \"NOANSWER\" || " +
-                            "\"${DIALSTATUS}\" = \"UNAVAIL\" || " +
-                            "\"${DIALSTATUS}\" = \"CHANUNAVAIL\" || " +
-                            "\"${DIALSTATUS}\" = \"CONGESTION\"]?secondres)\n");
-
-                    writer.write("same => n,Hangup()\n\n");
-                } else {
-                    // fallback to res2 if only one reserve exists
-                    writer.write("same => n(firstres),NoOp(Forwarding to second reserve " + res2 + ")\n");
-                    writer.write("same => n,Dial(PJSIP/" + res2 + ",30)\n");
-                    writer.write("same => n,Hangup()\n\n");
-                    continue;
-                }
-
-                if (res2 != null && !res2.isEmpty()) {
-                    writer.write("same => n(secondres),NoOp(Forwarding to second reserve " + res2 + ")\n");
-                    writer.write("same => n,Dial(PJSIP/" + res2 + ",30)\n");
-                    writer.write("same => n,Hangup()\n\n");
+                if ((ex.getRezerve1()!=null&&!ex.getRezerve1().equals(""))||(ex.getRezerve2()!=null&&!ex.getRezerve2().equals(""))) {
+                    writer.write("exten => "+ ex.getId()+",1,NoOp(Primary call attempt to "+ex.getId()+")\n");
+                    writer.write(" same => n,Dial(PJSIP/"+ex.getId()+",30)\n");
+                    writer.write(" same => n,GotoIf($[\"${DIALSTATUS}\" = \"BUSY\" || \"${DIALSTATUS}\" = \"NOANSWER\" || \"${DIALSTATUS}\" = \"UNAVAIL\" || \"${DIALSTATUS}\" = \"CHANUNAVAIL\" || \"${DIALSTATUS}\" = \"CONGESTION\"]?fallback1)\n");
+                    writer.write(" same => n,Hangup()\n\n");
+                    if (ex.getRezerve1()!=null&&!ex.getRezerve1().equals("")) {
+                        if (extenVirtualRepo.existsById(ex.getRezerve1())) {
+                            writer.write("exten => "+ex.getId()+",n(fallback1),NoOp(Forwarding to "+ex.getRezerve1()+" as first reserve)\n");
+                            writer.write(" same => n,Dial(PJSIP/"+ex.getRezerve1()+",30)\n");
+                            if (ex.getRezerve2()!=null&&!ex.getRezerve2().equals("")) {
+                                writer.write(" same => n,GotoIf($[\"${DIALSTATUS}\" = \"BUSY\" || \"${DIALSTATUS}\" = \"NOANSWER\" || \"${DIALSTATUS}\" = \"UNAVAIL\" || \"${DIALSTATUS}\" = \"CHANUNAVAIL\" || \"${DIALSTATUS}\" = \"CONGESTION\"]?fallback2)\n");
+                            }
+                            writer.write(" same => n,Hangup()\n\n");
+                        }else{
+                            writer.write("exten => "+ex.getId()+",n(fallback1),NoOp(Forwarding to out)\n");
+                            writer.write(" same => n,Goto("+ex.getRezerve1()+",1)\n\n");
+                        }
+                    }else{
+                        if (extenVirtualRepo.existsById(ex.getRezerve2())) {
+                            writer.write("exten => "+ex.getId()+",n(fallback1),NoOp(Forwarding to "+ex.getRezerve2()+" as first reserve)\n");
+                            writer.write(" same => n,Dial(PJSIP/"+ex.getRezerve2()+",30)\n");
+                            writer.write(" same => n,Hangup()\n\n");
+                        }else{
+                            writer.write("exten => "+ex.getId()+",n(fallback1),NoOp(Forwarding to out)\n");
+                            writer.write(" same => n,Goto("+ex.getRezerve2()+",1)\n\n");
+                        }
+                    }
+                    if (ex.getRezerve2()!=null&&!ex.getRezerve2().equals("")&&ex.getRezerve1()!=null&&!ex.getRezerve1().equals("")) {
+                        if (extenVirtualRepo.existsById(ex.getRezerve2())) {
+                            writer.write("exten => "+ex.getId()+",n(fallback2),NoOp(Forwarding to "+ex.getRezerve2()+" as second reserve)\n");
+                            writer.write(" same => n,Dial(PJSIP/"+ex.getRezerve2()+",30)\n");
+                            writer.write(" same => n,Hangup()\n"); 
+                        }else{
+                            writer.write("exten => "+ex.getId()+",n(fallback2),NoOp(Forwarding to out)\n");
+                            writer.write(" same => n,Goto("+ex.getRezerve2()+",1)\n\n");
+                        }
+                    }
                 }
             }
 
@@ -354,6 +349,7 @@ public class VirtExtensionsService {
 
         asteriskManager.reloadDialplan();
     }
+
 
     private void writeoutPermit() {
         if (PERMIT_CONF.exists())
@@ -381,4 +377,6 @@ public class VirtExtensionsService {
         asteriskManager.reloadDialplan();
     }
 
+
+    
 }
