@@ -156,7 +156,7 @@ public class QueueService {
 
             for (QueueModel que : qRepo.findAll()) {
                 writer.write("\n\n[queue-"+que.getId()+"]\n");
-                writer.write("setlanguage = en\n");
+                writer.write("setlanguage = ru\n");
                 writer.write("musiconhold = default\n");
                 writer.write("strategy = "+que.getStrategy()+"\n");
                 writer.write("timeout = 15\n");
@@ -197,7 +197,7 @@ public class QueueService {
                 writer.write(" same => n,Answer()\n");
                 writer.write(" same => n,Wait(1)\n");
                 if (!que.getVoiceMessage().equals("")) writer.write(" same => n,Playback(voicemessages/" + que.getVoiceMessage() + ")\n");
-                writer.write(" same => n,Set(CHANNEL(language)=en)\n");
+                writer.write(" same => n,Set(CHANNEL(language)=ru)\n");
                 writer.write(" same => n,Wait(1)\n");
                 writer.write(" same => n,Playback(queue-thankyou)\n");
                 writer.write(" same => n,Queue(queue-"+que.getId()+")\n");

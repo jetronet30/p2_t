@@ -1,9 +1,10 @@
 package com.jaba.p2_t.voices;
 
+import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileOutputStream;
 
-import java.io.OutputStream;
+import java.io.IOException;
+import java.io.InputStreamReader;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -11,8 +12,10 @@ import java.util.List;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.filefilter.SuffixFileFilter;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.server.ResponseStatusException;
 
 @Service
 public class SytemSoundsService {
@@ -62,55 +65,88 @@ public class SytemSoundsService {
         return folderNames;
     }
 
-    public void upladSoundTar(MultipartFile soundTar) {
+    public void uploadSoundTar(MultipartFile soundTar) {
         try {
-            // 1. შექმენი დროებითი ფაილი, რათა MultipartFile გადაყავდეს ფიზიკურ ფაილად
-            File tempFile = File.createTempFile("asterisk-sound-", ".tar");
-            try (OutputStream os = new FileOutputStream(tempFile)) {
-                os.write(soundTar.getBytes());
-            }
-
-            // 2. ამოიღე ენის კოდი (მაგ. 'fr') ფაილის სახელიდან
             String originalFilename = soundTar.getOriginalFilename();
-            if (originalFilename == null || !originalFilename.endsWith(".tar")) {
-                throw new IllegalArgumentException("Invalid file name");
+            if (originalFilename == null ||
+                    !(originalFilename.endsWith(".tar") || originalFilename.endsWith(".tar.gz")
+                            || originalFilename.endsWith(".tgz"))) {
+                throw new IllegalArgumentException("გთხოვ ატვირთო .tar, .tar.gz ან .tgz არქივი");
             }
 
-            // მაგ: asterisk-core-sounds-fr-gsm-current.tar → fr
+            // ენის კოდის ამოღება (მაგ: sounds-fr.tar.gz → fr)
             String[] parts = originalFilename.split("-");
             String lang = null;
             for (int i = 0; i < parts.length; i++) {
                 if ("sounds".equals(parts[i]) && i + 1 < parts.length) {
-                    lang = parts[i + 1]; // fr
+                    lang = parts[i + 1];
                     break;
                 }
             }
 
-            if (lang == null) {
-                throw new IllegalArgumentException("Could not determine language code from filename");
+            if (lang == null || lang.length() != 2) {
+                throw new IllegalArgumentException("არქივის სახელში ვერ მოიძებნა ენის კოდი (მაგ: fr)");
             }
 
-            File langDir = new File(SOUNDS, lang);
-            if (!langDir.exists()) {
-                langDir.mkdirs();
+            // დროებითი ფაილის შექმნა შესაბამისი გაფართოებით
+            String suffix = originalFilename.endsWith(".tar.gz") || originalFilename.endsWith(".tgz") ? ".tar.gz"
+                    : ".tar";
+            File tempFile = File.createTempFile("asterisk-sound-", suffix);
+            soundTar.transferTo(tempFile);
+
+            // ენის დირექტორიის შექმნა
+            File langDir = new File("/var/lib/asterisk/sounds", lang);
+            if (!langDir.exists() && !langDir.mkdirs()) {
+                throw new IOException("ვერ შეიქმნა დირექტორია: " + langDir.getAbsolutePath());
             }
 
-            // 4. ამაარქივე ფაილი შესაბამის ფოლდერში
-            ProcessBuilder pb = new ProcessBuilder(
-                    "tar", "-xvf", tempFile.getAbsolutePath(), "-C", langDir.getAbsolutePath());
-            pb.inheritIO(); // ლოგები კონსოლში დაიბეჭდება
+            // არქივის გახსნა
+            List<String> command = new ArrayList<>();
+            command.add("tar");
+            command.add("-xvf");
+            command.add(tempFile.getAbsolutePath());
+            command.add("-C");
+            command.add(langDir.getAbsolutePath());
+
+            // დამატებითი დროშა gz-ფაილებისთვის
+            if (suffix.equals(".tar.gz")) {
+                command.add(1, "-z"); // არქივის შემდეგვე ჩავსვათ -z
+            }
+
+            ProcessBuilder pb = new ProcessBuilder(command);
+            pb.redirectErrorStream(true);
             Process process = pb.start();
-            int exitCode = process.waitFor();
 
-            // 5. წაშალე დროებითი ფაილი
-            tempFile.delete();
-
-            if (exitCode != 0) {
-                throw new RuntimeException("Tar extraction failed with exit code " + exitCode);
+            StringBuilder outputLog = new StringBuilder();
+            try (BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()))) {
+                String line;
+                while ((line = reader.readLine()) != null) {
+                    outputLog.append("[TAR] ").append(line).append("\n");
+                }
             }
 
+            int exitCode = process.waitFor();
+            if (exitCode != 0) {
+                throw new RuntimeException("გახსნა წარუმატებელია (exit code = " + exitCode + "): \n" + outputLog);
+            }
+
+            if (!tempFile.delete()) {
+                System.err.println("ვერ წაიშალა დროებითი ფაილი: " + tempFile.getAbsolutePath());
+            }
+
+            System.out.println("სწრაფად აიტვირთა და გაიხსნა ენის პაკეტი: " + lang);
+            System.out.println(outputLog);
+
+        } catch (IllegalArgumentException e) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage(), e);
+        } catch (IOException e) {
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "ფაილის დამუშავება ვერ მოხერხდა", e);
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "გახსნის პროცესი შეწყდა", e);
         } catch (Exception e) {
-            throw new RuntimeException("Failed to upload and extract sound tar", e);
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "სისტემური შეცდომა: " + e.getMessage(),
+                    e);
         }
     }
 
