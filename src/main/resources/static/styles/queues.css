@@ -15,17 +15,6 @@
     justify-content: space-between;
 }
 
-@keyframes slideDownFade {
-    from {
-        opacity: 0;
-        transform: translateY(-10px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
-}
-
 .queue-program-form,
 .queue-add-form {
     display: flex;
@@ -34,9 +23,8 @@
     flex-wrap: wrap;
 }
 
-.voice-selector,
-.add-strategy-selector,
-.edit-strategy-selector {
+.queue-voice-selector,
+.queue_strategy {
     height: 36px;
     padding: 4px 10px;
     font-size: 0.9rem;
@@ -47,7 +35,8 @@
     font-family: 'Courier New', monospace;
 }
 
-.voice-selector:focus {
+.queue-voice-selector:focus,
+.queue_strategy:focus {
     outline: none;
     border-color: #007acc;
     box-shadow: 0 0 4px rgba(0, 122, 204, 0.4);
@@ -91,7 +80,7 @@
     background-color: #005b99;
 }
 
-/* ---------- CallGroup Edit Styling ---------- */
+/* ---------- Queue Edit Styling ---------- */
 
 .queue-edit-div {
     background-color: #f7f7f7;
@@ -102,14 +91,14 @@
     padding: 12px 16px;
 }
 
-.queue-edit-form {
+.queue {
     display: flex;
     flex-wrap: wrap;
     gap: 10px;
     align-items: center;
 }
 
-.queue-edit-form input[type="text"] {
+.queue input[type="text"] {
     height: 28px;
     padding: 4px 8px;
     font-size: 0.9rem;
@@ -123,7 +112,7 @@
     width: 10pt;
 }
 
-.queue-edit-form input[name="context"] {
+.queue input[name="context"] {
     min-width: 130px;
     text-align: left;
     padding-left: 10px;
@@ -131,7 +120,7 @@
     width: 10pt;
 }
 
-.queue-edit-form input:focus {
+.queue input:focus {
     border-color: #007acc;
     outline: none;
     box-shadow: 0 0 4px rgba(0, 122, 204, 0.5);
@@ -166,4 +155,15 @@
 
 .queue-delete-btn:hover {
     background-color: #b71c1c;
+}
+
+@keyframes slideDownFade {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }

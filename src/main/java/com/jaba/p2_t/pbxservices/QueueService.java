@@ -195,6 +195,7 @@ public class QueueService {
             for (QueueModel que : qRepo.findAll()) {
                 writer.write("exten => "+que.getId()+",1,NoOp(Queue queue-"+que.getId()+"  Call)\n");
                 writer.write(" same => n,Answer()\n");
+                writer.write(" same => n,Wait(1)\n");
                 if (!que.getVoiceMessage().equals("")) writer.write(" same => n,Playback(voicemessages/" + que.getVoiceMessage() + ")\n");
                 writer.write(" same => n,Set(CHANNEL(language)=en)\n");
                 writer.write(" same => n,Wait(1)\n");

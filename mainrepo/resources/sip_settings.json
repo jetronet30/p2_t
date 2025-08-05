@@ -1,1 +1,1 @@
-{"id":1,"transportProtocol":null,"bindAddress":"0.0.0.0","sipUdpPort":5060,"sipTcpPort":5070,"sipTlsPort":5080,"realm":null,"dtmfMode":"rfc4733","defPassword":"12345678"}
+{"id":1,"transportProtocol":null,"bindAddress":"0.0.0.0","sipUdpPort":5060,"sipTcpPort":5070,"sipTlsPort":5080,"realm":null,"dtmfMode":"auto","defPassword":"12345678"}

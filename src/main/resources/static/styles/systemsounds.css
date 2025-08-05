@@ -1,0 +1,95 @@
+/* ---------- System Sounds Sticky Header ---------- */
+.system_sounds_actions {
+    position: sticky;
+    top: 30px; /* თუ ზემოთ სხვა sticky header-ია */
+    backdrop-filter: blur(6px);
+    background-color: rgba(17, 17, 17, 0.7);
+    padding: 10px 20px;
+    z-index: 99;
+    display: flex;
+    gap: 20px;
+    align-items: center;
+    flex-wrap: wrap;
+    justify-content: flex-start;
+    border-bottom: 1px solid #444;
+    animation: slideDownFade 0.5s ease;
+    transition: background-color 0.3s ease, backdrop-filter 0.3s ease;
+}
+
+/* Common button style */
+.ser-act-btn,
+.sys_sounds_reboot_btn,
+#sound_upload_btn,
+#system-sound-edit-btn {
+    height: 32px;
+    padding: 0 14px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    background-color: #007acc;
+    color: white;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+.ser-act-btn:hover,
+.sys_sounds_reboot_btn:hover,
+#sound_upload_btn:hover,
+#system-sound-edit-btn:hover {
+    background-color: #005b99;
+    transform: translateY(-2px);
+}
+
+/* Select Dropdown */
+.system_sounds_actions select {
+    height: 32px;
+    padding: 6px 10px;
+    font-size: 0.9rem;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    background-color: #fff;
+    color: #333;
+    transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.system_sounds_actions select:focus {
+    border-color: #007acc;
+    outline: none;
+    box-shadow: 0 0 3px rgba(40, 167, 69, 0.4);
+}
+
+/* Upload input */
+.upload_value {
+    font-size: 0.85rem;
+    padding: 4px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    background-color: #fff;
+    color: #333;
+}
+
+/* Progress bar */
+#progressBar {
+    width: 120px;
+    height: 6px;
+    border-radius: 4px;
+    appearance: none;
+    margin-left: 10px;
+}
+
+/* Chrome/Safari style */
+#progressBar::-webkit-progress-bar {
+    background-color: #eee;
+    border-radius: 4px;
+}
+#progressBar::-webkit-progress-value {
+    background-color: #007acc;
+    border-radius: 4px;
+}
+
+/* Firefox style */
+#progressBar::-moz-progress-bar {
+    background-color: #007acc;
+    border-radius: 4px;
+}

@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.jaba.p2_t.pbxservices.InboundService;
 import com.jaba.p2_t.pbxservices.TrunkService;
-import com.jaba.p2_t.voices.VoicesService;
+import com.jaba.p2_t.voices.SytemSoundsService;
 
 import lombok.RequiredArgsConstructor;
 
@@ -20,13 +20,13 @@ import lombok.RequiredArgsConstructor;
 public class InbCon {
     private final TrunkService trunkService;
     private final InboundService inboundService;
-    private final VoicesService voicesService;
+    private final SytemSoundsService sytemSoundsService;
 
     @PostMapping("/inboundroutes")
     public String postInboundRoutes(Model m){
         m.addAttribute("trunks", trunkService.getAllTrunk());
         m.addAttribute("candidates", inboundService.inboundCandidates());
-        m.addAttribute("messages", voicesService.getVoiceFileNames());
+        m.addAttribute("messages", sytemSoundsService.getVoiceFileNames());
         return "fragments/inboundroutes";
     }
     @ResponseBody

@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.jaba.p2_t.pbxservices.QueueService;
-import com.jaba.p2_t.voices.VoicesService;
+import com.jaba.p2_t.voices.SytemSoundsService;
 
 import lombok.RequiredArgsConstructor;
 
@@ -18,12 +18,12 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class QuCon {
     private final QueueService queueService;
-    private final VoicesService voicesService;
+    private final SytemSoundsService sytemSoundsService;
 
     @PostMapping("/queues")
     public String postQueues(Model m){
         m.addAttribute("queues", queueService.getAllQueue());
-        m.addAttribute("messages", voicesService.getVoiceFileNames());
+        m.addAttribute("messages", sytemSoundsService.getVoiceFileNames());
         return "fragments/queues";
     }
 
@@ -34,7 +34,7 @@ public class QuCon {
             @RequestParam(name = "addStrategy") String strategy) {
         queueService.createQueue(voiceMessage,members,strategy);
         m.addAttribute("queues", queueService.getAllQueue());
-        m.addAttribute("messages", voicesService.getVoiceFileNames());
+        m.addAttribute("messages", sytemSoundsService.getVoiceFileNames());
         return "fragments/queues";
     }
 
@@ -47,9 +47,9 @@ public class QuCon {
     @ResponseBody
     @PostMapping("/edit-queue/{id}")
     public Map<String,Object> editQueue(@PathVariable("id") String id,
-            @RequestParam(value = "voiceMessage", required = false) String voiceMessage,
+            @RequestParam(value = "queueVoiceMessage", required = false) String voiceMessage,
             @RequestParam(value = "context", required = false) String context,
-            @RequestParam(value = "members", required = false) String members,
+            @RequestParam(value = "queue_members", required = false) String members,
             @RequestParam(name = "editStrategy") String strategy) {
                 System.out.println(members);
         return queueService.updateQueue(id,voiceMessage,members,strategy);

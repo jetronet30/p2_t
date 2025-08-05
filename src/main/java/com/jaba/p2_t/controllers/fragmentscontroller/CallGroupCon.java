@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.jaba.p2_t.pbxservices.CallGroupService;
-import com.jaba.p2_t.voices.VoicesService;
+import com.jaba.p2_t.voices.SytemSoundsService;
 
 import lombok.RequiredArgsConstructor;
 
@@ -18,7 +18,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class CallGroupCon {
     private final CallGroupService callGroupService;
-    private final VoicesService voicesService;
+    private final SytemSoundsService voicesService;
 
     @PostMapping("/callgroups")
     public String postCallGroup(Model m) {

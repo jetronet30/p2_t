@@ -7,7 +7,7 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
+
 
 import org.springframework.stereotype.Service;
 
@@ -47,11 +47,7 @@ public class OutBoundService {
             return response;
         }
 
-        Optional<OutBoundRouteModel> duplicate = oBoundRepo.findByPrefixAndTrunkId(prefix, trunkId);
-        if (duplicate.isPresent() && !duplicate.get().getId().equals(id)) {
-            response.put("success", false);
-            return response;
-        }
+       
 
         existingRoute.setPrefix(prefix);
         existingRoute.setAutoAdd(autoAdd);

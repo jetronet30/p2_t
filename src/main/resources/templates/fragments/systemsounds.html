@@ -1,0 +1,25 @@
+<div class="system_sounds_actions">
+    <button type="submit" class="ser-act-btn" id="system-sound-edit-btn-clone">
+        Edit
+    </button>
+    <form action="/syste-sounds-reboot" method="post" class="sys_sound_reboot_form">
+        <button type="submit" class="sys_sounds_reboot_btn" id="sys_sounds_reboot_btn">Reboot</button>
+    </form>
+    <form action="/set-systemsounds">
+        <select name="sys_sounds" id="sys_sounds" required>
+            <option th:each="sound : ${sounds}" th:value="${sound}" th:text="${sound}">
+            </option>
+        </select>
+        <button type="submit" class="ser-btn" id="system-sound-edit-btn" hidden>
+            Edit
+        </button>
+    </form>
+
+
+    <form id="upload_video" enctype="multipart/form-data" action="/upload_system_sound" method="post">
+        <input class="upload_value" type="file" name="systemsound">
+        <input type="button" id="sound_upload_btn" value="UP Sound Tar">
+    </form>
+
+</div>
+<script th:src="@{/scripts/systemsounds.js}"></script>
