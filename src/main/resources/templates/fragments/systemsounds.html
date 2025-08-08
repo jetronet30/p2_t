@@ -15,10 +15,15 @@
         </button>
     </form>
 
-
-    <form id="upload_video" enctype="multipart/form-data" action="/upload_system_sound" method="post">
+    <form id="upload_sound_form" enctype="multipart/form-data" action="/upload_system_sound" method="post">
         <input class="upload_value" type="file" name="systemsound" >
         <input type="button" id="sound_upload_btn" value="UP Sound Tar">
+    </form>
+</div>
+
+<div th:each="sound : ${sounds}" class="system_sound_container">
+    <form action="" method="post">
+        <input type="submit" th:value="${sound}">
     </form>
 
 </div>

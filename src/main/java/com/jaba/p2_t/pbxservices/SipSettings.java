@@ -21,6 +21,7 @@ import lombok.RequiredArgsConstructor;
 public class SipSettings {
     private final AsteriskManager asteriskManager;
     private final SipSettingsRepo sRepo;
+
     private static final File SIP_SETTINGS = new File(RepoInit.SERVER_RESOURCES, "sip_settings.json");
     private final ObjectMapper mapper = new ObjectMapper();
 
@@ -30,6 +31,7 @@ public class SipSettings {
     private String dtmfMode;
     private String defPassword;
     private String bindAddress;
+    private String sysSound;
 
     // --- Load SIP Settings on Startup ---
     @PostConstruct
@@ -45,10 +47,11 @@ public class SipSettings {
                 sipModel.setDefPassword("12345678");
                 sipModel.setDtmfMode("rfc4733");
                 sipModel.setBindAddress("0.0.0.0");
-
+                sipModel.setSysSound("en");
                 sRepo.save(sipModel);
                 mapper.writeValue(SIP_SETTINGS, sipModel);
                 updateLocalFields(sipModel);
+                
                 writeInPjsipconf();
             } catch (IOException e) {
                 e.printStackTrace();
@@ -62,7 +65,7 @@ public class SipSettings {
             }
         }
 
-        
+
     }
 
     // --- Update pjsip.conf transport section ---
@@ -131,10 +134,11 @@ public class SipSettings {
         this.dtmfMode = sipModel.getDtmfMode();
         this.defPassword = sipModel.getDefPassword();
         this.bindAddress = sipModel.getBindAddress();
+        this.sysSound = sipModel.getSysSound();
     }
 
     // --- Edit from UI/API and save ---
-    public boolean editSipSettings(int udpPort, int tcpPort, int tlsPort, String defPass, String dtmf, String bindAddr) {
+    public boolean editSipSettings(int udpPort, int tcpPort, int tlsPort, String defPass, String dtmf, String bindAddr,String syssound) {
         try {
             SipModel sModel = sRepo.findById(1L).orElseThrow();
             sModel.setSipUdpPort(udpPort);
@@ -143,10 +147,12 @@ public class SipSettings {
             sModel.setDefPassword(defPass);
             sModel.setDtmfMode(dtmf);
             sModel.setBindAddress(bindAddr);
+            sModel.setSysSound(syssound);
 
             sRepo.save(sModel);
             mapper.writeValue(SIP_SETTINGS, sModel);
             updateLocalFields(sModel);
+
             writeInPjsipconf();
             asteriskManager.reloadPJSIP();
             return true;
@@ -154,6 +160,7 @@ public class SipSettings {
             e.printStackTrace();
             return false;
         }
+        
     }
 
     // --- Getters ---
@@ -179,5 +186,9 @@ public class SipSettings {
 
     public String getBindAddress() {
         return bindAddress;
+    }
+
+    public String getSysSound(){
+        return sysSound;
     }
 }

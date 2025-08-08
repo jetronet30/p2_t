@@ -8,7 +8,9 @@ import java.io.InputStreamReader;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.filefilter.SuffixFileFilter;
@@ -23,9 +25,7 @@ public class SytemSoundsService {
     private static final File SOUNDS = new File("/var/lib/asterisk/sounds");
 
     public List<String> getVoiceFileNames() {
-        if (!VOICE_FOLDER.exists()) {
-            VOICE_FOLDER.mkdir();
-        }
+    
 
         List<String> voiceNames = new ArrayList<>();
 
@@ -55,7 +55,7 @@ public class SytemSoundsService {
             File[] files = SOUNDS.listFiles();
             if (files != null) {
                 for (File file : files) {
-                    if (file.isDirectory()) {
+                    if (file.isDirectory() && !file.getName().equals("voicemessages")) {
                         folderNames.add(file.getName());
                     }
                 }
@@ -148,6 +148,33 @@ public class SytemSoundsService {
             throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "სისტემური შეცდომა: " + e.getMessage(),
                     e);
         }
+    }
+
+    public Map<String, Object> deleteSysSound(String lang) {
+        Map<String, Object> response = new HashMap<>();
+
+        if (lang == null || lang.trim().isEmpty() || lang.length() != 2) {
+            response.put("success", false);
+            response.put("error", "ენის კოდი არასწორია (მაგ: 'fr', 'en')");
+            return response;
+        }
+
+        File langDir = new File(SOUNDS, lang);
+
+        if (!langDir.exists()) {
+            response.put("success", false);
+            response.put("error", "მითითებული ენის დირექტორია არ არსებობს: " + langDir.getAbsolutePath());
+            return response;
+        }
+
+        try {
+            FileUtils.deleteDirectory(langDir);
+            response.put("success", true);
+        } catch (IOException e) {
+            response.put("success", false);
+        }
+
+        return response;
     }
 
 }

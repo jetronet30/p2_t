@@ -1,22 +1,22 @@
 /* ---------- System Sounds Sticky Header ---------- */
 .system_sounds_actions {
     position: sticky;
-    top: 30px; /* თუ ზემოთ სხვა sticky header-ია */
+    top: 30px;
     backdrop-filter: blur(6px);
     background-color: rgba(17, 17, 17, 0.7);
     padding: 10px 20px;
     z-index: 99;
     display: flex;
+    flex-wrap: wrap;
     gap: 20px;
     align-items: center;
-    flex-wrap: wrap;
     justify-content: flex-start;
     border-bottom: 1px solid #444;
     animation: slideDownFade 0.5s ease;
     transition: background-color 0.3s ease, backdrop-filter 0.3s ease;
 }
 
-/* Common button style */
+/* ---------- Common Button Style ---------- */
 .ser-act-btn,
 .sys_sounds_reboot_btn,
 #sound_upload_btn,
@@ -41,7 +41,7 @@
     transform: translateY(-2px);
 }
 
-/* Select Dropdown */
+/* ---------- Select Dropdown ---------- */
 .system_sounds_actions select {
     height: 32px;
     padding: 6px 10px;
@@ -56,20 +56,21 @@
 .system_sounds_actions select:focus {
     border-color: #007acc;
     outline: none;
-    box-shadow: 0 0 3px rgba(40, 167, 69, 0.4);
+    box-shadow: 0 0 3px rgba(0, 122, 204, 0.5);
 }
 
-/* Upload input */
+/* ---------- Upload Input ---------- */
 .upload_value {
     font-size: 0.85rem;
-    padding: 4px;
+    padding: 4px 8px;
     border: 1px solid #ccc;
     border-radius: 4px;
     background-color: #fff;
     color: #333;
+    height: 32px;
 }
 
-/* Progress bar */
+/* ---------- Progress Bar ---------- */
 #progressBar {
     width: 120px;
     height: 6px;
@@ -78,18 +79,47 @@
     margin-left: 10px;
 }
 
-/* Chrome/Safari style */
 #progressBar::-webkit-progress-bar {
     background-color: #eee;
     border-radius: 4px;
 }
+
 #progressBar::-webkit-progress-value {
     background-color: #007acc;
     border-radius: 4px;
 }
 
-/* Firefox style */
 #progressBar::-moz-progress-bar {
     background-color: #007acc;
     border-radius: 4px;
+}
+
+/* ---------- System Sound Container ---------- */
+.system_sound_container {
+    margin-top: 40px;
+    padding: 5px 5px;
+    border-radius: 6px;
+    border: 1px solid #333;
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+}
+
+.system_sound_container form {
+    margin: 0;
+}
+
+.system_sound_container input[type="submit"] {
+    background-color: #007acc;
+    color: #fff;
+    border: none;
+    padding: 6px 12px;
+    font-size: 0.85rem;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+.system_sound_container input[type="submit"]:hover {
+    transform: translateY(-1px);
 }

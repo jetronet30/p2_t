@@ -38,6 +38,13 @@
             </option>
         </select>
 
+        <label for="sys-sound">Interfaces</label>
+        <select name="sys-sound" id="sys-sound" required>
+            <option th:value="${sysSound}" th:text="${sysSound}"></option>
+            <option th:each="sound : ${sounds}" th:value="${sound}" th:text="${sound}"></option>
+            </option>
+        </select>
+
         <label for="sip-default-password">Default Password</label>
         <input type="text" name="sip-default-password" id="sip-default-password" th:value="${defaultPassword}">
 

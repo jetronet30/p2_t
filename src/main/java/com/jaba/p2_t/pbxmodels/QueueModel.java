@@ -30,5 +30,8 @@ public class QueueModel {
     @Column(name = "strategy")
     private String strategy;
 
+    @Column(name = "voiceLang")
+    private String voiceLang;
+
 
 }

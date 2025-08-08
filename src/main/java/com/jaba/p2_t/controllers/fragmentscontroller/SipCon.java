@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.jaba.p2_t.networck.NetService;
 import com.jaba.p2_t.pbxservices.SipSettings;
+import com.jaba.p2_t.voices.SytemSoundsService;
 
 import lombok.RequiredArgsConstructor;
 
@@ -19,6 +20,7 @@ import lombok.RequiredArgsConstructor;
 public class SipCon {
     private final SipSettings sipSettings;
     private final NetService netService;
+     private final SytemSoundsService soundsService;
 
     @PostMapping("/sipsettings")
     public String postSip(Model m) {
@@ -28,7 +30,9 @@ public class SipCon {
         m.addAttribute("defaultPassword", sipSettings.getDefPassword());
         m.addAttribute("dtmf", sipSettings.getDtmfMode());
         m.addAttribute("bindAddress", sipSettings.getBindAddress());
+        m.addAttribute("sysSound", sipSettings.getSysSound());
         m.addAttribute("lans", netService.maplan());
+        m.addAttribute("sounds", soundsService.getSoundsFileName());
         return "fragments/sipsettings";
     }
 
@@ -40,15 +44,18 @@ public class SipCon {
             @RequestParam("sip-tls-port") int tlsPort,
             @RequestParam("sip-dtmf") String dtmf,
             @RequestParam("sip-bind-addres") String bindAddress,
-            @RequestParam("sip-default-password") String defaulPassword) {
+            @RequestParam("sip-default-password") String defaulPassword,
+            @RequestParam("sys-sound") String sysSound) {
         m.addAttribute("udpPort", sipSettings.getSipUdpPort());
         m.addAttribute("tcpPort", sipSettings.getSipTcpPort());
         m.addAttribute("tlsPort", sipSettings.getSipTlsPort());
         m.addAttribute("defaultPassword", sipSettings.getDefPassword());
         m.addAttribute("dtmf", sipSettings.getDtmfMode());
         m.addAttribute("bindAddress", sipSettings.getBindAddress());
+        m.addAttribute("sysSound", sipSettings.getSysSound());
         m.addAttribute("lans", netService.maplan());
-        if (sipSettings.editSipSettings(udpPort, tcpPort, tlsPort, defaulPassword, dtmf, bindAddress)) {
+        m.addAttribute("sounds", soundsService.getSoundsFileName());
+        if (sipSettings.editSipSettings(udpPort, tcpPort, tlsPort, defaulPassword, dtmf, bindAddress, sysSound)) {
             Map<String, Object> response = new HashMap<>();
             response.put("success", true);
             return response;

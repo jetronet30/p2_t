@@ -33,5 +33,7 @@ public class SipModel {
     private String dtmfMode;
     @Column(name = "default_password")
     private String defPassword;
+    @Column(name = "sysSound")
+    private String sysSound;
 
 }

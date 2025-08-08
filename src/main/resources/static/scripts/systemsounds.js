@@ -88,7 +88,7 @@ export function init() {
 
     // ✅ 4. Tar ფაილის ატვირთვა
     document.getElementById("sound_upload_btn")?.addEventListener("click", async () => {
-        const form = document.getElementById("upload_video");
+        const form = document.getElementById("upload_sound_form");
         const input = form.querySelector("input[type='file']");
         const file = input.files[0];
 

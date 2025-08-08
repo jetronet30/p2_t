@@ -54,9 +54,11 @@ export function init() {
 
       const voiceMessage = form.querySelector("select[name='queue_voice_message']")?.value || "";
       const strategy = form.querySelector("select[name='queue_strategy']")?.value || "";
+      const voiceLang = form.querySelector("select[name='voiceLang']")?.value || "";
 
       formData.append("voiceMessage", voiceMessage);
-      formData.append("addStrategy", strategy);
+      formData.append("queue_strategy", strategy);
+      formData.append("voiceLang", voiceLang);
     }
 
     try {

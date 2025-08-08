@@ -1,0 +1,26 @@
+<div class="announcements_actions">
+
+    <form id="upload_announcement_form" enctype="multipart/form-data" action="/upload_announcement" method="post">
+        <input class="upload_file" type="file" name="announcement">
+        <input type="button" id="announcements_upload_btn" value="UPLOAD">
+    </form>
+</div>
+
+
+<div th:each="voiceMessage : ${voiceMessages}" class="announcements_container">
+
+    <p th:text="${voiceMessage}"></p>
+
+    <audio controls>
+        <source th:src="@{'/announcement/' + ${voiceMessage}}" type="audio/wav">
+        Your browser does not support the audio element.
+    </audio>
+
+    <!-- წაშლის ღილაკი -->
+    <form th:action="@{/announcement/delete/{name}(name=${voiceMessage})}" method="post" style="display:inline;">
+        <button type="submit" class="mini-btn delete-btn">Delete</button>
+    </form>
+
+</div>
+
+<script th:src="@{/scripts/announcements.js}"></script>

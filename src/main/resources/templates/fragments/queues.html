@@ -9,11 +9,16 @@
             <option value="">voiceMessage</option>
             <option th:each="message : ${messages}" th:value="${message}" th:text="${message}"></option>
         </select>
+        
         <select name="queue_strategy" class="add-strategy-selector">
             <option value="linear">Linear</option>
             <option value="ringAll">RingAll</option>
             <option value="roundrobin">Roundrobin</option>
             <option value="leastrecent">Leastrecent</option>
+        </select>
+        <select name="voiceLang" class="queue-voice-selector">
+            <option th:value="${systemSound}" th:text="${systemSound}"></option>
+            <option th:each="sound : ${sounds}" th:value="${sound}" th:text="${sound}"></option>
         </select>
 
         <textarea name="members" id="membersInput" class="members-textarea"
@@ -37,7 +42,10 @@
             <option value="">voiceMessage</option>
             <option th:each="message : ${messages}" th:value="${message}" th:text="${message}"></option>
         </select>
-
+        <select name="voiceLang" class="queue-system-sound-selector">
+            <option th:value="${queue.voiceLang}" th:text="${queue.voiceLang}"></option>
+            <option th:each="sound : ${sounds}" th:value="${sound}" th:text="${sound}"></option>
+        </select>
         <select name="editStrategy" class="edit-strategy-selector">
             <option th:value="${queue.strategy}" th:text="${queue.strategy}"></option>
             <option value="linear">Linear</option>

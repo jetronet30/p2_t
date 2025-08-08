@@ -3,8 +3,8 @@
   "dataUser" : "jetronet",
   "dataPassword" : "bostana30",
   "dataName" : "p2_t_db",
-  "dataHost" : "localHost",
+  "dataHost" : "localhost",
   "dataPort" : 5432,
   "licenzi" : "demo",
-  "useData" : false
+  "useData" : true
 }
