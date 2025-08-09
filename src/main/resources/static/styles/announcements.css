@@ -3,10 +3,11 @@
     position: sticky;
     top: 0;
     backdrop-filter: blur(8px);
-    background-color: rgba(17, 17, 17, 0.7);
+    background-color: rgba(17, 17, 17, 0.75);
     padding: 10px 20px;
     z-index: 100;
     display: flex;
+    flex-wrap: wrap;
     gap: 10px;
     border-bottom: 1px solid #333;
     margin-bottom: 20px;
@@ -17,7 +18,7 @@
 
 /* ფაილის ატვირთვის input */
 .upload_file {
-    height: 30px;
+    height: 32px;
     padding: 4px 8px;
     font-size: 0.85rem;
     border: 1px solid #ccc;
@@ -28,7 +29,7 @@
 
 /* ატვირთვის ღილაკი */
 #announcements_upload_btn {
-    height: 32px;
+    height: 34px;
     padding: 0 14px;
     font-size: 0.85rem;
     font-weight: 600;
@@ -39,8 +40,24 @@
     color: white;
     transition: background-color 0.3s ease;
 }
-
 #announcements_upload_btn:hover {
+    background-color: #005b99;
+}
+
+/* Recorder Button */
+.recorder-btn {
+    height: 34px;
+    padding: 0 14px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    background-color: #007acc;
+    color: white;
+    transition: background-color 0.3s ease;
+}
+.recorder-btn:hover {
     background-color: #005b99;
 }
 
@@ -53,14 +70,12 @@
     box-shadow: 0 1px 3px rgba(0,0,0,0.05);
     margin-bottom: 10px;
 }
-
 .announcements_container:hover {
     box-shadow: 0 2px 6px rgba(0,0,0,0.1);
 }
-
 .announcements_container p {
-    margin: 0 0 5px 0;
-    font-size: 0.9rem;
+    margin: 0 0 8px 0;
+    font-size: 0.95rem;
     font-weight: 500;
     color: #333;
 }
@@ -69,4 +84,32 @@
 .announcements_container audio {
     width: 100%;
     outline: none;
+    margin-bottom: 8px;
+}
+
+/* Action Buttons */
+.announcement-buttons {
+    display: flex;
+    gap: 6px;
+}
+.mini-btn {
+    padding: 4px 10px;
+    font-size: 0.8rem;
+    border-radius: 4px;
+    cursor: pointer;
+    border: none;
+}
+.delete-btn {
+    background-color: #dc3545;
+    color: white;
+}
+.delete-btn:hover {
+    background-color: #b02a37;
+}
+.edit-btn {
+    background-color: #007acc;
+    color: #fff;
+}
+.edit-btn:hover {
+    background-color: #005b99;
 }

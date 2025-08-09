@@ -1,25 +1,36 @@
 <div class="announcements_actions">
 
+    <!-- ფაილის ატვირთვა -->
     <form id="upload_announcement_form" enctype="multipart/form-data" action="/upload_announcement" method="post">
         <input class="upload_file" type="file" name="announcement">
         <input type="button" id="announcements_upload_btn" value="UPLOAD">
     </form>
+
+    <!-- ჩაწერის პარამეტრების დაყენება -->
+    <form action="/setvoice/recorder" method="post" id="voice_recorder_form">
+        <input type="text" name="recorder_extension" value="11003" placeholder="Extension">
+        <input type="text" name="record_code" value="8888" placeholder="Record Code">
+        <button type="button" id="voice_recorder_btn" class="recorder-btn">SET RECORDER</button>
+    </form>
 </div>
 
-
+<!-- ხმოვანი შეტყობინებების სია -->
 <div th:each="voiceMessage : ${voiceMessages}" class="announcements_container">
 
-    <p th:text="${voiceMessage}"></p>
+    <p class="voice-name" th:text="${voiceMessage}"></p>
 
     <audio controls>
         <source th:src="@{'/announcement/' + ${voiceMessage}}" type="audio/wav">
         Your browser does not support the audio element.
     </audio>
 
-    <!-- წაშლის ღილაკი -->
-    <form th:action="@{/announcement/delete/{name}(name=${voiceMessage})}" method="post" style="display:inline;">
-        <button type="submit" class="mini-btn delete-btn">Delete</button>
-    </form>
+    <div class="announcement-buttons">
+        <form th:action="@{/announcement/delete/{name}(name=${voiceMessage})}" method="post" style="display:inline;">
+            <button type="submit" class="mini-btn delete-btn">Delete</button>
+        </form>
+
+        <button type="button" class="mini-btn edit-btn" th:data-name="${voiceMessage}">Rename</button>
+    </div>
 
 </div>
 

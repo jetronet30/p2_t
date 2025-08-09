@@ -6,7 +6,9 @@ import java.io.FileOutputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.filefilter.SuffixFileFilter;
@@ -87,7 +89,7 @@ public class AnnouncementService {
         try {
             // გარდაქმნილი ფაილის სახელი
             String baseName = soundFile.getName().replaceFirst("[.][^.]+$", "");
-            File outputFile = new File(VOICE_FOLDER,  baseName + ".wav");
+            File outputFile = new File(VOICE_FOLDER, baseName + ".wav");
 
             // ffmpeg ბრძანება array სახით
             String[] cmd = {
@@ -125,5 +127,74 @@ public class AnnouncementService {
             e.printStackTrace();
         }
     }
+
+    public Map<String, Object> deleteVoiceFile(String fileName) {
+        Map<String, Object> response = new HashMap<>();
+
+        try {
+            if (fileName == null || fileName.trim().isEmpty()) {
+                response.put("success", false);
+                response.put("message", "ფაილის სახელი ცარიელია");
+                return response;
+            }
+
+            File targetFile = new File(VOICE_FOLDER, fileName);
+
+            if (!targetFile.exists()) {
+                response.put("success", false);
+                response.put("message", "ფაილი არ არსებობს");
+                return response;
+            }
+
+            boolean deleted = targetFile.delete();
+            if (deleted) {
+                response.put("success", true);
+                response.put("message", "ფაილი წარმატებით წაიშალა");
+            } else {
+                response.put("success", false);
+                response.put("message", "ფაილის წაშლა ვერ მოხერხდა");
+            }
+
+        } catch (Exception e) {
+            response.put("success", false);
+            response.put("message", "შეცდომა ფაილის წაშლისას: " + e.getMessage());
+        }
+
+        return response;
+    }
+
+
+    public Map<String, Object> renameVoiceFile(String oldName, String newName) {
+    Map<String, Object> resp = new HashMap<>();
+    try {
+        File oldFile = new File(VOICE_FOLDER, oldName);
+        File newFile = new File(VOICE_FOLDER, newName);
+
+        if (!oldFile.exists()) {
+            resp.put("success", false);
+            resp.put("message", "ფაილი არ არსებობს");
+            return resp;
+        }
+        if (newFile.exists()) {
+            resp.put("success", false);
+            resp.put("message", "ასეთი ფაილი უკვე არსებობს");
+            return resp;
+        }
+
+        if (oldFile.renameTo(newFile)) {
+            resp.put("success", true);
+            resp.put("message", "ფაილი წარმატებით გადაერქვა");
+            resp.put("newName", newName);
+        } else {
+            resp.put("success", false);
+            resp.put("message", "ფაილის სახელის შეცვლა ვერ მოხერხდა");
+        }
+    } catch (Exception e) {
+        resp.put("success", false);
+        resp.put("message", "შეცდომა: " + e.getMessage());
+    }
+    return resp;
+}
+
 
 }
