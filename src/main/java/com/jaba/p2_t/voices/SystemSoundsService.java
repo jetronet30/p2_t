@@ -20,7 +20,7 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
 
 @Service
-public class SytemSoundsService {
+public class SystemSoundsService {
     private static final File VOICE_FOLDER = new File("/var/lib/asterisk/sounds/voicemessages");
     private static final File SOUNDS = new File("/var/lib/asterisk/sounds");
 

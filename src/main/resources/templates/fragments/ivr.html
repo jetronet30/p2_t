@@ -1,0 +1,58 @@
+<!-- Top Actions Bar for IVR -->
+<div class="ivr-actions-div">
+    <form action="/ivr-program" class="ivr-program-form" method="post">
+        <button type="submit" class="action-btn" id="ivr-program-btn">Program IVR</button>
+    </form>
+
+    <form action="/ivr-add" method="post" id="ivr-form" class="ivr-add-form">
+        <select name="ivr_welcome_message" class="ivr-voice-selector">
+            <option value="">Welcome Message</option>
+            <option th:each="message : ${voiceMesages}" th:value="${message}" th:text="${message}"></option>
+        </select>
+
+        <select name="ivr_language" class="ivr-voice-selector">
+            <option th:value="${systemSound}" th:text="${systemSound}"></option>
+            <option th:each="lang : ${voiceLangs}" th:value="${lang}" th:text="${lang}"></option>
+        </select>
+
+        <textarea name="ivr_menu" class="members-textarea"
+            placeholder="Example: 1=Sales, 2=Support, 3=Operator" required></textarea>
+
+        <span id="ivr-option-count" class="member-count">0 options</span>
+
+        <button type="submit" class="action-btn">Add IVR</button>
+    </form>
+</div>
+
+<!-- IVR List -->
+<div th:each="ivr : ${ivrs}" class="ivr-edit-div">
+    <form class="ivr" method="post" th:action="@{/edit-ivr/{id}(id=${ivr.id})}">
+        <input type="hidden" name="ivrId" th:value="${ivr.id}" />
+        <input type="text" name="ivr_id" th:value="${ivr.id}" readonly>
+
+        <select name="ivr_welcome_message" class="ivr-voice-selector">
+            <option th:value="${ivr.welcomeMessage}" th:text="${ivr.welcomeMessage}"></option>
+            <option value="">Welcome Message</option>
+            <option th:each="message : ${ivrMessages}" th:value="${message}" th:text="${message}"></option>
+        </select>
+
+        <select name="ivr_language" class="ivr-voice-selector">
+            <option th:value="${ivr.language}" th:text="${ivr.language}"></option>
+            <option th:each="sound : ${sounds}" th:value="${sound}" th:text="${sound}"></option>
+        </select>
+
+        <textarea name="ivr_menu" class="members-textarea" rows="3"
+            th:text="${ivr.menu}"></textarea>
+
+        <button type="submit" class="ivr-edit-btn" th:id="'ivr-edit-btn' + ${ivr.id}">
+            Edit
+        </button>
+
+        <button type="submit" class="ivr-delete-btn" th:id="'ivr-delete-btn' + ${ivr.id}"
+            th:formaction="@{/delete-ivr/{id}(id=${ivr.id})}">
+            Delete
+        </button>
+    </form>
+</div>
+
+<script th:src="@{/scripts/ivr.js}"></script>

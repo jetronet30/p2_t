@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.jaba.p2_t.networck.NetService;
 import com.jaba.p2_t.pbxservices.SipSettings;
-import com.jaba.p2_t.voices.SytemSoundsService;
+import com.jaba.p2_t.voices.SystemSoundsService;
 
 import lombok.RequiredArgsConstructor;
 
@@ -20,7 +20,7 @@ import lombok.RequiredArgsConstructor;
 public class SipCon {
     private final SipSettings sipSettings;
     private final NetService netService;
-     private final SytemSoundsService soundsService;
+     private final SystemSoundsService soundsService;
 
     @PostMapping("/sipsettings")
     public String postSip(Model m) {

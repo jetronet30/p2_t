@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.jaba.p2_t.pbxservices.InboundService;
 import com.jaba.p2_t.pbxservices.TrunkService;
-import com.jaba.p2_t.voices.SytemSoundsService;
+import com.jaba.p2_t.voices.SystemSoundsService;
 
 import lombok.RequiredArgsConstructor;
 
@@ -20,7 +20,7 @@ import lombok.RequiredArgsConstructor;
 public class InbCon {
     private final TrunkService trunkService;
     private final InboundService inboundService;
-    private final SytemSoundsService sytemSoundsService;
+    private final SystemSoundsService sytemSoundsService;
 
     @PostMapping("/inboundroutes")
     public String postInboundRoutes(Model m){

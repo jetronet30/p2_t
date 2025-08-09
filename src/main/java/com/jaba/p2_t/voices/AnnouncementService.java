@@ -89,6 +89,7 @@ public class AnnouncementService {
         return voiceNames;
     }
 
+    @SuppressWarnings("null")
     public void uploadVoiceMessage(MultipartFile voiceFile) {
         if (!voiceFile.isEmpty() && voiceFile.getContentType() != null
                 && voiceFile.getContentType().contains("audio")) {

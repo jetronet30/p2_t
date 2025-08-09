@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.jaba.p2_t.pbxservices.QueueService;
 import com.jaba.p2_t.pbxservices.SipSettings;
-import com.jaba.p2_t.voices.SytemSoundsService;
+import com.jaba.p2_t.voices.SystemSoundsService;
 
 import lombok.RequiredArgsConstructor;
 
@@ -19,7 +19,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class QuCon {
     private final QueueService queueService;
-    private final SytemSoundsService sytemSoundsService;
+    private final SystemSoundsService sytemSoundsService;
     private final SipSettings sipSettings;
 
     @PostMapping("/queues")

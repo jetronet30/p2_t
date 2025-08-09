@@ -10,14 +10,14 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
 
-import com.jaba.p2_t.voices.SytemSoundsService;
+import com.jaba.p2_t.voices.SystemSoundsService;
 
 import lombok.RequiredArgsConstructor;
 
 @Controller
 @RequiredArgsConstructor
 public class SystemSoundsCon {
-    private final SytemSoundsService soundsService;
+    private final SystemSoundsService soundsService;
 
     @PostMapping("/systemsounds")
     public String postSystemSounds(Model m){
