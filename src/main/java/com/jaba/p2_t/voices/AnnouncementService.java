@@ -1,8 +1,11 @@
 package com.jaba.p2_t.voices;
 
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileOutputStream;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -15,12 +18,29 @@ import org.apache.commons.io.filefilter.SuffixFileFilter;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.jaba.p2_t.asteriskmanager.AsteriskManager;
+
 import jakarta.annotation.PostConstruct;
+import lombok.RequiredArgsConstructor;
 
 @Service
+@RequiredArgsConstructor
 public class AnnouncementService {
 
+    private final AsteriskManager asteriskManager;
     private static final File VOICE_FOLDER = new File("/var/lib/asterisk/sounds/voicemessages");
+    private static final File VOICE_RECORDER = new File("/etc/asterisk/voice_recorde.conf");
+
+    private String recorderExtension;
+    private String recorderCode;
+
+    public String getRecorderExtension(){
+        return recorderExtension;
+    }
+
+    public String getRecordCode(){
+        return recorderCode;
+    }
 
     @PostConstruct
     public void createVoiceFolder() {
@@ -163,38 +183,73 @@ public class AnnouncementService {
         return response;
     }
 
-
     public Map<String, Object> renameVoiceFile(String oldName, String newName) {
-    Map<String, Object> resp = new HashMap<>();
-    try {
-        File oldFile = new File(VOICE_FOLDER, oldName);
-        File newFile = new File(VOICE_FOLDER, newName);
+        Map<String, Object> resp = new HashMap<>();
+        try {
+            File oldFile = new File(VOICE_FOLDER, oldName);
+            File newFile = new File(VOICE_FOLDER, newName);
 
-        if (!oldFile.exists()) {
-            resp.put("success", false);
-            resp.put("message", "ფაილი არ არსებობს");
-            return resp;
-        }
-        if (newFile.exists()) {
-            resp.put("success", false);
-            resp.put("message", "ასეთი ფაილი უკვე არსებობს");
-            return resp;
-        }
+            if (!oldFile.exists()) {
+                resp.put("success", false);
+                resp.put("message", "ფაილი არ არსებობს");
+                return resp;
+            }
+            if (newFile.exists()) {
+                resp.put("success", false);
+                resp.put("message", "ასეთი ფაილი უკვე არსებობს");
+                return resp;
+            }
 
-        if (oldFile.renameTo(newFile)) {
-            resp.put("success", true);
-            resp.put("message", "ფაილი წარმატებით გადაერქვა");
-            resp.put("newName", newName);
-        } else {
+            if (oldFile.renameTo(newFile)) {
+                resp.put("success", true);
+                resp.put("message", "ფაილი წარმატებით გადაერქვა");
+                resp.put("newName", newName);
+            } else {
+                resp.put("success", false);
+                resp.put("message", "ფაილის სახელის შეცვლა ვერ მოხერხდა");
+            }
+        } catch (Exception e) {
             resp.put("success", false);
-            resp.put("message", "ფაილის სახელის შეცვლა ვერ მოხერხდა");
+            resp.put("message", "შეცდომა: " + e.getMessage());
         }
-    } catch (Exception e) {
-        resp.put("success", false);
-        resp.put("message", "შეცდომა: " + e.getMessage());
+        return resp;
     }
-    return resp;
-}
 
+    public Map<String, Object> setRecoder(String extension, String code) {
+        this.recorderExtension = extension;
+        this.recorderCode = code;
+        Map<String, Object> resp = new HashMap<>();
+
+        if (VOICE_RECORDER.exists())
+            VOICE_RECORDER.delete();
+        try {
+            VOICE_RECORDER.createNewFile();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(VOICE_RECORDER, true))) {
+            writer.write("\n\n[default]\n\n");
+            writer.write("exten => "+code+",1,NoOp(=== Voice Recording Access Check ===)\n");
+            writer.write(" same => n,GotoIf($[\"${CALLERID(num)}\" = \""+extension+"\"]?allowed:notallowed)\n");
+            writer.write(" same => n(allowed),Answer()\n");
+            writer.write(" same => n,Playback(beep)\n");
+            writer.write(" same => n,Record(voicemessages/msg-${STRFTIME(${EPOCH},,%Y%m%d-%H%M%S)}.wav,5,60,k)\n");
+            writer.write(" same => n,Playback(auth-thankyou)\n");
+            writer.write(" same => n,Hangup()\n\n");
+            writer.write(" same => n(notallowed),Playback(auth-incorrect)\n");
+            writer.write(" same => n,Hangup()\n");
+            resp.put("success", true);
+            asteriskManager.reloadDialplan();
+            return resp;
+        } catch (Exception e) {
+            e.printStackTrace();
+            resp.put("success", false);
+            asteriskManager.reloadDialplan();
+            return resp;
+
+        }
+        
+    }
 
 }

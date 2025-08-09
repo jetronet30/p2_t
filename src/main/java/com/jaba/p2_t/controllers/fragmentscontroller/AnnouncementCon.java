@@ -22,11 +22,15 @@ public class AnnouncementCon {
     @PostMapping("/announcements")
     public String postAnnouncements(Model m) {
         m.addAttribute("voiceMessages", announcementService.getVoiceFiles());
+        m.addAttribute("recorderExtension", announcementService.getRecorderExtension());
+        m.addAttribute("recorderCode", announcementService.getRecordCode());
         return "fragments/announcements";
     }
 
     @PostMapping("/upload_announcement")
     public String uploadAnnouncements(@RequestParam("announcement") MultipartFile announcement, Model m) {
+        m.addAttribute("recorderExtension", announcementService.getRecorderExtension());
+        m.addAttribute("recorderCode", announcementService.getRecordCode());
         announcementService.uploadVoiceMessage(announcement);
         m.addAttribute("voiceMessages", announcementService.getVoiceFiles());
         return "fragments/announcements";
@@ -45,5 +49,16 @@ public class AnnouncementCon {
             @RequestParam("newName") String newName) {
         return announcementService.renameVoiceFile(oldName, newName);
     }
+
+
+    @ResponseBody
+    @PostMapping("/setvoice/recorder")
+    public Map<String, Object> setVoiceRecorder(
+            @RequestParam("recorder_extension") String extension,
+            @RequestParam("record_code") String code) {
+        return announcementService.setRecoder(extension,code);
+    }
+
+
 
 }

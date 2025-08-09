@@ -8,8 +8,8 @@
 
     <!-- ჩაწერის პარამეტრების დაყენება -->
     <form action="/setvoice/recorder" method="post" id="voice_recorder_form">
-        <input type="text" name="recorder_extension" value="11003" placeholder="Extension">
-        <input type="text" name="record_code" value="8888" placeholder="Record Code">
+        <input type="text" name="recorder_extension" th:value="${recorderExtension}" placeholder="Extension">
+        <input type="text" name="record_code" th:value="${recorderCode}" placeholder="Record Code">
         <button type="button" id="voice_recorder_btn" class="recorder-btn">SET RECORDER</button>
     </form>
 </div>
