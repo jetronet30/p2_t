@@ -214,6 +214,7 @@ public class QueueService {
         }
 
         asteriskManager.reloadDialplan();
+        asteriskManager.reloadAll();
     }
 
 }

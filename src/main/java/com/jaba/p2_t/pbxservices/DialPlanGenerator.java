@@ -60,6 +60,7 @@ public class DialPlanGenerator {
             writer.write("#include /etc/asterisk/outpermit.conf\n");
             writer.write("#include /etc/asterisk/queues_dial.conf\n");
             writer.write("#include /etc/asterisk/voice_recorde.conf\n");
+            writer.write("#include /etc/asterisk/ivr.conf\n");
 
             writer.write("\n[default]\n");
             writer.write("exten => _X.,1,NoOp(Calling number: ${CALLERID(num)} → ${EXTEN})\n");
