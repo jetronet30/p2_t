@@ -12,13 +12,14 @@ public class MvcConfig implements WebMvcConfigurer {
         public void addResourceHandlers(ResourceHandlerRegistry registry) {
 
                 String announsmetnts = "file:/var/lib/asterisk/sounds/voicemessages/";
+                String callRecords = "file://var/spool/asterisk/recording/";
 
                 ///////////////////////////////////////////////////////////
 
                 registry
-                                .addResourceHandler("/announcement/**")
+                                .addResourceHandler("/announcement/**","/records/**")
                                 .addResourceLocations(
-                                                announsmetnts
+                                                announsmetnts, callRecords
 
                                 )
                                 .setCachePeriod(0);

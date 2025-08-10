@@ -5,7 +5,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title> P2T</title>
+  <title>P2T</title>
   <link rel="stylesheet" th:href="@{/styles/main.css}">
   <link rel="stylesheet" th:href="@{/styles/serversettings.css}">
   <link rel="stylesheet" th:href="@{/styles/sipsettings.css}">
@@ -19,12 +19,14 @@
   <link rel="stylesheet" th:href="@{/styles/systemsounds.css}">
   <link rel="stylesheet" th:href="@{/styles/announcements.css}">
   <link rel="stylesheet" th:href="@{/styles/ivr.css}">
+  <link rel="stylesheet" th:href="@{/styles/callrecording.css}">
+  <link rel="icon" type="image/x-icon" th:href="@{/images/icon.png}" />
 </head>
 
 <body>
 
   <aside>
-    <div class="logo">Asterisk PBX</div>
+    <div class="logo">MINITELSY P2T</div>
 
     <div class="dropdown">
       <button class="menu-button" onclick="toggleMenu(this)">Dashboard &#x25BE;</button>
@@ -48,8 +50,7 @@
       <button class="menu-button" onclick="toggleMenu(this)">Applications &#x25BE;</button>
       <div class="submenu">
         <button class="submenu-button" onclick="loadContent('/announcements', this)">Announcements</button>
-        <button class="submenu-button" onclick="loadContent('/call-parking', this)">Call Parking</button>
-        <button class="submenu-button" onclick="loadContent('/call-forwarding', this)">Call Forwarding</button>
+        <button class="submenu-button" onclick="loadContent('/callrecording', this)">Call Recording</button>
       </div>
     </div>
 
