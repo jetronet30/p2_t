@@ -17,6 +17,7 @@ import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
 
+
 import com.jaba.p2_t.pbxmodels.IvrModel;
 import com.jaba.p2_t.pbxrepos.CallGroupRepo;
 import com.jaba.p2_t.pbxrepos.ExtenVirtualRepo;
@@ -35,6 +36,19 @@ public class IvrService {
     private final CallGroupRepo callGroupRepo;
 
     private static final File IVR_CONF = new File("/etc/asterisk/ivr.conf");
+
+    public List<String>listSortedIvrById(){
+        return ivrRepo.findAll()
+                .stream()
+                .map(IvrModel::getId)
+                .sorted()
+                .toList();
+
+    }
+
+    public List<IvrModel>listAllIvr(){
+        return ivrRepo.findAll();
+    }
 
     public void createIvr(String voiceMessage, String members) {
 
@@ -70,6 +84,7 @@ public class IvrService {
         IvrModel ivr = new IvrModel();
         ivr.setId(availableId);
         ivr.setContext("default");
+        ivr.setIvrMenu(members);
         ivr.setVoiceMessage(voiceMessage);
         ivr.setMembers(new ArrayList<>(validMembers));
         ivr.setDigits(digitList); // ციფრების დამატება
@@ -141,6 +156,7 @@ public class IvrService {
             ivr.setVoiceMessage(voiceMessage);
             ivr.setDigits(digitList);
             ivr.setMembers(new ArrayList<>(validMembers));
+            ivr.setIvrMenu(members);
 
             // შენახვა
             ivrRepo.save(ivr);
@@ -164,6 +180,7 @@ public class IvrService {
         }
         return Optional.empty();
     }
+
     @PostConstruct
     public void writeIvrConf() {
         if (IVR_CONF.exists())
@@ -181,7 +198,7 @@ public class IvrService {
             // ყველა IVR ჩამოტვირთვა
             List<IvrModel> ivrs = ivrRepo.findAll();
             for (IvrModel ivr : ivrs) {
-                writer.write("exten => "+ivr.getId()+",1,Goto(ivr-menu-"+ivr.getId()+",s,1)\n");
+                writer.write("exten => " + ivr.getId() + ",1,Goto(ivr-menu-" + ivr.getId() + ",s,1)\n");
             }
 
             for (IvrModel ivr : ivrs) {

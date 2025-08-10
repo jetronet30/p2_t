@@ -53,10 +53,9 @@ export function init() {
       formData.append("ivr_menu", rawInput);
 
       const voiceMessage = form.querySelector("select[name='ivr_welcome_message']")?.value || "";
-      const voiceLang = form.querySelector("select[name='ivr_language']")?.value || "";
 
       formData.append("voiceMessage", voiceMessage);
-      formData.append("voiceLang", voiceLang);
+
     }
 
     try {

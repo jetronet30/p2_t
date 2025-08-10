@@ -16,6 +16,7 @@ public class InboundService {
     private final VirtExtensionsService extensionsService;
     private final CallGroupService callGroupService;
     private final QueueService queueService;
+    private final IvrService ivrService;
 
     public List<String> inboundCandidates() {
         List<String> candidates = new ArrayList<>();
@@ -28,6 +29,9 @@ public class InboundService {
         }
         for (String qe : queueService.getQueueSortedById()) {
             candidates.add(qe + "-queue");
+        }
+        for (String ivr: ivrService.listSortedIvrById()) {
+            candidates.add(ivr + "-ivr");
         }
         return candidates;
     }

@@ -23,6 +23,9 @@ public class IvrModel {
     @Column(name = "digits")
     private List<Integer> digits;
 
+    @Column(name = "ivrMenu")
+    private String ivrMenu;
+
     @Column(name = "members")
     private List<String> members;
 

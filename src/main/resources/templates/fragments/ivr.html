@@ -10,10 +10,6 @@
             <option th:each="message : ${voiceMesages}" th:value="${message}" th:text="${message}"></option>
         </select>
 
-        <select name="ivr_language" class="ivr-voice-selector">
-            <option th:value="${systemSound}" th:text="${systemSound}"></option>
-            <option th:each="lang : ${voiceLangs}" th:value="${lang}" th:text="${lang}"></option>
-        </select>
 
         <textarea name="ivr_menu" class="members-textarea"
             placeholder="Example: 1=Sales, 2=Support, 3=Operator" required></textarea>
@@ -31,18 +27,15 @@
         <input type="text" name="ivr_id" th:value="${ivr.id}" readonly>
 
         <select name="ivr_welcome_message" class="ivr-voice-selector">
-            <option th:value="${ivr.welcomeMessage}" th:text="${ivr.welcomeMessage}"></option>
+            <option th:value="${ivr.voiceMessage}" th:text="${ivr.voiceMessage}"></option>
             <option value="">Welcome Message</option>
-            <option th:each="message : ${ivrMessages}" th:value="${message}" th:text="${message}"></option>
+            <option th:each="message : ${voiceMesages}" th:value="${message}" th:text="${message}"></option>
         </select>
 
-        <select name="ivr_language" class="ivr-voice-selector">
-            <option th:value="${ivr.language}" th:text="${ivr.language}"></option>
-            <option th:each="sound : ${sounds}" th:value="${sound}" th:text="${sound}"></option>
-        </select>
+        
 
         <textarea name="ivr_menu" class="members-textarea" rows="3"
-            th:text="${ivr.menu}"></textarea>
+            th:text="${ivr.ivrMenu}"></textarea>
 
         <button type="submit" class="ivr-edit-btn" th:id="'ivr-edit-btn' + ${ivr.id}">
             Edit

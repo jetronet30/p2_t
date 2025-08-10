@@ -68,7 +68,7 @@ public class DialPlanGenerator {
             writer.write("same => n,GotoIf($[\"${CONTACT}\" = \"\"]?nocon:found)\n");
             writer.write("same => n(nocon),Playback(" + sipSettings.getSysSound() + "/vm-nobodyavail)\n");
             writer.write("same => n,Hangup()\n");
-            writer.write("same => n(found),Dial(${CONTACT},60)\n");
+            writer.write("same => n(found),Dial(${CONTACT},60,Tf)\n");
             writer.write("same => n,Goto(${DIALSTATUS},1)\n");
             writer.write("exten => BUSY,1,Playback(" + sipSettings.getSysSound() + "/please-try-call-later)\n");
             writer.write("same => n,Hangup()\n");
