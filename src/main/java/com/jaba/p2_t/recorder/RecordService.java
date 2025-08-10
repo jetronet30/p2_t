@@ -16,6 +16,8 @@ import org.springframework.stereotype.Service;
 public class RecordService {
     private static final File RECORD_FOLDER = new File("/var/spool/asterisk/recording");
 
+    private static final String RECORD_FOLDER_PATH = "/var/spool/asterisk/recording";
+
     public List<String> getRecordeFileNames() {
         List<String> fileNames = new ArrayList<>();
         if (RECORD_FOLDER.exists() && RECORD_FOLDER.isDirectory()) {
@@ -88,35 +90,130 @@ public class RecordService {
         cleanUpIfStorageFull(1000); // 1000 MB ლიმიტი
     }
 
+    // ყოველ 10 დღეში ერთხელ გაშვება და 400GB ზე მეტის შემთხვევაში დასუფთავება
+    @Scheduled(cron = "0 0 0 */10 * *")
+    public void scheduledCleanUpLarge() {
+        long maxSizeGB = 400;
+        long maxSizeBytes = maxSizeGB * 1024L * 1024L * 1024L;
+        if (!RECORD_FOLDER.exists() || !RECORD_FOLDER.isDirectory()) {
+            return;
+        }
 
-    //დააბრუნებს  ყველა   დისკს
-    public  List<String> getNonRootDisks() {
-        List<String> disks = new ArrayList<>();
-        String rootDevice = null;
+        long folderSizeBytes = FileUtils.sizeOfDirectory(RECORD_FOLDER);
+        System.out.println("Checking recording folder size: " + (folderSizeBytes / (1024 * 1024 * 1024)) + " GB");
+
+        if (folderSizeBytes > maxSizeBytes) {
+            System.out.println("Folder size exceeds 400GB. Cleaning up...");
+            cleanUpIfStorageFull(maxSizeGB * 1024); // 400GB to MB
+        }
+    }
+
+    public List<String> getUnMountedPartitions() {
+        List<String> partitions = new ArrayList<>();
+        List<String> mountedPartitions = new ArrayList<>();
 
         try {
-            // ვიპოვოთ root device
-            Process rootProc = Runtime.getRuntime()
-                    .exec(new String[] { "bash", "-c", "df / --output=source | tail -n 1" });
-            try (BufferedReader reader = new BufferedReader(new InputStreamReader(rootProc.getInputStream()))) {
-                rootDevice = reader.readLine().trim();
-            }
-
-            // ვიპოვოთ ყველა მონტაჟებული დისკი
-            Process allProc = Runtime.getRuntime().exec(
-                    new String[] { "bash", "-c", "lsblk -ndo NAME,TYPE | grep disk | awk '{print \"/dev/\"$1}'" });
-            try (BufferedReader reader = new BufferedReader(new InputStreamReader(allProc.getInputStream()))) {
+            // 1. მონტაჟირებული partition-ების მიღება
+            Process mountProc = Runtime.getRuntime()
+                    .exec(new String[] { "bash", "-c", "mount | grep '^/dev/' | awk '{print $1}'" });
+            try (BufferedReader reader = new BufferedReader(new InputStreamReader(mountProc.getInputStream()))) {
                 String line;
                 while ((line = reader.readLine()) != null) {
-                    String device = line.trim();
-                    if (!device.isEmpty() && (rootDevice == null || !device.equals(rootDevice))) {
-                        disks.add(device);
+                    mountedPartitions.add(line.trim());
+                }
+            }
+
+            // 2. ყველა partition და მათი ზომა სრული სახელებით
+            Process lsblkProc = Runtime.getRuntime()
+                    .exec(new String[] { "bash", "-c", "lsblk -lnpo NAME,SIZE,TYPE | grep part" });
+            try (BufferedReader reader = new BufferedReader(new InputStreamReader(lsblkProc.getInputStream()))) {
+                String line;
+                while ((line = reader.readLine()) != null) {
+                    String[] parts = line.trim().split("\\s+");
+                    if (parts.length >= 3) {
+                        String name = parts[0]; // სრული პარტიციის სახელი, მაგალითად /dev/sda1
+                        String size = parts[1];
+                        String type = parts[2];
+                        if ("part".equals(type)) {
+                            if (!mountedPartitions.contains(name)) {
+                                partitions.add(name + "-|-" + size);
+                            }
+                        }
                     }
                 }
             }
+
         } catch (Exception e) {
             e.printStackTrace();
         }
-        return disks;
+        return partitions;
     }
+
+    public List<String> getMountedPartitionOnRecording() {
+        List<String> result = new ArrayList<>();
+
+        try {
+            // 1. ვპოულობთ მონტაჟირებულ მოწყობილობას ამ ბმულზე
+            Process proc = Runtime.getRuntime().exec(new String[] {
+                    "bash", "-c", "findmnt -n -o SOURCE --target " + RECORD_FOLDER_PATH
+            });
+            String device = null;
+            try (BufferedReader reader = new BufferedReader(new InputStreamReader(proc.getInputStream()))) {
+                device = reader.readLine();
+            }
+
+            if (device == null || device.isEmpty()) {
+                System.out.println("No device mounted on " + RECORD_FOLDER_PATH);
+                return result;
+            }
+
+            device = device.trim(); // მაგალითად: /dev/sda1
+
+            // 2. შევამოწმოთ, არის თუ არა ეს device Ubuntu-ს root ან სხვად რომელიმე
+            // მნიშვნელოვანი fs
+            boolean isUbuntuPartition = false;
+
+            Process mountProc = Runtime.getRuntime().exec(new String[] {
+                    "bash", "-c", "mount | grep '^/dev/' | awk '{print $1}'"
+            });
+            try (BufferedReader reader = new BufferedReader(new InputStreamReader(mountProc.getInputStream()))) {
+                String line;
+                while ((line = reader.readLine()) != null) {
+                    String mountedDev = line.trim();
+                    if (device.equals(mountedDev)) {
+                        // ეს device მონტაჟირებულია Ubuntu-ში, ამიტომ არ დავაბრუნოთ
+                        isUbuntuPartition = true;
+                        break;
+                    }
+                }
+            }
+
+            if (isUbuntuPartition) {
+                
+                return result; // ცარიელი სია
+            }
+
+            // 3. ვიღებთ მოცულობას (ზომას) ამ partition-ზე
+            Process sizeProc = Runtime.getRuntime().exec(new String[] {
+                    "bash", "-c", "lsblk -ndo SIZE " + device
+            });
+            String size = null;
+            try (BufferedReader reader = new BufferedReader(new InputStreamReader(sizeProc.getInputStream()))) {
+                size = reader.readLine();
+            }
+
+            if (size == null || size.isEmpty()) {
+                size = "UnknownSize";
+            }
+
+            // 4. ვაბრუნებთ ფორმატში: /dev/sda1-|-465.8G
+            result.add(device + "-|-" + size.trim());
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return result;
+    }
+
 }

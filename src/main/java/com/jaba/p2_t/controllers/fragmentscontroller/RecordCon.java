@@ -14,8 +14,13 @@ public class RecordCon {
 
     @PostMapping("/callrecording")
     public String posRecording(){
-        for (String cd  : recordService.getNonRootDisks()) {
-            System.out.println(" mounted disk " + cd);
+        for (String cd  : recordService.getUnMountedPartitions()) {
+            System.out.println(" UNMOUNTED DISK " + cd);
+        }
+
+        
+        for (String cd : recordService.getMountedPartitionOnRecording()) {
+            System.out.println("MOUNTED DISK " + cd);
         }
         return "fragments/callrecording";
     }

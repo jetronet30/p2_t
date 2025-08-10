@@ -12,7 +12,7 @@ public class MvcConfig implements WebMvcConfigurer {
         public void addResourceHandlers(ResourceHandlerRegistry registry) {
 
                 String announsmetnts = "file:/var/lib/asterisk/sounds/voicemessages/";
-                String callRecords = "file://var/spool/asterisk/recording/";
+                String callRecords = "file:/var/spool/asterisk/recording/";
 
                 ///////////////////////////////////////////////////////////
 
