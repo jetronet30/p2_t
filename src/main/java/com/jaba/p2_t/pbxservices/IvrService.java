@@ -17,14 +17,14 @@ import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
 
-
+import com.jaba.p2_t.asteriskmanager.AsteriskManager;
 import com.jaba.p2_t.pbxmodels.IvrModel;
 import com.jaba.p2_t.pbxrepos.CallGroupRepo;
 import com.jaba.p2_t.pbxrepos.ExtenVirtualRepo;
 import com.jaba.p2_t.pbxrepos.IvrRepo;
 import com.jaba.p2_t.pbxrepos.QueueRepo;
 
-import jakarta.annotation.PostConstruct;
+
 import lombok.RequiredArgsConstructor;
 
 @Service
@@ -34,6 +34,7 @@ public class IvrService {
     private final ExtenVirtualRepo extenVirtualRepo;
     private final QueueRepo queueRepo;
     private final CallGroupRepo callGroupRepo;
+    private final AsteriskManager asteriskManager;
 
     private static final File IVR_CONF = new File("/etc/asterisk/ivr.conf");
 
@@ -181,7 +182,7 @@ public class IvrService {
         return Optional.empty();
     }
 
-    @PostConstruct
+    
     public void writeIvrConf() {
         if (IVR_CONF.exists())
             IVR_CONF.delete();
@@ -223,10 +224,15 @@ public class IvrService {
                 writer.write("exten => i,1,Playback(invalid)\n");
                 writer.write(" same => n,Goto(s,start)\n\n");
             }
+        
+            
 
         } catch (IOException e) {
             e.printStackTrace();
         }
+
+        asteriskManager.reloadDialplan();
+        asteriskManager.reloadAll();
     }
 
 }

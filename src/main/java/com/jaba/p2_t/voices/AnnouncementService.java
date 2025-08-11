@@ -241,16 +241,12 @@ public class AnnouncementService {
             writer.write(" same => n(notallowed),Playback(auth-incorrect)\n");
             writer.write(" same => n,Hangup()\n");
             resp.put("success", true);
-            asteriskManager.reloadDialplan();
-            return resp;
         } catch (Exception e) {
             e.printStackTrace();
             resp.put("success", false);
-            asteriskManager.reloadDialplan();
-            return resp;
-
         }
-        
+        asteriskManager.reloadDialplan();
+        return resp;  
     }
 
 }

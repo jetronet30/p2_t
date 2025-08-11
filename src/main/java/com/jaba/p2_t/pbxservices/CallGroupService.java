@@ -140,10 +140,6 @@ public class CallGroupService {
             // Save updated group
             callGroupRepo.save(group);
             writeConfForCallGroup();
-
-
-
-
             response.put("success", true);
             response.put("id", group.getId());
         } catch (Exception e) {
@@ -212,6 +208,7 @@ public class CallGroupService {
             e.printStackTrace();
         } 
         asteriskManager.reloadDialplan();
+        asteriskManager.reloadAll();
 
     }
 
