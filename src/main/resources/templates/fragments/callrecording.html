@@ -1,4 +1,3 @@
-
 <div class="callrecords_action">
     <!-- საძიებო ველი -->
     <input type="text" id="searchField" placeholder="find..." style="margin-top: 15px;">
@@ -8,11 +7,15 @@
 </div>
 
 <div class="callrecords_container">
-    <div th:each="record : ${callrecords}" class="callrecords" data-date="2025-08-11">
-        <p class="record" th:text="${record}"></p>
-        <audio controls>
-            <source th:src="@{'/records/' + ${record}}" type="audio/wav">
-            Your browser does not support the audio element.
-        </audio>
+    <div th:each="record : ${callrecords}" class="callrecords">
+        <div th:id="${record}">
+            <p class="record" th:text="${record}"></p>
+            <audio controls>
+                <source th:src="@{'/records/' + ${record}}" type="audio/wav">
+                Your browser does not support the audio element.
+            </audio>
+        </div>
+
     </div>
 </div>
+<script th:src="@{/scripts/callrecording.js}"></script>
