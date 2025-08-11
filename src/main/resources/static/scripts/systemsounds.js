@@ -1,4 +1,6 @@
 export function init() {
+    if (window.__IvirInit) return;
+    window.__IvirInit = true;
     const mainContent = document.getElementById("main-content");
 
     const successClass = "highlight-success";
