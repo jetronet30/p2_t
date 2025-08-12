@@ -11,16 +11,19 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.jaba.p2_t.networck.NetService;
 import com.jaba.p2_t.pbxservices.SipSettings;
+import com.jaba.p2_t.servermanager.SerManger;
 import com.jaba.p2_t.voices.SystemSoundsService;
 
 import lombok.RequiredArgsConstructor;
+
+
 
 @Controller
 @RequiredArgsConstructor
 public class SipCon {
     private final SipSettings sipSettings;
     private final NetService netService;
-     private final SystemSoundsService soundsService;
+    private final SystemSoundsService soundsService;
 
     @PostMapping("/sipsettings")
     public String postSip(Model m) {
@@ -65,5 +68,13 @@ public class SipCon {
         return error;
 
     }
+
+
+    @PostMapping("/sip-reboot")
+    public String rebootSipreboot() {
+        SerManger.reboot();
+        return "fragments/sipsettings";
+    }
+    
 
 }

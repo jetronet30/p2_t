@@ -6,5 +6,6 @@
   "dataHost" : "localhost",
   "dataPort" : 5432,
   "licenzi" : "demo",
-  "useData" : true
+  "useData" : true,
+  "timeZone" : "Asia/Tbilisi"
 }

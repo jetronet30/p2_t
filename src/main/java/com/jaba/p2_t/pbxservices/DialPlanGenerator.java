@@ -22,6 +22,7 @@ public class DialPlanGenerator {
     private static final File TRUNKS_CONF = new File("/etc/asterisk/custom_trunks.conf");
     private static final File FORWARDING_CONF = new File("/etc/asterisk/autoforwarding.conf");
     private static final File RECORD_CONF = new File("/etc/asterisk/permitrecording.conf");
+    private static final File VOICE_FOLDER = new File("/etc/asterisk/voice_recorde.conf");
 
     @PostConstruct
     public void createDefaultContext() {
@@ -39,6 +40,8 @@ public class DialPlanGenerator {
                 FORWARDING_CONF.createNewFile();
             if (!RECORD_CONF.exists())
                 RECORD_CONF.createNewFile();
+            if (!VOICE_FOLDER.exists())
+                VOICE_FOLDER.mkdirs();
         } catch (IOException e) {
             e.printStackTrace();
         }

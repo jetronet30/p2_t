@@ -1,7 +1,9 @@
 package com.jaba.p2_t.servermanager;
 
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -33,6 +35,7 @@ public class ServerSettings {
         private int dataPort;
         private String licenzi;
         private boolean useData;
+        private String timeZone;
     }
 
     public static String getFullDBHost() {
@@ -63,6 +66,10 @@ public class ServerSettings {
         return config.getLicenzi();
     }
 
+    public String getTimeZone(){
+        return config.getTimeZone();
+    }
+
     public static int s_getPort(){
         return config.getPort();
     }
@@ -82,6 +89,9 @@ public class ServerSettings {
     public static String s_getDataHost(){
         return config.getDataHost();
     }
+    public static String s_getTimeZone(){
+        return config.getTimeZone();
+    }
 
 
     public static void initServerSettings() {
@@ -95,7 +105,7 @@ public class ServerSettings {
     }
 
     public void editSetting(int _port, String _licenzi, int _dataPort, String _dataUser, String _dataPassword,
-            String _dataName, String _dataHost) {
+            String _dataName, String _dataHost, String _timeZone) {
         config.setPort(_port);
         config.setDataPort(_dataPort);
         config.setDataUser(_dataUser);
@@ -103,6 +113,8 @@ public class ServerSettings {
         config.setDataName(_dataName);
         config.setDataHost(_dataHost);
         config.setLicenzi(_licenzi);
+        config.setTimeZone(_timeZone);
+        setTimeZoneInSys(_timeZone);
         writeToFile();
     }
 
@@ -136,10 +148,41 @@ public class ServerSettings {
         def.setDataHost("localhost");
         def.setLicenzi("demo");
         def.setUseData(true);
+        def.setTimeZone("Asia/Tbilisi");
+        setTimeZoneInSys(def.getTimeZone());
         return def;
     }
 
     public static synchronized ServerConfig getConfig() {
         return config;
+    }
+
+    private static void setTimeZoneInSys(String timezone) {
+        try {
+            String[] cmd = { "timedatectl", "set-timezone", timezone };
+
+            ProcessBuilder pb = new ProcessBuilder(cmd);
+            pb.redirectErrorStream(true);
+
+            Process process = pb.start();
+
+            try (BufferedReader reader = new BufferedReader(
+                    new InputStreamReader(process.getInputStream()))) {
+                String line;
+                while ((line = reader.readLine()) != null) {
+                    System.out.println(line);
+                }
+            }
+
+            int exitCode = process.waitFor();
+            if (exitCode == 0) {
+                System.out.println("Time zone changed to: " + timezone);
+            } else {
+                System.err.println("Failed to change time zone. Exit code: " + exitCode);
+            }
+
+        } catch (IOException | InterruptedException e) {
+            e.printStackTrace();
+        }
     }
 }

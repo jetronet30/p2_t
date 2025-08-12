@@ -20,7 +20,7 @@ public class SerCon {
     private final ServerSettings serverSettings;
 
     @PostMapping("/serversettings")
-    public String postSerSet(Model m){
+    public String postSerSet(Model m) {
         m.addAttribute("port", serverSettings.getPort());
         m.addAttribute("licenzi", serverSettings.getLicenzi());
         m.addAttribute("dataUser", serverSettings.getDataUser());
@@ -28,17 +28,20 @@ public class SerCon {
         m.addAttribute("dataPort", serverSettings.getDataPort());
         m.addAttribute("dataName", serverSettings.getDataName());
         m.addAttribute("dataHost", serverSettings.getDataHost());
-        return"fragments/serversettings";
+        m.addAttribute("timeZone", serverSettings.getTimeZone());
+        return "fragments/serversettings";
     }
+
     @PostMapping("/set-factory-reset")
-    public String factoryRtreset(Model m){
+    public String factoryRtreset(Model m) {
         System.out.println("factoy");
-        return"fragments/serversettings";
+        return "fragments/serversettings";
     }
+
     @PostMapping("/set-reboot")
-    public String setReboot(Model m){
+    public String setReboot(Model m) {
         System.out.println("reboot");
-        return"fragments/serversettings";
+        return "fragments/serversettings";
     }
 
     @ResponseBody
@@ -49,11 +52,12 @@ public class SerCon {
             @RequestParam("ser-data-user") String dataUser,
             @RequestParam("ser-data-password") String dataPassword,
             @RequestParam("ser-data-name") String dataName,
-            @RequestParam("ser-data-host") String dataHost) {
+            @RequestParam("ser-data-host") String dataHost,
+            @RequestParam("timeZone") String timeZone) {
         try {
             Map<String, Object> response = new HashMap<>();
             response.put("success", true);
-            serverSettings.editSetting(port, licenzi, dataPort, dataUser, dataPassword, dataName, dataHost);
+            serverSettings.editSetting(port, licenzi, dataPort, dataUser, dataPassword, dataName, dataHost, timeZone);
             return response;
         } catch (Exception e) {
             e.printStackTrace();
@@ -63,6 +67,5 @@ public class SerCon {
             return error;
         }
     }
-
 
 }

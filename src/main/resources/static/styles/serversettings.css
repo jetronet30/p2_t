@@ -1,3 +1,4 @@
+/* ---------- Top Action Bar ---------- */
 .ser-actions {
     position: sticky;
     top: 0;
@@ -11,7 +12,7 @@
     margin-bottom: 20px;
     animation: slideDownFade 0.5s ease;
     transition: background-color 0.3s ease, backdrop-filter 0.3s ease;
-    align-items: center; /* Aligns the items vertically */
+    align-items: center;
     height: 60px;
 }
 
@@ -29,7 +30,7 @@
     border-radius: 4px;
     background-color: #fff;
     color: #333;
-    width: 120px; /* Increased width for better visibility */
+    width: 120px;
 }
 
 .ser-act-btn {
@@ -51,7 +52,6 @@
 }
 
 /* ---------- Server Settings Vertical Form ---------- */
-
 #server-settings-container {
     display: flex;
     justify-content: center;
@@ -77,7 +77,8 @@
 }
 
 #server-settings-container input[type="text"],
-#server-settings-container input[type="password"] {
+#server-settings-container input[type="password"],
+#server-settings-container select {
     height: 32px;
     padding: 6px 12px;
     font-size: 0.9rem;
@@ -91,7 +92,8 @@
 }
 
 #server-settings-container input[type="text"]:focus,
-#server-settings-container input[type="password"]:focus {
+#server-settings-container input[type="password"]:focus,
+#server-settings-container select:focus {
     border-color: #007acc;
     outline: none;
     box-shadow: 0 0 3px rgba(0, 122, 204, 0.4);
@@ -108,14 +110,13 @@
 }
 
 /* --------- Align Serial Number to the Right --------- */
-
 .seriall-number {
     margin-left: auto;
     font-size: 1rem;
     font-weight: 500;
     color: #ffcc00;
     text-align: right;
-    padding-right: 15px; /* Adds some space from the right */
+    padding-right: 15px;
 }
 
 /* Animation reused */

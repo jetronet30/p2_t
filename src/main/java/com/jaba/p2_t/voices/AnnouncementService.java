@@ -20,7 +20,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.jaba.p2_t.asteriskmanager.AsteriskManager;
 
-import jakarta.annotation.PostConstruct;
+
 import lombok.RequiredArgsConstructor;
 
 @Service
@@ -42,11 +42,6 @@ public class AnnouncementService {
         return recorderCode;
     }
 
-    @PostConstruct
-    public void createVoiceFolder() {
-        if (!VOICE_FOLDER.exists())
-            VOICE_FOLDER.mkdirs();
-    }
 
     public List<String> getVoiceFileNames() {
 
