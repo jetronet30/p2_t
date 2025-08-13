@@ -29,15 +29,6 @@
     <div class="logo">MINITELSY P2T</div>
 
     <div class="dropdown">
-      <button class="menu-button" onclick="toggleMenu(this)">Dashboard &#x25BE;</button>
-      <div class="submenu">
-        <button class="submenu-button" onclick="loadContent('/systemoverview', this)">System Overview</button>
-        <button class="submenu-button" onclick="loadContent('/activechannels', this)">Active Channels</button>
-        <button class="submenu-button" onclick="loadContent('/cpuram', this)">CPU & RAM</button>
-      </div>
-    </div>
-
-    <div class="dropdown">
       <button class="menu-button" onclick="toggleMenu(this)">Call Management &#x25BE;</button>
       <div class="submenu">
         <button class="submenu-button" onclick="loadContent('/callgroups', this)">Call Groups</button>
@@ -62,7 +53,14 @@
         <button class="submenu-button" onclick="loadContent('/trunks', this)">Trunks</button>
         <button class="submenu-button" onclick="loadContent('/outboundroutes', this)">Outbound Routes</button>
         <button class="submenu-button" onclick="loadContent('/inboundroutes', this)">Inbound Routes</button>
-        <button class="submenu-button" onclick="loadContent('/firewall', this)">Firewall</button>
+      </div>
+    </div>
+
+     <div class="dropdown">
+      <button class="menu-button" onclick="toggleMenu(this)">PMS &#x25BE;</button>
+      <div class="submenu">
+        <button class="submenu-button" onclick="loadContent('/servicecodes', this)">Service codes</button>
+        <button class="submenu-button" onclick="loadContent('/rooms', this)">Rooms</button>
       </div>
     </div>
 
@@ -81,9 +79,6 @@
         <button class="submenu-button" onclick="loadContent('/serversettings', this)">Server Settings</button>
         <button class="submenu-button" onclick="loadContent('/networksettings', this)">Network Settings</button>
         <button class="submenu-button" onclick="loadContent('/systemsounds', this)">System Sounds</button>
-        <button class="submenu-button" onclick="loadContent('/voicemailsettings', this)">Voicemail Settings</button>
-        <button class="submenu-button" onclick="loadContent('/timegroups', this)">Time Groups</button>
-        <button class="submenu-button" onclick="loadContent('/featurecodes', this)">Feature Codes</button>
       </div>
     </div>
   </aside>

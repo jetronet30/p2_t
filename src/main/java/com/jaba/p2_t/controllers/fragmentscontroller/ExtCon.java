@@ -45,10 +45,9 @@ public class ExtCon {
             @RequestParam("password") String password,
             @RequestParam("permit") int permit,
             @RequestParam("callerId") String callerId,
-            @RequestParam("context") String context,
             @RequestParam("rezerve1")String rezerve1,
             @RequestParam("rezerve2")String rezerve2) {
-        return virtExtensionsService.updateVirtExt(id,callerId,context,password,permit,rezerve1,rezerve2);
+        return virtExtensionsService.updateVirtExt(id,callerId,password,permit,rezerve1,rezerve2);
     }
 
     @ResponseBody

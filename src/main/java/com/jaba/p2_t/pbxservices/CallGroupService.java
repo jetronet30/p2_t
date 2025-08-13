@@ -170,21 +170,23 @@ public class CallGroupService {
                 switch (cg.getStrategy()) {
                     case "RingAll":
                         for (String member : cg.getMembers()) {
-                            writer.write("same => n,Dial(PJSIP/" + member + ",20)\n");
+                            writer.write(" same => n,GoSub(permitrecording,s,1("+member+"))\n");
+                            writer.write(" same => n,Dial(PJSIP/" + member + ",20,T)\n");
                         }
                         break;
 
                     case "RingGroup":
-                        writer.write("same => n,Dial(PJSIP/" + String.join(",", cg.getMembers()) + ",g)\n");
+                        writer.write(" same => n,Dial(PJSIP/" + String.join(",", cg.getMembers()) + ",g)\n");
                         break;
 
                     case "FirstAvailable":
                         for (String member : cg.getMembers()) {
-                            writer.write("same => n,Dial(PJSIP/" + member + ",20)\n");
-                            writer.write("same => n,GotoIf($[${DIALSTATUS} = \"ANSWERED\"]?found:next)\n");
+                            writer.write(" same => n,GoSub(permitrecording,s,1("+member+"))\n");
+                            writer.write(" same => n,Dial(PJSIP/" + member + ",20,T)\n");
+                            writer.write(" same => n,GotoIf($[${DIALSTATUS} = \"ANSWERED\"]?found:next)\n");
                         }
-                        writer.write("same => n(next),Hangup()\n");
-                        writer.write("same => n(found),Hangup()\n");
+                        writer.write(" same => n(next),Hangup()\n");
+                        writer.write(" same => n(found),Hangup()\n");
                         break;
 
                     case "RoundRobin":
@@ -192,16 +194,17 @@ public class CallGroupService {
                         // For simplicity, let's simulate it
                         String[] members = cg.getMembers().toArray(new String[0]);
                         for (int i = 0; i < members.length; i++) {
-                            writer.write("same => n,Dial(PJSIP/" + members[i] + ",20)\n");
+                            writer.write(" same => n,GoSub(permitrecording,s,1("+members[i]+"))\n");
+                            writer.write(" same => n,Dial(PJSIP/" + members[i] + ",20,T)\n");
                         }
                         break;
 
                     default:
-                        writer.write("same => n,Hangup()\n");
+                        writer.write(" same => n,Hangup()\n");
                         break;
                 }
 
-                writer.write("same => n,Hangup()\n\n");
+                writer.write(" same => n,Hangup()\n\n");
             }
             writer.close();
         } catch (IOException e) {
@@ -211,5 +214,6 @@ public class CallGroupService {
         asteriskManager.reloadAll();
 
     }
+    
 
 }

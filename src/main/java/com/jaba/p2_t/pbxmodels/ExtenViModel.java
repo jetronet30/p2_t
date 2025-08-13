@@ -39,4 +39,13 @@ public class ExtenViModel {
     @Column(name = "rezerve_2")
     private String rezerve2;
 
+    @Column(name = "isRoom")
+    private boolean isRoom;
+
+    @Column(name = "voiceMessage")
+    private String voiceMessage;
+
+    @Column(name = "recordPermit")
+    private boolean recordPermit;
+
 }

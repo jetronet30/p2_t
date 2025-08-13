@@ -60,7 +60,7 @@ public class QueueService {
 
         // ახალი CallGroup-ის ID-ს ძებნა
         String availableId = findAvailableQueueId()
-                .orElseThrow(() -> new RuntimeException("ყველა CallGroup ID დაკავებულია (100000 - 100900)"));
+                .orElseThrow(() -> new RuntimeException("ყველა CallGroup ID დაკავებულია (200000 - 200900)"));
 
         // CallGroup ობიექტის შექმნა და იდენტიფიკაციის მინიჭება
         QueueModel queue = new QueueModel();
@@ -69,6 +69,7 @@ public class QueueService {
         queue.setVoiceMessage(voiceMessage);
         queue.setStrategy(strategy);
         queue.setVoiceLang(voicelang);
+        queue.setRecordPermit(false);
 
         // წევრების სიაში გადაყვანა
         List<String> memberList = new ArrayList<>(validMembers);
@@ -98,7 +99,8 @@ public class QueueService {
         return response;
     }
 
-    public Map<String, Object> updateQueue(String id, String voiceMessage, String members, String strategy,String voicelang) {
+    public Map<String, Object> updateQueue(String id, String voiceMessage, String members, String strategy,
+            String voicelang) {
         Map<String, Object> response = new HashMap<>();
         try {
             Optional<QueueModel> optionalQueue = qRepo.findById(id);
@@ -123,6 +125,7 @@ public class QueueService {
 
             queue.setStrategy(strategy);
             queue.setVoiceLang(voicelang);
+            queue.setRecordPermit(true);
 
             // Save updated group
             qRepo.save(queue);
@@ -158,7 +161,7 @@ public class QueueService {
 
             for (QueueModel que : qRepo.findAll()) {
                 writer.write("\n\n[queue-" + que.getId() + "]\n");
-                writer.write("setlanguage = " + que.getVoiceLang() + "\n");
+                // writer.write("setlanguage = " + que.getVoiceLang() + "\n");
                 writer.write("musiconhold = default\n");
                 writer.write("strategy = " + que.getStrategy() + "\n");
                 writer.write("timeout = 15\n");
@@ -198,12 +201,15 @@ public class QueueService {
                 writer.write("exten => " + que.getId() + ",1,NoOp(Queue queue-" + que.getId() + "  Call)\n");
                 writer.write(" same => n,Answer()\n");
                 writer.write(" same => n,Wait(1)\n");
+                if (que.isRecordPermit())
+                    writer.write(
+                            " same => n,MixMonitor(/var/spool/asterisk/recording/${STRFTIME(${EPOCH},,%Y-%m-%d)}_|_${STRFTIME(${EPOCH},,%H-%M-%S)}_|_${CALLERID(num)}_|_to_"
+                                    + que.getId() + ".wav,b)\n");
                 if (!que.getVoiceMessage().equals(""))
                     writer.write(" same => n,Playback(voicemessages/" + que.getVoiceMessage() + ")\n");
                 writer.write(" same => n,Set(CHANNEL(language)=" + que.getVoiceLang() + ")\n");
                 writer.write(" same => n,Wait(1)\n");
-                writer.write(" same => n,Playback(queue-thankyou)\n");
-                writer.write(" same => n,Queue(queue-" + que.getId() + ")\n");
+                writer.write(" same => n,Queue(queue-" + que.getId() + ",t)\n");
                 writer.write(" same => n,Hangup()\n");
 
             }

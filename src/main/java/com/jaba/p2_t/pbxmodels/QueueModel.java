@@ -33,5 +33,8 @@ public class QueueModel {
     @Column(name = "voiceLang")
     private String voiceLang;
 
+    @Column (name = "recordPermit")
+    private boolean recordPermit;
+
 
 }

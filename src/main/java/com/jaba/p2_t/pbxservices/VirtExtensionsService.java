@@ -76,6 +76,9 @@ public class VirtExtensionsService {
             vi.setOutPermit(3);
             vi.setVirContext("default");
             vi.setVirPass(sipSettings.getDefPassword());
+            vi.setRecordPermit(false);
+            vi.setRoom(false);
+            vi.setVoiceMessage(null);
             viModels.add(vi);
 
             PjsipEndpoint ep = new PjsipEndpoint();
@@ -140,6 +143,9 @@ public class VirtExtensionsService {
             viModel.setOutPermit(3);
             viModel.setVirContext("default");
             viModel.setVirPass(sipSettings.getDefPassword());
+            viModel.setRoom(false);
+            viModel.setVoiceMessage(null);
+            viModel.setRecordPermit(false);
 
             PjsipEndpoint endpoint = new PjsipEndpoint();
             endpoint.setId(extensionId);
@@ -174,7 +180,7 @@ public class VirtExtensionsService {
     }
 
     @Transactional
-    public Map<String, Object> updateVirtExt(String extensionId, String displayName, String virContext, String virPass,
+    public Map<String, Object> updateVirtExt(String extensionId, String displayName, String virPass,
             int outPermit, String rezerve_1, String rezerve_2) {
         Map<String, Object> result = new HashMap<>();
 
@@ -191,7 +197,6 @@ public class VirtExtensionsService {
 
         ExtenViModel viModel = viModelOpt.get();
         viModel.setDisplayName(displayName);
-        viModel.setVirContext(virContext);
         viModel.setVirPass(virPass);
         viModel.setOutPermit(outPermit);
         viModel.setRezerve1(rezerve_1);
@@ -202,7 +207,6 @@ public class VirtExtensionsService {
         endpoint.setAuthId(extensionId);
         endpoint.setType("endpoint");
         endpoint.setTransport("udp");
-        endpoint.setContext(virContext);
         endpoint.setDisallow("all");
         endpoint.setAllow("ulaw,alaw");
         endpoint.setDtmfMode(sipSettings.getDtmfMode());
@@ -305,7 +309,8 @@ public class VirtExtensionsService {
             for (ExtenViModel ex : extenVirtualRepo.findAll()) {
                 if ((ex.getRezerve1()!=null&&!ex.getRezerve1().equals(""))||(ex.getRezerve2()!=null&&!ex.getRezerve2().equals(""))) {
                     writer.write("exten => "+ ex.getId()+",1,NoOp(Primary call attempt to "+ex.getId()+")\n");
-                    writer.write(" same => n,Dial(PJSIP/"+ex.getId()+",30)\n");
+                    writer.write(" same => n,GoSub(permitrecording,s,1("+ex.getId()+"))\n");
+                    writer.write(" same => n,Dial(PJSIP/"+ex.getId()+",30,T)\n");
                     writer.write(" same => n,GotoIf($[\"${DIALSTATUS}\" = \"BUSY\" || \"${DIALSTATUS}\" = \"NOANSWER\" || \"${DIALSTATUS}\" = \"UNAVAIL\" || \"${DIALSTATUS}\" = \"CHANUNAVAIL\" || \"${DIALSTATUS}\" = \"CONGESTION\"]?fallback1)\n");
                     writer.write(" same => n,Hangup()\n\n");
                     if (ex.getRezerve1()!=null&&!ex.getRezerve1().equals("")) {
@@ -369,7 +374,7 @@ public class VirtExtensionsService {
                 if (ex.getOutPermit() == 0)
                     writer.write(" exten =>" + ex.getId() + ",1,Return()\n");
             }
-            writer.write("exten => _X.,1,Playback(en/ss-noservice)\n");
+            writer.write("exten => _X.,1,Playback("+sipSettings.getSysSound()+"/ss-noservice)\n");
             writer.write("same => n,Hangup()\n");
         } catch (IOException e) {
             e.printStackTrace();

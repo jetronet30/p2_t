@@ -8,7 +8,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-
 import org.springframework.stereotype.Service;
 
 import com.jaba.p2_t.asteriskmanager.AsteriskManager;
@@ -46,8 +45,6 @@ public class OutBoundService {
             response.put("success", false);
             return response;
         }
-
-       
 
         existingRoute.setPrefix(prefix);
         existingRoute.setAutoAdd(autoAdd);
@@ -102,14 +99,26 @@ public class OutBoundService {
                     pattern = digits;
                 }
 
+                // ახლა მხოლოდ ერთხელ ვწერთ exten-ს და პრიორიტეტებს
                 writer.write("exten => _" + pattern + ",1,NoOp(Dialing outbound call from ${CALLERID(num)})\n");
                 writer.write(" same => n,GoSub(allow-outbound-users,${CALLERID(num)},1)\n");
 
-                if (autoAdd != null && !autoAdd.isEmpty()) {
-
-                    writer.write(" same => n,Set(OUTNUM=" + autoAdd + "${EXTEN})\n");
+                if (prefix != null && !prefix.isEmpty()) {
+                    // Dial-ში ამოვიღოთ prefix (autoAdd-ს შემთხვევაში, ასევე ჩავსვათ autoAdd)
+                    writer.write(" same => n,Set(OUTNUM=");
+                    if (autoAdd != null && !autoAdd.isEmpty()) {
+                        writer.write(autoAdd + "${EXTEN:" + prefix.length() + "}");
+                    } else {
+                        writer.write("${EXTEN:" + prefix.length() + "}");
+                    }
+                    writer.write(")\n");
                 } else {
-                    writer.write(" same => n,Set(OUTNUM=${EXTEN})\n");
+                    // როცა prefix არ არის, Set OUTNUM ჩვეულებრივია
+                    if (autoAdd != null && !autoAdd.isEmpty()) {
+                        writer.write(" same => n,Set(OUTNUM=" + autoAdd + "${EXTEN})\n");
+                    } else {
+                        writer.write(" same => n,Set(OUTNUM=${EXTEN})\n");
+                    }
                 }
 
                 writer.write(" same => n,Dial(PJSIP/${OUTNUM}@trunk-" + trunk + "-sip)\n");
