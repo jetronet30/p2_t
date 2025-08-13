@@ -1,0 +1,123 @@
+/* --- Music On Hold Actions Bar --- */
+.system_sounds_actions {
+    position: sticky;
+    top: 0;
+    backdrop-filter: blur(8px);
+    background-color: rgba(17, 17, 17, 0.75);
+    padding: 10px 20px;
+    z-index: 100;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    border-bottom: 1px solid #333;
+    margin-bottom: 20px;
+    animation: slideDownFade 0.5s ease;
+    transition: background-color 0.3s ease, backdrop-filter 0.3s ease;
+    align-items: center;
+}
+
+/* ფაილის ატვირთვის input */
+.upload_value {
+    height: 32px;
+    padding: 4px 8px;
+    font-size: 0.85rem;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    background-color: #fff;
+    color: #333;
+}
+
+/* ატვირთვის ღილაკი */
+#moh_upload_btn {
+    height: 34px;
+    padding: 0 14px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    background-color: #007acc;
+    color: white;
+    transition: background-color 0.3s ease;
+}
+#moh_upload_btn:hover {
+    background-color: #005b99;
+}
+
+/* Set ღილაკი */
+#moh_set_btn {
+    height: 34px;
+    padding: 0 14px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    background-color: #007acc;
+    color: white;
+    transition: background-color 0.3s ease;
+}
+#moh_set_btn:hover {
+    background-color: #005b99;
+}
+
+/* Select dropdown */
+#moh-selector {
+    height: 34px;
+    padding: 4px 8px;
+    font-size: 0.85rem;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    background-color: #fff;
+    color: #333;
+}
+
+/* --- Individual MOH Container --- */
+.musiconhold_container {
+    padding: 10px;
+    background-color: #f7f7f7;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    margin-bottom: 10px;
+}
+.musiconhold_container:hover {
+    box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+}
+.musiconhold_container .moh-name {
+    margin: 0 0 8px 0;
+    font-size: 0.95rem;
+    font-weight: 500;
+    color: #333;
+}
+
+/* აუდიო ელემენტი */
+.musiconhold_container audio {
+    width: 100%;
+    outline: none;
+    margin-bottom: 8px;
+}
+
+/* Action Buttons */
+.moh-buttons {
+    display: flex;
+    gap: 6px;
+}
+.moh-delete-btn {
+    padding: 4px 10px;
+    font-size: 0.8rem;
+    border-radius: 4px;
+    cursor: pointer;
+    border: none;
+    background-color: #dc3545;
+    color: white;
+}
+.moh-delete-btn:hover {
+    background-color: #b02a37;
+}
+
+/* Animation */
+@keyframes slideDownFade {
+    from { transform: translateY(-10px); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
+}

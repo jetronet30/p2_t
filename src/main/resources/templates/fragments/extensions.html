@@ -30,7 +30,10 @@
             <option value="2">2</option>
             <option value="3">3</option>
         </select>
-        
+        <label>
+            <input type="checkbox" name="recordPermit" th:checked="${ext.recordPermit}">
+            Record
+        </label>
         <input type="text" name="rezerve1" th:value="${ext.rezerve1}" placeholder="Reserve 1">
         <input type="text" name="rezerve2" th:value="${ext.rezerve2}" placeholder="Reserve 2">
         <input type="text" th:value="${ext.modelName}" hidden>

@@ -56,6 +56,10 @@ public class AsteriskManager {
         executeCommand("asterisk", "-rx", "core reload");
     }
 
+     public void reloadMoh() {
+        executeCommand("asterisk", "-rx", "moh reload");
+    }
+
     /** Stop Asterisk service */
     public void stopAsteriskService() {
         executeCommand("systemctl", "stop", "asterisk");

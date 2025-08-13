@@ -23,7 +23,7 @@ public class QuCon {
     private final SipSettings sipSettings;
 
     @PostMapping("/queues")
-    public String postQueues(Model m){
+    public String postQueues(Model m) {
         m.addAttribute("queues", queueService.getAllQueue());
         m.addAttribute("messages", sytemSoundsService.getVoiceFileNames());
         m.addAttribute("sounds", sytemSoundsService.getSoundsFileName());
@@ -37,7 +37,7 @@ public class QuCon {
             @RequestParam(name = "voiceMessage", required = false) String voiceMessage,
             @RequestParam(name = "queue_strategy") String strategy,
             @RequestParam(name = "voiceLang") String voiceLang) {
-        queueService.createQueue(voiceMessage,members,strategy,voiceLang);
+        queueService.createQueue(voiceMessage, members, strategy, voiceLang);
         m.addAttribute("queues", queueService.getAllQueue());
         m.addAttribute("messages", sytemSoundsService.getVoiceFileNames());
         m.addAttribute("sounds", sytemSoundsService.getSoundsFileName());
@@ -53,15 +53,14 @@ public class QuCon {
 
     @ResponseBody
     @PostMapping("/edit-queue/{id}")
-    public Map<String,Object> editQueue(@PathVariable("id") String id,
+    public Map<String, Object> editQueue(@PathVariable("id") String id,
             @RequestParam(value = "queueVoiceMessage", required = false) String voiceMessage,
             @RequestParam(value = "context", required = false) String context,
             @RequestParam(value = "queue_members", required = false) String members,
             @RequestParam(name = "editStrategy") String strategy,
-            @RequestParam(name = "voiceLang") String voiceLang) {
-                System.out.println(members);
-        return queueService.updateQueue(id,voiceMessage,members,strategy,voiceLang);
+            @RequestParam(name = "voiceLang") String voiceLang,
+            @RequestParam(name = "recordPermit", defaultValue = "false") boolean permit) {
+        return queueService.updateQueue(id, voiceMessage, members, strategy, voiceLang,permit);
     }
-
 
 }

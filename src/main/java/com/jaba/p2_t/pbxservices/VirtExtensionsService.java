@@ -31,6 +31,8 @@ public class VirtExtensionsService {
     private final AsteriskManager asteriskManager;
     private static final File FORWARDING_CONF = new File("/etc/asterisk/autoforwarding.conf");
     private static final File PERMIT_CONF = new File("/etc/asterisk/outpermit.conf");
+    private static final File PERMIT_RECORDING = new File("/etc/asterisk/permitrecording.conf");
+
     private final SipSettings sipSettings;
     private final PjsipEndpointRepositor pjsipEndpointRepositor;
     private final PjsipAuthRepositor pjsipAuthRepositor;
@@ -176,12 +178,13 @@ public class VirtExtensionsService {
             pjsipAuthRepositor.save(auth);
             pjsipAorRepositor.save(aor);
             writeAutoForvarding();
+            writeRecordPermit();
         }
     }
 
     @Transactional
     public Map<String, Object> updateVirtExt(String extensionId, String displayName, String virPass,
-            int outPermit, String rezerve_1, String rezerve_2) {
+            int outPermit, boolean recordpermit, String rezerve_1, String rezerve_2) {
         Map<String, Object> result = new HashMap<>();
 
         Optional<ExtenViModel> viModelOpt = extenVirtualRepo.findById(extensionId);
@@ -201,6 +204,7 @@ public class VirtExtensionsService {
         viModel.setOutPermit(outPermit);
         viModel.setRezerve1(rezerve_1);
         viModel.setRezerve2(rezerve_2);
+        viModel.setRecordPermit(recordpermit);
 
         PjsipEndpoint endpoint = endpointOpt.get();
         endpoint.setAorsId(extensionId);
@@ -227,6 +231,7 @@ public class VirtExtensionsService {
 
         writeAutoForvarding();
         writeoutPermit();
+        writeRecordPermit();
         result.put("success", true);
         return result;
     }
@@ -269,6 +274,7 @@ public class VirtExtensionsService {
         result.put("deletedCount", deletedCount);
         writeAutoForvarding();
         writeoutPermit();
+        writeRecordPermit();
         return result;
     }
 
@@ -307,42 +313,49 @@ public class VirtExtensionsService {
             writer.write("\n[default]\n\n");
 
             for (ExtenViModel ex : extenVirtualRepo.findAll()) {
-                if ((ex.getRezerve1()!=null&&!ex.getRezerve1().equals(""))||(ex.getRezerve2()!=null&&!ex.getRezerve2().equals(""))) {
-                    writer.write("exten => "+ ex.getId()+",1,NoOp(Primary call attempt to "+ex.getId()+")\n");
-                    writer.write(" same => n,GoSub(permitrecording,s,1("+ex.getId()+"))\n");
-                    writer.write(" same => n,Dial(PJSIP/"+ex.getId()+",30,T)\n");
-                    writer.write(" same => n,GotoIf($[\"${DIALSTATUS}\" = \"BUSY\" || \"${DIALSTATUS}\" = \"NOANSWER\" || \"${DIALSTATUS}\" = \"UNAVAIL\" || \"${DIALSTATUS}\" = \"CHANUNAVAIL\" || \"${DIALSTATUS}\" = \"CONGESTION\"]?fallback1)\n");
+                if ((ex.getRezerve1() != null && !ex.getRezerve1().equals(""))
+                        || (ex.getRezerve2() != null && !ex.getRezerve2().equals(""))) {
+                    writer.write("exten => " + ex.getId() + ",1,NoOp(Primary call attempt to " + ex.getId() + ")\n");
+                    writer.write(" same => n,GoSub(permitrecording,s,1(" + ex.getId() + "))\n");
+                    writer.write(" same => n,Dial(PJSIP/" + ex.getId() + ",30,T)\n");
+                    writer.write(
+                            " same => n,GotoIf($[\"${DIALSTATUS}\" = \"BUSY\" || \"${DIALSTATUS}\" = \"NOANSWER\" || \"${DIALSTATUS}\" = \"UNAVAIL\" || \"${DIALSTATUS}\" = \"CHANUNAVAIL\" || \"${DIALSTATUS}\" = \"CONGESTION\"]?fallback1)\n");
                     writer.write(" same => n,Hangup()\n\n");
-                    if (ex.getRezerve1()!=null&&!ex.getRezerve1().equals("")) {
+                    if (ex.getRezerve1() != null && !ex.getRezerve1().equals("")) {
                         if (extenVirtualRepo.existsById(ex.getRezerve1())) {
-                            writer.write("exten => "+ex.getId()+",n(fallback1),NoOp(Forwarding to "+ex.getRezerve1()+" as first reserve)\n");
-                            writer.write(" same => n,Dial(PJSIP/"+ex.getRezerve1()+",30)\n");
-                            if (ex.getRezerve2()!=null&&!ex.getRezerve2().equals("")) {
-                                writer.write(" same => n,GotoIf($[\"${DIALSTATUS}\" = \"BUSY\" || \"${DIALSTATUS}\" = \"NOANSWER\" || \"${DIALSTATUS}\" = \"UNAVAIL\" || \"${DIALSTATUS}\" = \"CHANUNAVAIL\" || \"${DIALSTATUS}\" = \"CONGESTION\"]?fallback2)\n");
+                            writer.write("exten => " + ex.getId() + ",n(fallback1),NoOp(Forwarding to "
+                                    + ex.getRezerve1() + " as first reserve)\n");
+                            writer.write(" same => n,Dial(PJSIP/" + ex.getRezerve1() + ",30)\n");
+                            if (ex.getRezerve2() != null && !ex.getRezerve2().equals("")) {
+                                writer.write(
+                                        " same => n,GotoIf($[\"${DIALSTATUS}\" = \"BUSY\" || \"${DIALSTATUS}\" = \"NOANSWER\" || \"${DIALSTATUS}\" = \"UNAVAIL\" || \"${DIALSTATUS}\" = \"CHANUNAVAIL\" || \"${DIALSTATUS}\" = \"CONGESTION\"]?fallback2)\n");
                             }
                             writer.write(" same => n,Hangup()\n\n");
-                        }else{
-                            writer.write("exten => "+ex.getId()+",n(fallback1),NoOp(Forwarding to out)\n");
-                            writer.write(" same => n,Goto("+ex.getRezerve1()+",1)\n\n");
+                        } else {
+                            writer.write("exten => " + ex.getId() + ",n(fallback1),NoOp(Forwarding to out)\n");
+                            writer.write(" same => n,Goto(" + ex.getRezerve1() + ",1)\n\n");
                         }
-                    }else{
+                    } else {
                         if (extenVirtualRepo.existsById(ex.getRezerve2())) {
-                            writer.write("exten => "+ex.getId()+",n(fallback1),NoOp(Forwarding to "+ex.getRezerve2()+" as first reserve)\n");
-                            writer.write(" same => n,Dial(PJSIP/"+ex.getRezerve2()+",30)\n");
+                            writer.write("exten => " + ex.getId() + ",n(fallback1),NoOp(Forwarding to "
+                                    + ex.getRezerve2() + " as first reserve)\n");
+                            writer.write(" same => n,Dial(PJSIP/" + ex.getRezerve2() + ",30)\n");
                             writer.write(" same => n,Hangup()\n\n");
-                        }else{
-                            writer.write("exten => "+ex.getId()+",n(fallback1),NoOp(Forwarding to out)\n");
-                            writer.write(" same => n,Goto("+ex.getRezerve2()+",1)\n\n");
+                        } else {
+                            writer.write("exten => " + ex.getId() + ",n(fallback1),NoOp(Forwarding to out)\n");
+                            writer.write(" same => n,Goto(" + ex.getRezerve2() + ",1)\n\n");
                         }
                     }
-                    if (ex.getRezerve2()!=null&&!ex.getRezerve2().equals("")&&ex.getRezerve1()!=null&&!ex.getRezerve1().equals("")) {
+                    if (ex.getRezerve2() != null && !ex.getRezerve2().equals("") && ex.getRezerve1() != null
+                            && !ex.getRezerve1().equals("")) {
                         if (extenVirtualRepo.existsById(ex.getRezerve2())) {
-                            writer.write("exten => "+ex.getId()+",n(fallback2),NoOp(Forwarding to "+ex.getRezerve2()+" as second reserve)\n");
-                            writer.write(" same => n,Dial(PJSIP/"+ex.getRezerve2()+",30)\n");
-                            writer.write(" same => n,Hangup()\n"); 
-                        }else{
-                            writer.write("exten => "+ex.getId()+",n(fallback2),NoOp(Forwarding to out)\n");
-                            writer.write(" same => n,Goto("+ex.getRezerve2()+",1)\n\n");
+                            writer.write("exten => " + ex.getId() + ",n(fallback2),NoOp(Forwarding to "
+                                    + ex.getRezerve2() + " as second reserve)\n");
+                            writer.write(" same => n,Dial(PJSIP/" + ex.getRezerve2() + ",30)\n");
+                            writer.write(" same => n,Hangup()\n");
+                        } else {
+                            writer.write("exten => " + ex.getId() + ",n(fallback2),NoOp(Forwarding to out)\n");
+                            writer.write(" same => n,Goto(" + ex.getRezerve2() + ",1)\n\n");
                         }
                     }
                 }
@@ -354,7 +367,6 @@ public class VirtExtensionsService {
 
         asteriskManager.reloadDialplan();
     }
-
 
     private void writeoutPermit() {
         if (PERMIT_CONF.exists())
@@ -374,7 +386,7 @@ public class VirtExtensionsService {
                 if (ex.getOutPermit() == 0)
                     writer.write(" exten =>" + ex.getId() + ",1,Return()\n");
             }
-            writer.write("exten => _X.,1,Playback("+sipSettings.getSysSound()+"/ss-noservice)\n");
+            writer.write("exten => _X.,1,Playback(" + sipSettings.getSysSound() + "/ss-noservice)\n");
             writer.write("same => n,Hangup()\n");
         } catch (IOException e) {
             e.printStackTrace();
@@ -383,6 +395,49 @@ public class VirtExtensionsService {
         asteriskManager.reloadDialplan();
     }
 
+    private void writeRecordPermit() {
+        if (PERMIT_RECORDING.exists())
+            PERMIT_RECORDING.delete();
 
-    
+        try {
+            PERMIT_RECORDING.createNewFile();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(PERMIT_RECORDING, false))) {
+            writer.write("\n[permitrecording]\n\n");
+            writer.write("exten => s,1,NoOp(Start recording if extension matches)\n");
+
+            // ვფილტრავთ მხოლოდ ჩაწერის უფლებით მქონე extensions
+            List<ExtenViModel> permittedExtensions = extenVirtualRepo.findAll()
+                    .stream()
+                    .filter(ExtenViModel::isRecordPermit)
+                    .toList();
+
+            if (permittedExtensions.isEmpty()) {
+                // თუ არც ერთი არ არის ნებადართული, პირდაპირ ვაბრუნებთ
+                writer.write(" same => n,Return()\n");
+            } else {
+                // ვაწყობთ პირობას
+                writer.write(" same => n,ExecIf($[ ");
+                for (int i = 0; i < permittedExtensions.size(); i++) {
+                    ExtenViModel ext = permittedExtensions.get(i);
+                    writer.write("\"${ARG1}\" = \"" + ext.getId() + "\"");
+                    if (i < permittedExtensions.size() - 1) {
+                        writer.write(" | ");
+                    }
+                }
+                writer.write(
+                        " ]?MixMonitor(/var/spool/asterisk/recording/${STRFTIME(${EPOCH},,%Y-%m-%d)}_|_${STRFTIME(${EPOCH},,%k-%M-%S)}_|_${CALLERID(num)}_|_to_|_${ARG1}.wav,b))\n");
+                writer.write(" same => n,Return()\n");
+            }
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        asteriskManager.reloadDialplan();
+    }
+
 }

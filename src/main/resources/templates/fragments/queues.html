@@ -9,7 +9,7 @@
             <option value="">voiceMessage</option>
             <option th:each="message : ${messages}" th:value="${message}" th:text="${message}"></option>
         </select>
-        
+
         <select name="queue_strategy" class="add-strategy-selector">
             <option value="linear">Linear</option>
             <option value="ringAll">RingAll</option>
@@ -23,7 +23,7 @@
 
         <textarea name="members" id="membersInput" class="members-textarea"
             placeholder="110021, 110032, 110025 or space-separated" required></textarea>
-           
+
 
         <span id="member-count" class="member-count">0 members </span>
 
@@ -57,7 +57,12 @@
         <input type="text" name="context" th:value="${queue.context}" placeholder="Context" hidden>
 
         <textarea name="queue_members" class="members-textarea" rows="3"
-    th:text="${#strings.replace(queue.members, '[', '').replace(']', '')}"></textarea>
+            th:text="${#strings.replace(queue.members, '[', '').replace(']', '')}"></textarea>
+
+        <label>
+            <input type="checkbox" name="recordPermit" th:checked="${queue.recordPermit}">
+            Record
+        </label>
 
         <button type="submit" class="queue-edit-btn" th:id="'queue-edit-btn' + ${queue.id}">
             Edit

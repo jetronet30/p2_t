@@ -12,11 +12,13 @@ public class RepoInit {
     public static final File SERVER_RESOURCES = new File("./mainrepo/resources");
     //public static final File SERVER_RESOURCES = new File("/var/lib/mainrepo/resources");
     public static final File REZERV_REPO = new File("/var/lib/rezerv");
+    public static final File MOH_REPO_DEF = new File("/var/lib/asterisk/moh/play_moh");
 
     public static void repoCreator() {
         createDirectory(SERVER_REPO);
         createDirectory(SERVER_RESOURCES);
         createDirectory(REZERV_REPO);
+        createDirectory(MOH_REPO_DEF);
     }
 
     private static void createDirectory(File dir) {

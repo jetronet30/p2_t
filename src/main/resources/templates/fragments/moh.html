@@ -1,0 +1,30 @@
+<div class="system_sounds_actions">
+    <form id="upload_moh_form" enctype="multipart/form-data" action="/upload_moh" method="post">
+        <input class="upload_value" type="file" name="musiconhold">
+        <input type="button" id="moh_upload_btn" value="UP MOH">
+    </form>
+    <form action="/set-music-on-hold">
+        <select name="select-moh" id="moh-selector" required>
+            <option  th:value="${setedMoh}" th:text="${setedMoh}"></option>
+            <option th:each="moh : ${mohs}" th:value="${moh}" th:text="${moh}">
+            </option>
+        </select>
+        <input type="button" class="ser-btn" id="moh_set_btn" value="set" >
+    </form>
+</div>
+
+<div th:each="moh : ${mohs}" class="musiconhold_container">
+    <p class="moh-name" th:text="${moh}"></p>
+
+    <audio controls>
+        <source th:src="@{'/mohscon/' + ${moh}}" type="audio/wav">
+        Your browser does not support the audio element.
+    </audio>
+
+    <div class="moh-buttons">
+        <form th:action="@{/moh/delete/{name}(name=${moh})}" method="post" style="display:inline;">
+            <button type="submit" class=" moh-delete-btn">Delete</button>
+        </form>
+    </div>
+</div>
+<script th:src="@{/scripts/moh.js}"></script>

@@ -46,8 +46,9 @@ public class ExtCon {
             @RequestParam("permit") int permit,
             @RequestParam("callerId") String callerId,
             @RequestParam("rezerve1")String rezerve1,
-            @RequestParam("rezerve2")String rezerve2) {
-        return virtExtensionsService.updateVirtExt(id,callerId,password,permit,rezerve1,rezerve2);
+            @RequestParam("rezerve2")String rezerve2,
+            @RequestParam(name = "recordPermit", defaultValue = "false")boolean recordpermit) {
+        return virtExtensionsService.updateVirtExt(id,callerId,password,permit,recordpermit,rezerve1,rezerve2);
     }
 
     @ResponseBody

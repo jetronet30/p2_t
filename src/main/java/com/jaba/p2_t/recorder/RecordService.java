@@ -8,6 +8,8 @@ import java.util.Collection;
 import java.util.List;
 
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.filefilter.FileFilterUtils;
+import org.apache.commons.io.filefilter.IOFileFilter;
 import org.apache.commons.io.filefilter.SuffixFileFilter;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
@@ -41,10 +43,14 @@ public class RecordService {
     public List<String> getRecordeFiles() {
         List<String> recodedfiles = new ArrayList<>();
         if (RECORD_FOLDER.exists() && RECORD_FOLDER.isDirectory()) {
-            Collection<File> voiceFiles = FileUtils.listFiles(
-                    RECORD_FOLDER,
-                    new SuffixFileFilter(new String[] { ".wav", ".gsm", ".ulaw" }),
-                    null);
+
+            // სუფიქსი + ზომა >1KB
+            IOFileFilter suffixFilter = new SuffixFileFilter(new String[] { ".wav", ".gsm", ".ulaw" });
+            IOFileFilter sizeFilter = FileFilterUtils.sizeFileFilter(1024, true); // true = უფრო მეტი ვიდრე 1024 ბაიტი
+
+            IOFileFilter finalFilter = FileFilterUtils.and(suffixFilter, sizeFilter);
+
+            Collection<File> voiceFiles = FileUtils.listFiles(RECORD_FOLDER, finalFilter, null);
 
             for (File file : voiceFiles) {
                 recodedfiles.add(file.getName());
@@ -189,7 +195,7 @@ public class RecordService {
             }
 
             if (isUbuntuPartition) {
-                
+
                 return result; // ცარიელი სია
             }
 
