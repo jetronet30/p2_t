@@ -18,4 +18,5 @@ public class NetModels {
     private String yamlFileName; 
     private String nickname;
     private String metric;
+    private String speed;
 }

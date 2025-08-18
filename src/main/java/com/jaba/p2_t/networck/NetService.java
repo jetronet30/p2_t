@@ -8,8 +8,10 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.yaml.snakeyaml.Yaml;
 
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileReader;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.util.*;
@@ -21,12 +23,12 @@ public class NetService {
     private static final File NETWORCK_FOLDER = new File("/etc/netplan");
 
     public Map<String, String> maplan() {
-    Map<String, String> map = new LinkedHashMap<>();
-    for (NetModels model : getNetModels()) {
-        map.put(model.getNickname(), model.getIpAddress()); // ან .getName()
+        Map<String, String> map = new LinkedHashMap<>();
+        for (NetModels model : getNetModels()) {
+            map.put(model.getNickname(), model.getIpAddress()); // ან .getName()
+        }
+        return map;
     }
-    return map;
-}
 
     @SuppressWarnings("unchecked")
     @PostConstruct
@@ -96,7 +98,7 @@ public class NetService {
                                 Object toVal = route.get("to");
                                 if (toVal != null &&
                                         ("default".equalsIgnoreCase(toVal.toString()) ||
-                                         "0.0.0.0/0".equals(toVal.toString()))) {
+                                                "0.0.0.0/0".equals(toVal.toString()))) {
                                     gateway = (String) route.get("via");
                                     break;
                                 }
@@ -125,7 +127,8 @@ public class NetService {
                             Object toVal = route.get("to");
                             if (toVal != null &&
                                     ("default".equalsIgnoreCase(toVal.toString()) ||
-                                     "0.0.0.0/0".equals(toVal.toString())) &&
+                                            "0.0.0.0/0".equals(toVal.toString()))
+                                    &&
                                     route.get("metric") != null) {
                                 metric = String.valueOf(route.get("metric"));
                                 break;
@@ -146,7 +149,8 @@ public class NetService {
                             status,
                             yamlFile.getName(),
                             nickname,
-                            metric);
+                            metric,
+                            getInterFaceSpeed(ifaceName));
 
                     result.add(model);
                 }
@@ -186,5 +190,23 @@ public class NetService {
             log.error("Failed to read interface status for {}", ifaceName, e);
         }
         return false;
+    }
+
+    private String getInterFaceSpeed(String iface) {
+        File speedFile = new File("/sys/class/net/" + iface + "/speed");
+        if (!speedFile.exists()) {
+            return "Unknown (no speed file)";
+        }
+
+        try (BufferedReader br = new BufferedReader(new FileReader(speedFile))) {
+            String line = br.readLine();
+            if (line != null && !line.trim().isEmpty()) {
+                return line.trim();
+            }
+        } catch (IOException e) {
+            return "Error reading speed: " + e.getMessage();
+        }
+
+        return "Unknown";
     }
 }
