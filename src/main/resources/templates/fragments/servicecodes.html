@@ -1,1 +1,32 @@
-AAAAAAAAAAAA
+<div class="code-action">
+    <button type="submit" class="code-act-btn" id="code-edit-btn-clone">
+        Edit
+    </button>
+</div>
+<div id="serice-codes-container">
+    <form action="/set-servicecodes">
+        <label for="code-clean">Room Status Clean</label>
+        <input type="text" name="code-clean" id="code-clean" th:value="${code.clean}">
+
+        <label for="code-dirty">Room Status Dirty</label>
+        <input type="text" name="code-dirty" id="code-dirty" th:value="${code.dirty}">
+
+        <label for="code-ofo">Room Status Out of Order</label>
+        <input type="text" name="code-ofo" id="code-ofo" th:value="${code.outOfOrder}">
+
+        <label for="code-ofs">Room Status Out of Service</label>
+        <input type="text" name="code-ofs" id="code-ofs" th:value="${code.outOfService}">
+
+        <label for="code-inspected">Room Status Inspected </label>
+        <input type="text" name="code-inspected" id="code-inspected" th:value="${code.inspected}">
+
+        <label for="code-alarm">Alarm</label>
+        <input type="text" name="code-alarm" id="code-alarm" th:value="${code.alarm}">
+
+        
+        <button type="submit" class="ser-btn" id="code-edit-btn" hidden>
+            SET
+        </button>
+    </form>
+</div>
+<script th:src="@{/scripts/servicecodes.js}"></script>
