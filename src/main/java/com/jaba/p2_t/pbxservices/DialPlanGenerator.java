@@ -23,6 +23,7 @@ public class DialPlanGenerator {
     private static final File FORWARDING_CONF = new File("/etc/asterisk/autoforwarding.conf");
     private static final File RECORD_CONF = new File("/etc/asterisk/permitrecording.conf");
     private static final File VOICE_FOLDER = new File("/etc/asterisk/voice_recorde.conf");
+    private static final File AIGI_DIAL = new File("/etc/asterisk/agi_dial.conf");
 
     @PostConstruct
     public void createDefaultContext() {
@@ -42,6 +43,8 @@ public class DialPlanGenerator {
                 RECORD_CONF.createNewFile();
             if (!VOICE_FOLDER.exists())
                 VOICE_FOLDER.mkdirs();
+            if (!AIGI_DIAL.exists())
+                AIGI_DIAL.createNewFile();    
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -68,6 +71,7 @@ public class DialPlanGenerator {
             writer.write("#include /etc/asterisk/voice_recorde.conf\n");
             writer.write("#include /etc/asterisk/ivr.conf\n");
             writer.write("#include /etc/asterisk/permitrecording.conf\n");
+            writer.write("#include /etc/asterisk/agi_dial.conf\n");
 
             writer.write("\n[default]\n");
             writer.write("exten => _X.,1,NoOp(Calling number: ${CALLERID(num)} → ${EXTEN})\n");
