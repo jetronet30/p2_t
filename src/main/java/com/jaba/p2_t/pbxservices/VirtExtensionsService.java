@@ -21,6 +21,7 @@ import com.jaba.p2_t.pbxrepos.PjsipAorRepositor;
 import com.jaba.p2_t.pbxrepos.PjsipAuthRepositor;
 import com.jaba.p2_t.pbxrepos.PjsipContactRepository;
 import com.jaba.p2_t.pbxrepos.PjsipEndpointRepositor;
+import com.jaba.p2_t.pms.RoomService;
 
 import lombok.RequiredArgsConstructor;
 
@@ -40,12 +41,14 @@ public class VirtExtensionsService {
     private final ExtenVirtualRepo extenVirtualRepo;
     private final PjsipContactRepository pjsipContactRepository;
 
+    private final RoomService roomService;
+
     public List<ExtenViModel> getVirtExts() {
         return extenVirtualRepo.findAll(Sort.by(Sort.Direction.ASC, "id"));
     }
 
     @Transactional
-    public void createVirtExtInRange(String start, String stop) {
+    public void createVirtExtInRange(String start, String stop, boolean isRoom) {
         int first, last;
         try {
             first = Integer.parseInt(start.trim());
@@ -79,9 +82,10 @@ public class VirtExtensionsService {
             vi.setVirContext("default");
             vi.setVirPass(sipSettings.getDefPassword());
             vi.setRecordPermit(false);
-            vi.setRoom(true);
+            vi.setRoom(isRoom);
             vi.setVoiceMessage(null);
             viModels.add(vi);
+            roomService.addRoom(id, isRoom);
 
             PjsipEndpoint ep = new PjsipEndpoint();
             ep.setId(id);
@@ -132,7 +136,7 @@ public class VirtExtensionsService {
     }
 
     @Transactional
-    public void createVirtExt(String extensionId) {
+    public void createVirtExt(String extensionId, boolean isRoom) {
 
         if (!pjsipEndpointRepositor.existsById(extensionId) &&
                 !pjsipAuthRepositor.existsById(extensionId) &&
@@ -148,6 +152,7 @@ public class VirtExtensionsService {
             viModel.setRoom(false);
             viModel.setVoiceMessage(null);
             viModel.setRecordPermit(false);
+            viModel.setRoom(isRoom);
 
             PjsipEndpoint endpoint = new PjsipEndpoint();
             endpoint.setId(extensionId);
@@ -177,6 +182,7 @@ public class VirtExtensionsService {
             pjsipEndpointRepositor.save(endpoint);
             pjsipAuthRepositor.save(auth);
             pjsipAorRepositor.save(aor);
+            roomService.addRoom(extensionId, isRoom);
             writeAutoForvarding();
             writeRecordPermit();
         }
@@ -184,7 +190,7 @@ public class VirtExtensionsService {
 
     @Transactional
     public Map<String, Object> updateVirtExt(String extensionId, String displayName, String virPass,
-            int outPermit, boolean recordpermit, String rezerve_1, String rezerve_2) {
+            int outPermit, boolean recordpermit,boolean isRoom ,String rezerve_1, String rezerve_2) {
         Map<String, Object> result = new HashMap<>();
 
         Optional<ExtenViModel> viModelOpt = extenVirtualRepo.findById(extensionId);
@@ -205,6 +211,7 @@ public class VirtExtensionsService {
         viModel.setRezerve1(rezerve_1);
         viModel.setRezerve2(rezerve_2);
         viModel.setRecordPermit(recordpermit);
+        viModel.setRoom(isRoom);
 
         PjsipEndpoint endpoint = endpointOpt.get();
         endpoint.setAorsId(extensionId);
@@ -228,6 +235,7 @@ public class VirtExtensionsService {
         extenVirtualRepo.save(viModel);
         pjsipEndpointRepositor.save(endpoint);
         pjsipAuthRepositor.save(auth);
+        roomService.addRoom(extensionId, isRoom);
 
         writeAutoForvarding();
         writeoutPermit();
@@ -270,6 +278,7 @@ public class VirtExtensionsService {
             return result;
         }
 
+        roomService.deleteRoom(extensionId);
         result.put("success", true);
         result.put("deletedCount", deletedCount);
         writeAutoForvarding();

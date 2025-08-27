@@ -36,14 +36,14 @@ public class AgiCreator {
                 CALLERID=$3
 
                 # ლოკალური PMS
-                LOCAL_URL="http://127.0.0.1:%d/pms/roomstatus?room=${ROOM}&status=${STATUS}&src=${CALLERID}"
+                LOCAL_URL="http://127.0.0.1:%d/roomstatus?room=${ROOM}&status=${STATUS}&src=${CALLERID}"
 
                 # დაშორებული PMS
-                REMOTE_URL="http://%s:%s/pms/roomstatus?room=${ROOM}&status=${STATUS}&src=${CALLERID}"
+                # REMOTE_URL="http://%s:%s/pms/roomstatus?room=${ROOM}&status=${STATUS}&src=${CALLERID}"
 
                 # გაგზავნა ორივე სერვერზე
                 curl -s -X POST "$LOCAL_URL"
-                curl -s -X POST "$REMOTE_URL"
+                # curl -s -X POST "$REMOTE_URL"
 
                 echo "SET VARIABLE AGI_RESULT SUCCESS"
                 """, serverSettings.getPort(), "192.168.23.23", 8080);

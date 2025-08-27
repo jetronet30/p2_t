@@ -28,11 +28,13 @@ public class ExtCon {
 
     @PostMapping("/ext-add")
     public String addExt(Model model,
-            @RequestParam("exten") String exten, @RequestParam("exten-end") String extenEnd) {
+            @RequestParam("exten") String exten, 
+            @RequestParam("exten-end") String extenEnd,
+            @RequestParam(name = "isRoom", defaultValue = "false")boolean isRoom) {
         if (extenEnd != null && !extenEnd.isEmpty() && exten != null && !exten.isEmpty()) {
-            virtExtensionsService.createVirtExtInRange(exten, extenEnd);
+            virtExtensionsService.createVirtExtInRange(exten, extenEnd, isRoom);
         } else if (exten != null && !exten.isEmpty()) {
-            virtExtensionsService.createVirtExt(exten);
+            virtExtensionsService.createVirtExt(exten, isRoom);
         }
         model.addAttribute("extensions", virtExtensionsService.getVirtExts());
         return "fragments/extensions";
@@ -47,8 +49,9 @@ public class ExtCon {
             @RequestParam("callerId") String callerId,
             @RequestParam("rezerve1")String rezerve1,
             @RequestParam("rezerve2")String rezerve2,
-            @RequestParam(name = "recordPermit", defaultValue = "false")boolean recordpermit) {
-        return virtExtensionsService.updateVirtExt(id,callerId,password,permit,recordpermit,rezerve1,rezerve2);
+            @RequestParam(name = "recordPermit", defaultValue = "false")boolean recordpermit,
+            @RequestParam(name = "isRoom", defaultValue = "false")boolean isRoom) {
+        return virtExtensionsService.updateVirtExt(id, callerId, password, permit, recordpermit, isRoom, rezerve1, rezerve2);
     }
 
     @ResponseBody
