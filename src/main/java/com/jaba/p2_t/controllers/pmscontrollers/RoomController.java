@@ -10,10 +10,17 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/pms")
 public class RoomController {
 
+    @PostMapping("/rooms")
+    public String postRooms() {
+        return "fragments/rooms";
+    }
+
     @PostMapping("/roomstatus")
     public String testPost(@RequestParam String room, @RequestParam String status) {
         System.out.println(room+"  test  "+status);
         return "test";
     }
+
+
 
 }
