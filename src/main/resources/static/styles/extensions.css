@@ -159,3 +159,7 @@
     font-family: 'Courier New', monospace;
     text-decoration: none;
 }
+
+#isRoomLabel {
+    color: #ffffff;
+}

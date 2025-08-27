@@ -2,15 +2,23 @@ package com.jaba.p2_t.controllers.pmscontrollers;
 
 
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import com.jaba.p2_t.pbxservices.VirtExtensionsService;
+
+import lombok.RequiredArgsConstructor;
+
 
 @Controller
+@RequiredArgsConstructor
 public class RoomController {
+    private final VirtExtensionsService virtExtensionsService;
 
     @PostMapping("/rooms")
-    public String postRooms() {
+    public String postRooms(Model m) {
+        m.addAttribute("extensions",virtExtensionsService.getVirtExts());
         return "fragments/rooms";
     }
 

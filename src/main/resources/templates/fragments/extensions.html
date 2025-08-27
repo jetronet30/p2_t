@@ -9,6 +9,10 @@
         <input type="text" name="exten" placeholder="exten">
         <input type="text" name="exten-end" placeholder="exten-end">
         <button type="submit" class="action-btn" id="ext-add-btn">Add</button>
+        <label id="isRoomLabel">
+            <input type="checkbox" name="isRoom" >
+            Room
+        </label>
         <label id="program-alert" style="color: rgb(251, 255, 0); font-size: 18px;" hidden>&#x26A0;</label>
     </form>
 
@@ -33,6 +37,10 @@
         <label>
             <input type="checkbox" name="recordPermit" th:checked="${ext.recordPermit}">
             Record
+        </label>
+        <label>
+            <input type="checkbox" name="isRoom" th:checked="${ext.isRoom}">
+            Room
         </label>
         <input type="text" name="rezerve1" th:value="${ext.rezerve1}" placeholder="Reserve 1">
         <input type="text" name="rezerve2" th:value="${ext.rezerve2}" placeholder="Reserve 2">

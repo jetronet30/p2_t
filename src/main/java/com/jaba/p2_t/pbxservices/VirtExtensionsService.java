@@ -79,7 +79,7 @@ public class VirtExtensionsService {
             vi.setVirContext("default");
             vi.setVirPass(sipSettings.getDefPassword());
             vi.setRecordPermit(false);
-            vi.setRoom(false);
+            vi.setRoom(true);
             vi.setVoiceMessage(null);
             viModels.add(vi);
 

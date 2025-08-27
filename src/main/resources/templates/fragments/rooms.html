@@ -1,2 +1,12 @@
-AAAAAAAAAAAAAAAAAAAAAAAAAAA
-AAAAAAAAAAAAAAAAA
+
+
+
+<div th:each="room : ${extensions}" class="ext-form">
+
+    <form class="exten-form" method="post">
+        <input type="text" name="exten_id" th:value="${room.id}" readonly>
+        <input type="text" name="exten" th:value="${room.id}" hidden>
+        <input type="text" name="callerId" th:value="${room.displayName}">
+    </form>
+</div>
+<script th:src="@{/scripts/rooms.js}"></script>
