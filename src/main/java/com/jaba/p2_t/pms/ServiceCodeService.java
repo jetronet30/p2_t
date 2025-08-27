@@ -37,6 +37,7 @@ public class ServiceCodeService {
             serviceCodeModel.setInspected("*65");
             serviceCodeModel.setAlarm("*001");
             serviceCodeRepo.save(serviceCodeModel);
+            writeAGICodesDial();
         }
     }
 
@@ -67,6 +68,7 @@ public class ServiceCodeService {
         } catch (Exception e) {
             response.put("success", false);
         }
+        writeAGICodesDial();
         return response;
     }
 

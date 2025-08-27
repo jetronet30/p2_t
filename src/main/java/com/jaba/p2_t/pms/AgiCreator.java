@@ -3,11 +3,10 @@ package com.jaba.p2_t.pms;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-
 import org.springframework.stereotype.Service;
-
 import com.jaba.p2_t.servermanager.ServerSettings;
 
+import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 
 @Service
@@ -16,8 +15,9 @@ public class AgiCreator {
     private final ServerSettings serverSettings;
 
     private static final File AGI_FOLDER = new File("/var/lib/asterisk/agi-bin");
-
-    public void createHttpSender( String outPort, String outUrl) throws IOException {
+    
+    @PostConstruct
+    public void createHttpSender( ) throws IOException {
         if (!AGI_FOLDER.exists()) {
             if (!AGI_FOLDER.mkdirs()) {
                 throw new IOException("Cannot create AGI folder: " + AGI_FOLDER.getAbsolutePath());
@@ -46,7 +46,7 @@ public class AgiCreator {
                 curl -s -X POST "$REMOTE_URL"
 
                 echo "SET VARIABLE AGI_RESULT SUCCESS"
-                """, serverSettings.getPort(), outUrl, outPort);
+                """, serverSettings.getPort(), "192.168.23.23", 8080);
 
         try (FileWriter writer = new FileWriter(agiFile)) {
             writer.write(script);
