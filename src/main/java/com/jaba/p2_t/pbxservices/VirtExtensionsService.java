@@ -190,7 +190,7 @@ public class VirtExtensionsService {
 
     @Transactional
     public Map<String, Object> updateVirtExt(String extensionId, String displayName, String virPass,
-            int outPermit, boolean recordpermit,boolean isRoom ,String rezerve_1, String rezerve_2) {
+            int outPermit, boolean recordpermit, boolean isRoom, String rezerve_1, String rezerve_2) {
         Map<String, Object> result = new HashMap<>();
 
         Optional<ExtenViModel> viModelOpt = extenVirtualRepo.findById(extensionId);
@@ -235,7 +235,7 @@ public class VirtExtensionsService {
         extenVirtualRepo.save(viModel);
         pjsipEndpointRepositor.save(endpoint);
         pjsipAuthRepositor.save(auth);
-        roomService.addRoom(extensionId, isRoom);
+        roomService.editName(extensionId, displayName);
 
         writeAutoForvarding();
         writeoutPermit();

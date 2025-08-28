@@ -1,11 +1,10 @@
 
-<div th:each="room : ${extensions}" class="ext-form" 
+<div th:each="room : ${extensions}" class="room-div" 
      th:attr="data-status=${room.status}">
-    <form class="exten-form" method="post">
-        <input type="text" name="exten_id" th:value="${room.id}" readonly>
-        <input type="text" name="exten" th:value="${room.id}" hidden>
-        <input type="text" name="callerId" th:value="${room.name}">
-        <input type="text" name="callerId" th:value="${room.status}" readonly class="status-field">
+    <form class="room-form" method="post">
+        <input type="text" name="room_id" th:value="${room.id}" readonly>
+        <input type="text" name="roomName" th:value="${room.name}">
+        <input type="text" name="status" th:value="${room.status}" readonly class="status-field">
     </form>
 </div>
 
