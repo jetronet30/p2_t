@@ -141,3 +141,22 @@ main {
     font-size: 1rem;
     color: var(--gray-dark);
 }
+
+.logout-btn {
+    background: var(--blue-light);
+    border: none;
+    color: var(--blue-main);
+    padding: 0.5rem 1rem;
+    margin-bottom: 0.3rem;
+    border-radius: 4px;
+    font-weight: 600;
+    cursor: pointer;
+    width: 100%;
+    text-align: left;
+    transition: background 0.3s ease;
+}
+
+.logout-btn:hover {
+    background: #d41515;
+    color: #ffcc00;
+}

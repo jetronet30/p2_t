@@ -60,7 +60,7 @@
       </div>
     </div>
 
-     <div class="dropdown">
+    <div class="dropdown">
       <button class="menu-button" onclick="toggleMenu(this)">PMS &#x25BE;</button>
       <div class="submenu">
         <button class="submenu-button" onclick="loadContent('/servicecodes', this)">Service codes</button>
@@ -85,13 +85,18 @@
         <button class="submenu-button" onclick="loadContent('/systemsounds', this)">System Sounds</button>
       </div>
     </div>
+
+    <form th:action="@{/logout}" method="post">
+      <button type="submit" class="logout-btn" >Logout</button>
+    </form>
+
   </aside>
 
   <main id="main-content">
-    
+
   </main>
   <script th:src="@{/scripts/main.js}"></script>
-  
+
 </body>
 
 </html>

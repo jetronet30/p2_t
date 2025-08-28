@@ -36,7 +36,6 @@ public class RoomService {
     }
 
     public void setStatus(String id, String status) {
-        System.out.println("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA");
         RoomModel rModel = roomRepo.getReferenceById(id);
         switch (status) {
             case "clean":
