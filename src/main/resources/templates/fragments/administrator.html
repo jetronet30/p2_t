@@ -1,0 +1,9 @@
+<div  class="admin-div">
+    <form class="admin-edit-form" method="post" action="/editadmin" >
+        <input type="text" name="username" th:value="${admin.userName}" readonly>
+        <input type="password" name="userpassword" value="">
+        <input type="password" name="repassword" value="">
+        <button type="submit" class="admin-edit-btn" id="admin-edit-btn">Change</button>
+    </form>
+</div>
+<script th:src="@{/scripts/administrator.js}"></script>

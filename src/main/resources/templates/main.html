@@ -23,6 +23,7 @@
   <link rel="stylesheet" th:href="@{/styles/moh.css}">
   <link rel="stylesheet" th:href="@{/styles/servicecodes.css}">
   <link rel="stylesheet" th:href="@{/styles/rooms.css}">
+  <link rel="stylesheet" th:href="@{/styles/administrator.css}">
   <link rel="icon" type="image/x-icon" th:href="@{/images/icon.png}" />
 </head>
 
@@ -69,20 +70,20 @@
     </div>
 
     <div class="dropdown">
-      <button class="menu-button" onclick="toggleMenu(this)">Admin &#x25BE;</button>
-      <div class="submenu">
-        <button class="submenu-button" onclick="loadContent('/administrator', this)">Administrato</button>
-        <button class="submenu-button" onclick="loadContent('/systemupdates', this)">System Updates</button>
-        <button class="submenu-button" onclick="loadContent('/modules', this)">Modules</button>
-      </div>
-    </div>
-
-    <div class="dropdown">
       <button class="menu-button" onclick="toggleMenu(this)">Settings &#x25BE;</button>
       <div class="submenu">
         <button class="submenu-button" onclick="loadContent('/serversettings', this)">Server Settings</button>
         <button class="submenu-button" onclick="loadContent('/networksettings', this)">Network Settings</button>
         <button class="submenu-button" onclick="loadContent('/systemsounds', this)">System Sounds</button>
+      </div>
+    </div>
+
+     <div class="dropdown">
+      <button class="menu-button" onclick="toggleMenu(this)">Admin &#x25BE;</button>
+      <div class="submenu">
+        <button class="submenu-button" onclick="loadContent('/administrator', this)">Administrato</button>
+        <button class="submenu-button" onclick="loadContent('/systemupdates', this)">System Updates</button>
+        <button class="submenu-button" onclick="loadContent('/modules', this)">Modules</button>
       </div>
     </div>
 

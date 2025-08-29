@@ -1,0 +1,57 @@
+.admin-div {
+    padding: 4px;
+    background-color: #f7f7f7;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    margin: 5px 0;
+    width: 100%;
+}
+
+.admin-edit-form {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+    width: 100%;
+}
+
+.admin-edit-form:hover {
+    box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+}
+
+.admin-edit-form input[type="text"],
+.admin-edit-form input[type="password"] {
+    height: 22px;
+    padding: 2px 6px;
+    font-size: 0.85rem;
+    text-align: center;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    background-color: #fff;
+    color: #020202;
+    width: 18ch;
+}
+
+.admin-edit-form input:focus {
+    border-color: #007acc;
+    outline: none;
+    box-shadow: 0 0 3px rgba(0, 122, 204, 0.4);
+}
+
+.admin-edit-btn {
+    height: 24px;
+    padding: 0 12px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background 0.2s ease;
+    background-color: #007acc;
+    color: white;
+}
+
+.admin-edit-btn:hover {
+    background-color: #005fa3;
+}

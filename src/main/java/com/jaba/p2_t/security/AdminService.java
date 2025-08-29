@@ -2,11 +2,10 @@ package com.jaba.p2_t.security;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import com.jaba.p2_t.servermanager.SerManger;
-
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 
@@ -33,19 +32,46 @@ public class AdminService {
                 .orElseThrow(() -> new RuntimeException("Admin not found"));
     }
 
-    public Map<String, Object> editAdmin(String userName, String userPassword) {
-        Map<String, Object> respons = new HashMap<>();
-        if (adminRepo.existsById((long) 1)) {
-            AdminModel admin = adminRepo.getReferenceById((long) 1);
-            admin.setUserName(userName);
-            admin.setUserPassword(passwordEncoder.encode(userPassword));
-            adminRepo.save(admin);
-            respons.put("success", true);
-            SerManger.reboot();
-        } else {
-            respons.put("success", false);
-        }
-        return respons;
+    public Map<String, Object> editAdmin(String userName, String userPassword, String rePassword) {
+    Map<String, Object> response = new HashMap<>();
+
+    // --- Input validation ---
+    if (userName == null || userName.trim().isEmpty()) {
+        response.put("success", false);
+        response.put("message", "Username cannot be empty");
+        return response;
     }
+
+    if (userPassword == null || rePassword == null || !userPassword.equals(rePassword)) {
+        response.put("success", false);
+        response.put("message", "Passwords do not match");
+        return response;
+    }
+
+    if (userPassword.length() < 4) {
+        response.put("success", false);
+        response.put("message", "Password must be at least 8 characters");
+        return response;
+    }
+
+    // --- Find Admin safely ---
+    Optional<AdminModel> optionalAdmin = adminRepo.findById(1L);
+    if (optionalAdmin.isEmpty()) {
+        response.put("success", false);
+        response.put("message", "Admin user not found");
+        return response;
+    }
+
+    // --- Update securely ---
+    AdminModel admin = optionalAdmin.get();
+    admin.setUserName(userName.trim());
+    admin.setUserPassword(passwordEncoder.encode(userPassword));
+    adminRepo.save(admin);
+
+    response.put("success", true);
+    response.put("message", "Admin updated successfully");
+    return response;
+}
+
 
 }
