@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Asterisk CLI Live</title>
+<style>
+body { 
+  background: #000; 
+  color: #0f0; 
+  font-family: monospace; 
+  margin: 0; 
+  padding: 10px;
+}
+#log { 
+  white-space: pre-wrap; 
+  font-size: 14px;
+  max-height: 90vh;
+  overflow-y: auto;
+}
+</style>
+</head>
+<body>
+<h2>Asterisk CLI Live (Real-Time)</h2>
+<pre id="log"></pre>
+
+<!-- ჩართვა ცალკე terminal.js ფაილიდან -->
+<script type="module" th:src="@{/scripts/terminal.js}"></script>
+</body>
+</html>

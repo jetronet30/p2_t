@@ -50,7 +50,7 @@ public class AdminService {
 
     if (userPassword.length() < 4) {
         response.put("success", false);
-        response.put("message", "Password must be at least 8 characters");
+        response.put("message", "Password must be at least 4 characters");
         return response;
     }
 
