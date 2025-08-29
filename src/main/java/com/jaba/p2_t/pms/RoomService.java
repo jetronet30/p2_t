@@ -27,8 +27,15 @@ public class RoomService {
 
     
 
-    public void editName(String id , String name){
-        if (roomRepo.existsById(id) ) {
+    public void addOrEditName(String id , String name, boolean isRoom) {
+        if (!isRoom) return;
+        if (!roomRepo.existsById(id)) {
+            RoomModel rModel = new RoomModel();
+            rModel.setId(id);
+            rModel.setName(name);
+            rModel.setStatus("dirty");
+            roomRepo.save(rModel);
+        }else {
             RoomModel rModel = roomRepo.getReferenceById(id);
             rModel.setName(name);
             roomRepo.save(rModel);

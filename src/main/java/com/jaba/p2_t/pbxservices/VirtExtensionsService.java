@@ -235,7 +235,7 @@ public class VirtExtensionsService {
         extenVirtualRepo.save(viModel);
         pjsipEndpointRepositor.save(endpoint);
         pjsipAuthRepositor.save(auth);
-        roomService.editName(extensionId, displayName);
+        roomService.addOrEditName(extensionId, displayName, isRoom);
 
         writeAutoForvarding();
         writeoutPermit();
