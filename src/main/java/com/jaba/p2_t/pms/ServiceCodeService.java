@@ -9,6 +9,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.jaba.p2_t.asteriskmanager.AsteriskManager;
 import com.jaba.p2_t.models.ServiceCodeModel;
@@ -71,7 +72,7 @@ public class ServiceCodeService {
         writeAGICodesDial();
         return response;
     }
-
+    @Transactional
     public void writeAGICodesDial() {
         if (AGI_DIAL.exists())
             AGI_DIAL.delete();
