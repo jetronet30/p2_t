@@ -1,0 +1,26 @@
+sudo systemctl stop asterisk
+sudo apt remove --purge asterisk asterisk-core-sounds-* asterisk-moh-opsound-* -y
+sudo apt autoremove -y
+
+
+sudo rm -rf /etc/asterisk
+sudo rm -rf /var/lib/asterisk
+sudo rm -rf /var/log/asterisk
+sudo rm -rf /var/spool/asterisk
+sudo rm -rf /usr/lib/asterisk
+
+
+
+cd /usr/src/asterisk*
+sudo make uninstall
+
+
+
+sudo systemctl stop asterisk
+sudo rm -f /usr/sbin/asterisk
+sudo rm -rf /usr/lib/asterisk
+sudo rm -rf /usr/include/asterisk
+sudo rm -rf /var/lib/asterisk
+sudo rm -rf /var/log/asterisk
+sudo rm -rf /var/spool/asterisk
+sudo rm -rf /etc/asterisk
