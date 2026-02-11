@@ -10,6 +10,13 @@ make
 contrib/scripts/get_mp3_source.sh
 make install
 make samples
+
+
+mkdir /etc/asterisk/samples
+mv /etc/asterisk/*.* /etc/asterisk/samples/
+make basic-pbxcd 
+
+
 make config
 systemctl enable asterisk
 systemctl start asterisk
@@ -19,3 +26,8 @@ systemctl status asterisk
 sudo apt install odbc-postgresql               დრაივერი  აუცილებელია!!!!!!!!!!!!!!!!!  postgres
 
 sudo apt install unixodbc unixodbc-dev odbc-mariadb     დრაივერი  აუცილებელია!!!!!!!!!!!!!!!!!   mariadb
+
+
+module reload res_pjsip
+
+realtime load ps_endpoints id 2003

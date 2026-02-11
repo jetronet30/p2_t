@@ -11,7 +11,8 @@ sudo rm -rf /usr/lib/asterisk
 
 
 
-cd /usr/src/asterisk*
+cd asterisk-20.18.2
+
 sudo make uninstall
 
 
