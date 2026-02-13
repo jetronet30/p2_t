@@ -36,7 +36,7 @@ public class AgiCreator {
                 CALLERID=$3
 
                 # ლოკალური PMS
-                LOCAL_URL="http://127.0.0.1:%d/roomstatus?room=${ROOM}&status=${STATUS}&src=${CALLERID}"
+                LOCAL_URL="https://127.0.0.1:%d/roomstatus?room=${ROOM}&status=${STATUS}&src=${CALLERID}"
 
                 # დაშორებული PMS
                 # REMOTE_URL="http://%s:%s/pms/roomstatus?room=${ROOM}&status=${STATUS}&src=${CALLERID}"
