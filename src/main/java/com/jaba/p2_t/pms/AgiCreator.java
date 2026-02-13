@@ -42,7 +42,7 @@ public class AgiCreator {
                 # REMOTE_URL="http://%s:%s/pms/roomstatus?room=${ROOM}&status=${STATUS}&src=${CALLERID}"
 
                 # გაგზავნა ორივე სერვერზე
-                curl -s -X POST "$LOCAL_URL"
+                curl -k -X POST "$LOCAL_URL"
                 # curl -s -X POST "$REMOTE_URL"
 
                 echo "SET VARIABLE AGI_RESULT SUCCESS"
